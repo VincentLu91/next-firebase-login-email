@@ -11,11 +11,13 @@ import getBlobDuration from "get-blob-duration";
 import summarize_config from "../pages/api/summarize_config";
 import translate_config from "../pages/api/translate_config";
 import axios from "axios";
+import { useRouter } from "next/router";
 import Select from "react-select";
 
 import audioPlayerStyles from "../styles/audioPlayerStyles";
 
 function AudioPlayer() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const sound = useSelector((state) => state.recordingReducer.sound);
   const [percentage, setPercentage] = useState(0);
