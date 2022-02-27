@@ -149,6 +149,9 @@ const ManageSubscriptions = () => {
   };
   return (
     <div>
+      <button onClick={() => router.push("/dashboard")}>
+        Back to Dashboard
+      </button>
       <h1>ManageSubscriptions</h1>
       {loading && (
         <div>

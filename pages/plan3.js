@@ -65,6 +65,9 @@ const Plan3 = (props) => {
 
   return (
     <>
+      <button onClick={() => router.push("/dashboard")}>
+        Back to Dashboard
+      </button>
       {["plan3"].includes(subscription.role) && (
         <div>You are in plan3 subscription and thus, viewing Plan3 content</div>
       )}

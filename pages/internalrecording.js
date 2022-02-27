@@ -310,6 +310,9 @@ const InternalRecording = () => {
         alignItems: "center",
       }}
     >
+      <button onClick={() => router.push("/dashboard")}>
+        Back to Dashboard
+      </button>
       {renderView()}
       <style jsx>{signInStyles}</style>
     </div>

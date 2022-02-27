@@ -99,6 +99,9 @@ const Library = () => {
 
   return (
     <div className="title">
+      <button onClick={() => router.push("/dashboard")}>
+        Back to Dashboard
+      </button>
       <h2>List of recordings and transcriptions</h2>
       <ul className="no-bullet">
         {cloudRecordingList.map(function (item) {

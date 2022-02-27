@@ -183,6 +183,9 @@ function AudioPlayer() {
 
   return (
     <div>
+      <button onClick={() => router.push("/dashboard")}>
+        Back to Dashboard
+      </button>
       <div className="audioplayer-body">
         <div className="audioplayer-container">
           <h1 className="h1-center-bold">Audio Player</h1>

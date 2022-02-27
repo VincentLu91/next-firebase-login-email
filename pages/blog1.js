@@ -66,6 +66,9 @@ const BlogPage = (props) => {
 
   return (
     <>
+      <button onClick={() => router.push("/dashboard")}>
+        Back to Dashboard
+      </button>
       {["plan2", "plan3", "plan4"].includes(subscription.role) && (
         <div>This is blog one</div>
       )}
