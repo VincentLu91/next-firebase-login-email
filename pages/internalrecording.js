@@ -260,10 +260,9 @@ const InternalRecording = () => {
       if (isTranscribing) {
         return (
           <div className="title">
-            <p>{status}</p>
+            {/*<p>{status}</p>*/}
             <button onClick={stopRecordingAudio}>Stop Recording</button>
             {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
-            <video src={mediaBlobUrl} controls />
             <h1>Transcript below</h1>
             <p>{transcript}</p>
           </div>
@@ -271,10 +270,9 @@ const InternalRecording = () => {
       } else {
         return (
           <div className="title">
-            <p>{status}</p>
+            {/*<p>{status}</p>*/}
             <button onClick={startRecordingAudio}>Start Recording</button>
             {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
-            <video src={mediaBlobUrl} controls />
             <h1>Transcript below</h1>
             <p>{transcript}</p>
           </div>
