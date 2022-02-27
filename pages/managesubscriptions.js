@@ -17,9 +17,8 @@ import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { setSound } from "../redux/recording/actions";
 import dashboardStyles from "../styles/dashboardStyles";
-import Image from "next/image";
 
-const Dashboard = () => {
+const ManageSubscriptions = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.currentUser);
@@ -133,6 +132,7 @@ const Dashboard = () => {
     await checkAuth(currentUser);
     setLoading(false);
     window.location.reload(true); // workaround for screen refresh
+    //router.push("/dashboard");
   };
 
   const cancelPlan = async (currentSubscriptionId) => {
@@ -145,44 +145,57 @@ const Dashboard = () => {
     await checkAuth(currentUser);
     setLoading(false);
     window.location.reload(true);
+    //router.push("/dashboard");
   };
-
   return (
-    <div className="center">
-      <h1 className="title">Welcome home</h1>
-      <p>
-        <button
-          className="logout"
-          onClick={() => {
-            signOut(auth);
-            //dispatch(setSound(null));
-            dispatch({ type: "SIGNED_OUT" });
-          }}
-        >
-          Sign out
-        </button>
-        <button onClick={() => router.push("/blog1")}>Go to Blog1</button>
-        <br />
-        <button onClick={() => router.push("/plan1")}>Go to Plan1</button>
-        <button onClick={() => router.push("/plan2")}>Go to Plan2</button>
-        <br />
-        <button onClick={() => router.push("/plan3")}>Go to Plan3</button>
-        <button onClick={() => router.push("/plan4")}>Go to Plan4</button>
-        <br />
-        <button onClick={() => router.push("/audioplayer")}>AudioPlayer</button>
-        <button onClick={() => router.push("/managesubscriptions")}>
-          Manage Subscriptions
-        </button>
-        <br />
-        <button onClick={() => router.push("/internalrecording")}>
-          InternalRecording (which works on audio recording too)
-        </button>
-        <button onClick={() => router.push("/library")}>Library</button>
-      </p>
-
-      <style jsx>{dashboardStyles}</style>
+    <div>
+      <h1>ManageSubscriptions</h1>
+      {loading && (
+        <div>
+          <h3>Updating Subscriptions...</h3>
+        </div>
+      )}
+      <div className="plans-container">
+        {Object.entries(products).map(([productId, productData]) => {
+          const isCurrentPlan = productData?.name
+            ?.toLowerCase()
+            .includes(subscription?.role);
+          return (
+            <div className="plans" key={productId}>
+              <div>
+                {productData.name} - {productData.description}
+              </div>
+              <button
+                className={isCurrentPlan && "subscribed" ? "subscribed" : null}
+                disabled={isCurrentPlan}
+                onClick={() =>
+                  subscription?.role
+                    ? isCurrentPlan
+                      ? undefined
+                      : switchPlan(
+                          subscription.subscriptionId,
+                          productData.prices.priceId
+                        )
+                    : checkOut(productData.prices.priceId)
+                }
+              >
+                {subscription?.role
+                  ? isCurrentPlan
+                    ? "Subscribed"
+                    : "Switch Plan"
+                  : "Buy Plan"}
+              </button>
+              {isCurrentPlan && (
+                <button onClick={() => cancelPlan(subscription.subscriptionId)}>
+                  Cancel
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default ManageSubscriptions;
