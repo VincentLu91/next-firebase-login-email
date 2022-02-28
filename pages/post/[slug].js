@@ -14,16 +14,26 @@ export const Post = ({ title, body, image }) => {
       dataset: "production",
     });
 
-    setImageUrl(imgBuilder.image(image));
+    setImageUrl(imgBuilder.image(image).url());
   }, [image]);
 
   const url = image[0]?.url;
   return (
     <div>
       <Toolbar />
-      <div className={styles.main}>
+      <div className={styles.unset_img}>
         <h1>{title}</h1>
-        {imageUrl && <img className={styles.mainImage} src={imageUrl} />}
+        {imageUrl && (
+          <Image
+            className={styles.mainImage}
+            src={imageUrl}
+            alt="main image"
+            width="100%"
+            height="100%"
+            layout="responsive"
+            objectFit="contain"
+          />
+        )}
 
         <div className={styles.body}>
           <BlockContent blocks={body} />

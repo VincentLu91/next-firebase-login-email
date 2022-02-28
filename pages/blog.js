@@ -21,7 +21,7 @@ export default function Home({ posts }) {
         posts.map((p) => {
           return {
             ...p,
-            mainImage: imgBuilder.image(p.mainImage).width(500).height(250),
+            mainImage: imgBuilder.image(p.mainImage).url(),
           };
         })
       );
@@ -49,18 +49,14 @@ export default function Home({ posts }) {
                 >
                   {console.log("test", p)}
                   <h3>{p.title}</h3>
-                  <img
-                    className={styles.mainImage}
-                    src={p.mainImage}
-                    alt="main image"
-                  />
-                  {/*<Image
+                  <Image
                     //loader={myLoader}
                     src={p.mainImage}
                     alt="main image"
                     width={500}
-                    height={500}
-                  />*/}
+                    height={300}
+                    //layout="fill"
+                  />
                 </div>
               ))
               .reverse() // this is to display the most recent post at the top. This fnc wasn't needed in the tutorial.
