@@ -20,7 +20,7 @@ export default css.global`
   .audioplayer-container {
     width: 600px;
     padding: 0 10px;
-    background-color: #272727;
+    background-color: #8a2be2; /*originally #272727*/
     padding: 30px 50px;
     border-radius: 10px;
     box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.479);
