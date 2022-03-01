@@ -87,4 +87,5 @@ footer {
 
 .footerstyle {
   flex-direction: column;
+  margin-top: 60px;
 }
