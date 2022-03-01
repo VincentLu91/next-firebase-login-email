@@ -211,6 +211,7 @@ function AudioPlayer() {
       </div>
       {isAudioSelected ? (
         <>
+          <h1 className="h1-center-bold">{sound.fileName}</h1>
           <h1 className="h1-center-bold">Transcript:</h1>
           <h1 className="h1-center-bold">{sound.transcript}</h1>
         </>
