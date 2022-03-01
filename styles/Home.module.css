@@ -4,7 +4,7 @@
 
 .main {
   min-height: 100vh;
-  padding: 4rem 0;
+  /*padding: 4rem 0;*/
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -43,6 +43,7 @@
   margin: 0;
   line-height: 1.15;
   font-size: 4rem;
+  color: white;
 }
 
 .title,
@@ -54,6 +55,7 @@
   margin: 4rem 0;
   line-height: 1.5;
   font-size: 1.5rem;
+  color: white;
 }
 
 .code {
@@ -142,4 +144,14 @@
 .post:hover .mainImage {
   width: 490px;
   transition: 0.2s;
+}
+
+.hero-image {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("placeholder.png");
+  height: 50%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
 }

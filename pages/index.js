@@ -16,15 +16,19 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>Let AI Recreate Communication For You</h1>
+        <div className={styles["hero-image"]}>
+          <h1 className={styles.title}>
+            Let AI Recreate Communication For You
+          </h1>
 
-        {/*<h2>
+          {/*<h2>
           <Link href="/signin">Sign in</Link>
         </h2>*/}
 
-        <p className={styles.description}>
-          So you won&apos;t lose sight of important information
-        </p>
+          <p className={styles.description}>
+            So you won&apos;t lose sight of important information
+          </p>
+        </div>
 
         <h2>Ever forgotten what you have to do for your shopping list?</h2>
         <h2>
