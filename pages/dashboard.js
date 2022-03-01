@@ -33,6 +33,7 @@ const Dashboard = () => {
             signOut(auth);
             //dispatch(setSound(null));
             dispatch({ type: "SIGNED_OUT" });
+            router.push("/signin");
           }}
         >
           Sign out
