@@ -51,7 +51,7 @@ const Dashboard = () => {
         </button>
         <br />
         <button onClick={() => router.push("/internalrecording")}>
-          InternalRecording (which works on audio recording too)
+          Recording
         </button>
         <button onClick={() => router.push("/library")}>Library</button>
       </p>
