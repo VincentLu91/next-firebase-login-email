@@ -84,3 +84,7 @@ footer {
 .register {
   color: rgb(100, 128, 0);
 }
+
+.footerstyle {
+  flex-direction: column;
+}
