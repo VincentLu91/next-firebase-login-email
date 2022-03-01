@@ -18,10 +18,10 @@ a {
 
 /* additional styles for buttons */
 button {
-  background: #2ecc71;
+  background: #2e8dcc;
   padding: 1rem 4rem;
   border-radius: 6px;
-  font-size: 18px;
+  font-size: 14px;
   text-transform: uppercase;
   flex-shrink: 0;
   outline: none;
