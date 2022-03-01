@@ -47,13 +47,13 @@ export default function Home() {
             <a className="register">Today</a>
           </Link>
         </h2>
-
+        <br />
         <div className="landing-page-container">
           <div className="vertical-align-image-left">
             <Image src="/random.png" alt="" width={300} height={400} />
           </div>
           <div className="vertical-align-text">
-            <h1>Paris is one of the most beautiful cities in France.</h1>
+            <h1>Start transcribing whenever you want.</h1>
           </div>
         </div>
 
@@ -62,9 +62,43 @@ export default function Home() {
             <Image src="/random.png" alt="" width={300} height={400} />
           </div>
           <div className="vertical-align-text">
-            <h1>London is the capital and largest city of England.</h1>
+            <h1>Easily translate and summarize saved transcripts.</h1>
           </div>
         </div>
+
+        <br />
+        <h2>Communicate efficiently. Minimize communication breakdowns.</h2>
+        <div className={styles["alt-grid"]}>
+          <div className={styles["alt-card"]}>
+            <h2>Real Time Transcription</h2>
+            <p>All spoken words are transcribed while recording</p>
+          </div>
+          <div className={styles["alt-card"]}>
+            <h2>Save Texts and Recordings</h2>
+            <p>
+              All recordings and transcriptions will be saved for your
+              reference.
+            </p>
+          </div>
+          <div className={styles["alt-card"]}>
+            <h2>Access your saved comms anytime</h2>
+            <p>
+              Just like email, you could easily find your recording and
+              transcriptions.
+            </p>
+          </div>
+        </div>
+
+        <h2 style={{ textAlign: "center" }}>
+          Transform your communication with anyone using AI. <br />
+          Foster healthy relationships.
+        </h2>
+        <h2>
+          Try for free{" "}
+          <Link href="/signin">
+            <a className="register">Today</a>
+          </Link>
+        </h2>
       </main>
     </div>
   );
