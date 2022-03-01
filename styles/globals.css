@@ -89,3 +89,24 @@ footer {
   flex-direction: column;
   margin-top: 60px;
 }
+
+/* test vertically align text next to image */
+.landing-page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-align-image-left {
+  flex-basis: 40%;
+}
+
+.vertical-align-image-right {
+  flex-basis: 70%;
+  order: 2;
+}
+
+.vertical-align-text {
+  font-size: 20px;
+  padding-left: 20px;
+}

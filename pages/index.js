@@ -47,6 +47,24 @@ export default function Home() {
             <a className="register">Today</a>
           </Link>
         </h2>
+
+        <div className="landing-page-container">
+          <div className="vertical-align-image-left">
+            <Image src="/random.png" alt="" width={300} height={400} />
+          </div>
+          <div className="vertical-align-text">
+            <h1>Paris is one of the most beautiful cities in France.</h1>
+          </div>
+        </div>
+
+        <div className="landing-page-container">
+          <div className="vertical-align-image-right">
+            <Image src="/random.png" alt="" width={300} height={400} />
+          </div>
+          <div className="vertical-align-text">
+            <h1>London is the capital and largest city of England.</h1>
+          </div>
+        </div>
       </main>
     </div>
   );
