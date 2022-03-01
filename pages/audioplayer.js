@@ -191,33 +191,34 @@ function AudioPlayer() {
       <div className="audioplayer-body">
         <div className="audioplayer-container">
           <h1 className="h1-center-bold">Audio Player</h1>
-          {isAudioSelected ? (
-            <>
-              <h1 className="h1-center-bold">Lol: {sound.transcript}</h1>
-              <Slider percentage={percentage} onChange={onChange} />
-              <audio
-                ref={audioRef}
-                onTimeUpdate={getCurrDuration}
-                onLoadedData={(e) => {
-                  urlToDuration(audioURL);
-                  console.log("e.currentTarget is: ", e.currentTarget);
-                }}
-                src={audioURL}
-              ></audio>
-              <ControlPanel
-                play={play}
-                isPlaying={isPlaying}
-                duration={durationSeconds} // this is the duration of the audio file in seconds
-                currentTime={currentTime}
-              />
-            </>
-          ) : (
-            <>
-              <h1 className="h1-center-bold">no audio selected</h1>
-            </>
-          )}
+          <Slider percentage={percentage} onChange={onChange} />
+          <audio
+            ref={audioRef}
+            onTimeUpdate={getCurrDuration}
+            onLoadedData={(e) => {
+              urlToDuration(audioURL);
+              console.log("e.currentTarget is: ", e.currentTarget);
+            }}
+            src={audioURL}
+          ></audio>
+          <ControlPanel
+            play={play}
+            isPlaying={isPlaying}
+            duration={durationSeconds} // this is the duration of the audio file in seconds
+            currentTime={currentTime}
+          />
         </div>
       </div>
+      {isAudioSelected ? (
+        <>
+          <h1 className="h1-center-bold">Transcript:</h1>
+          <h1 className="h1-center-bold">{sound.transcript}</h1>
+        </>
+      ) : (
+        <>
+          <h1 className="h1-center-bold">no audio selected</h1>
+        </>
+      )}
       <h1 className="h1-center-bold">
         outside of audio player: select translation and summary
       </h1>
