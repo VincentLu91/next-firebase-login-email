@@ -26,7 +26,7 @@ const ManageSubscriptions = () => {
   const [subscription, setSubscription] = useState(null);
 
   const [loading, setLoading] = useState(false);
-  async function getSubscriptionsInfo(user) {
+  const getSubscriptionsInfo = useCallback(async (user) => {
     const subscriptionsRef = collection(
       db,
       `customers/${user.uid}/subscriptions`
@@ -41,7 +41,7 @@ const ManageSubscriptions = () => {
         current_period_end: subscription.data().current_period_end,
       });
     });
-  }
+  }, []);
 
   const checkAuth = useCallback(
     async (user) => {
@@ -56,7 +56,7 @@ const ManageSubscriptions = () => {
         }
       });
     },
-    [router]
+    [router, getSubscriptionsInfo]
   );
 
   // create useEffect to track user's subscriptions...
@@ -134,7 +134,7 @@ const ManageSubscriptions = () => {
       console.log(error);
       alert("Failed");
     }
-    setSubscription(null);
+    //setSubscription(null);
     await checkAuth(currentUser);
     setLoading(false);
     //window.location.reload(true); // workaround for screen refresh
