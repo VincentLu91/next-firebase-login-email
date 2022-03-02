@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import db, { auth } from "../firebase";
-import { signOut } from "firebase/auth";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import {
   collection,
   query,
@@ -64,7 +64,7 @@ const ManageSubscriptions = () => {
     checkAuth(currentUser);
   }, [checkAuth, currentUser]);
 
-  async function getProductsDisplay() {
+  const getProductsDisplay = useCallback(async () => {
     const productsRef = collection(db, "products");
     const q = query(productsRef, where("active", "==", true));
     const querySnapshot = await getDocs(q);
@@ -83,10 +83,10 @@ const ManageSubscriptions = () => {
       });
     });
     setProducts(products);
-  }
+  }, []);
   useEffect(() => {
     getProductsDisplay();
-  }, []);
+  }, [getProductsDisplay]);
 
   // have no subscription
   const checkOut = async (priceId) => {
@@ -117,22 +117,28 @@ const ManageSubscriptions = () => {
     await checkAuth(currentUser);
     setLoading(true);
     try {
-      await axios.post(
-        //"https://us-central1-audio-example-expo.cloudfunctions.net/stripeSwitchPlans", // this is to be replaced by ngrok, otherwise use localhost link below
-        "http://localhost:8080/stripe/switch-plans",
-        {
-          stripeSubscriptionId: currentSubscriptionId,
-          newPriceId: newPriceId,
-        }
-      );
+      const functions = getFunctions();
+      const addMessage = httpsCallable(functions, "stripeSwitchPlans");
+      console.log(currentUser);
+      addMessage({
+        stripeSubscriptionId: currentSubscriptionId,
+        newPriceId: newPriceId,
+        customerId: currentUser.uid,
+      }).then((result) => {
+        // Read result of the Cloud Function.
+        /** @type {any} */
+        const data = result.data;
+        console.log(data);
+      });
     } catch (error) {
+      console.log(error);
       alert("Failed");
     }
     setSubscription(null);
     await checkAuth(currentUser);
     setLoading(false);
-    window.location.reload(true); // workaround for screen refresh
-    //router.push("/dashboard");
+    //window.location.reload(true); // workaround for screen refresh
+    router.push("/dashboard");
   };
 
   const cancelPlan = async (currentSubscriptionId) => {
