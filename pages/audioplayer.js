@@ -185,13 +185,6 @@ function AudioPlayer() {
     console.log("Language selected: ", e.value);
   };
 
-  // comment this useEffect() block when API is turned off
-  /*useEffect(() => {
-    if (sound.transcript) {
-      getSummary(sound.transcript);
-    }
-  }, []);*/
-
   return (
     <div>
       <button onClick={() => router.push("/dashboard")}>
@@ -232,8 +225,6 @@ function AudioPlayer() {
       <h1 className="h1-center-bold">
         outside of audio player: select translation and summary
       </h1>
-      {/* uncomment the following line below when ready to use the API */}
-      {/*<h2>Summary is: {summary}</h2>*/}
       <Select
         placeholder="Select Option"
         value={languages.find((obj) => obj.value === language)} // set selected value
@@ -244,12 +235,12 @@ function AudioPlayer() {
       {sound && (
         <div style={{ marginTop: 20, lineHeight: "25px" }}>
           <div>
-            <button onClick={() => getSummary(sound.transcript)}>
+            {/* uncomment the below when API is ready to use */}
+            {/*<button onClick={() => getSummary(sound.transcript)}>
               Summary
-            </button>
-            {/* uncomment the two lines below when ready to use the API */}
-            {/*<button onClick={() => getTranslation(language)}>Translate</button>*/}
-            <h2>Summary is: {summary}</h2>
+      </button>*/}
+            {/* uncomment the below when API is ready to use */}
+            {/*<h2>Summary is: {summary}</h2>*/}
           </div>
         </div>
       )}
