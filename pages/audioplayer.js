@@ -31,10 +31,17 @@ function AudioPlayer() {
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
 
-  const getSummary = async () => {
+  const getSummary = async (transcript) => {
+    if (sound == null || transcript == null) {
+      setSummary("Transcript is empty!");
+      return;
+    }
     try {
       const resp = await axios.post(
-        `${summarize_config.api_address}${summarize_config.route_path}`
+        `${summarize_config.api_address}${summarize_config.route_path}`,
+        {
+          transcript,
+        }
       );
       const summary_text = resp.data["summary_text"];
       console.log(summary_text);
@@ -180,7 +187,9 @@ function AudioPlayer() {
 
   // comment this useEffect() block when API is turned off
   /*useEffect(() => {
-    getSummary();
+    if (sound.transcript) {
+      getSummary(sound.transcript);
+    }
   }, []);*/
 
   return (
@@ -231,6 +240,19 @@ function AudioPlayer() {
         options={languages} // set list of the data
         onChange={handleChange} // assign onChange function
       />
+
+      {sound && (
+        <div style={{ marginTop: 20, lineHeight: "25px" }}>
+          <div>
+            <button onClick={() => getSummary(sound.transcript)}>
+              Summary
+            </button>
+            {/* uncomment the two lines below when ready to use the API */}
+            {/*<button onClick={() => getTranslation(language)}>Translate</button>*/}
+            <h2>Summary is: {summary}</h2>
+          </div>
+        </div>
+      )}
 
       {language && (
         <div style={{ marginTop: 20, lineHeight: "25px" }}>
