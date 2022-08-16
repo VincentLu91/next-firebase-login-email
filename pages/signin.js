@@ -3,6 +3,7 @@ import { auth } from "../firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
@@ -61,6 +62,29 @@ const Signin = () => {
       });
   };
 
+  const forgotPassword = (email) => {
+    return sendPasswordResetEmail(auth, email)
+      .then(() => {
+        // Password reset email sent!
+        console.log("email is sent...");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+        console.log(errorCode);
+        console.log(errorMessage);
+      });
+  };
+
+  const forgotPasswordHandler = () => {
+    const email = emailRef.current.value;
+    if (email)
+      forgotPassword(email).then(() => {
+        emailRef.current.value = "";
+      });
+  };
+
   return (
     <>
       <div className="signin">
@@ -75,6 +99,7 @@ const Signin = () => {
               Sign up
             </span>
           </h6>
+          <p onClick={forgotPasswordHandler}>Forgot Password?</p>
         </form>
       </div>
       <style jsx>{signInStyles}</style>
