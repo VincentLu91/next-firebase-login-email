@@ -50,7 +50,12 @@ export default function Home() {
         <br />
         <div className="landing-page-container">
           <div className="vertical-align-image-left">
-            <Image src="/random.png" alt="" width={300} height={400} />
+            <Image
+              src="/transcriptBrowser.png"
+              alt=""
+              width={500}
+              height={400}
+            />
           </div>
           <div className="vertical-align-text">
             <h1>Start transcribing whenever you want.</h1>
@@ -59,7 +64,12 @@ export default function Home() {
 
         <div className="landing-page-container">
           <div className="vertical-align-image-right">
-            <Image src="/random.png" alt="" width={300} height={400} />
+            <Image
+              src="/transcriptMobileAndSummary.png"
+              alt=""
+              width={300}
+              height={400}
+            />
           </div>
           <div className="vertical-align-text">
             <h1>Easily translate and summarize saved transcripts.</h1>
