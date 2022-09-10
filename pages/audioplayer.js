@@ -235,12 +235,10 @@ function AudioPlayer() {
       {sound && (
         <div style={{ marginTop: 20, lineHeight: "25px" }}>
           <div>
-            {/* uncomment the below when API is ready to use */}
-            {/*<button onClick={() => getSummary(sound.transcript)}>
+            <button onClick={() => getSummary(sound.transcript)}>
               Summary
-      </button>*/}
-            {/* uncomment the below when API is ready to use */}
-            {/*<h2>Summary is: {summary}</h2>*/}
+            </button>
+            <h2>Summary is: {summary}</h2>
           </div>
         </div>
       )}
@@ -251,9 +249,8 @@ function AudioPlayer() {
             <b>Selected Value: </b> {language}
           </div>
           <div>
-            {/* uncomment the two lines below when ready to use the API */}
-            {/*<button onClick={() => getTranslation(language)}>Translate</button>*/}
-            {/*<h2>Translation is: {translation}</h2>*/}
+            <button onClick={() => getTranslation(language)}>Translate</button>
+            <h2>Translation is: {translation}</h2>
           </div>
         </div>
       )}
