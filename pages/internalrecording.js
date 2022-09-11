@@ -20,6 +20,7 @@ const InternalRecording = () => {
     useReactMediaRecorder({ audio: true }); // could also put video and screen props as true!
 
   const [filename, setFilename] = React.useState("");
+  const [liveTranscript, setLiveTranscript] = React.useState("");
   const [transcript, setTranscript] = React.useState("");
   const [isTranscribing, setIsTranscribing] = React.useState(false);
   const dispatch = useDispatch();
@@ -139,7 +140,7 @@ const InternalRecording = () => {
         }
       }
       console.log("Leaving onmessage. msg is: ", msg);
-      setTranscript(msg);
+      setLiveTranscript(msg);
       console.log("Opening. window.socket is: ", window.socket);
     };
 
@@ -200,6 +201,7 @@ const InternalRecording = () => {
   async function stopRecordingAudio() {
     stopRecording();
     setIsTranscribing(false);
+    setTranscript(liveTranscript);
   }
 
   async function renameRecord() {
@@ -264,7 +266,7 @@ const InternalRecording = () => {
             <button onClick={stopRecordingAudio}>Stop Recording</button>
             {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
             <h1>Transcript below</h1>
-            <p>{transcript}</p>
+            <p>{liveTranscript}</p>
           </div>
         );
       } else {
@@ -274,7 +276,7 @@ const InternalRecording = () => {
             <button onClick={startRecordingAudio}>Start Recording</button>
             {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
             <h1>Transcript below</h1>
-            <p>{transcript}</p>
+            {/*<p>{liveTranscript}</p>*/}
           </div>
         );
       }
