@@ -250,7 +250,7 @@ const InternalRecording = () => {
     // Reset the field
     setFilename("");
     dispatch(setRecordURI(null));
-    alert("entered...");
+    //alert("entered..."); // if I hold the alert for too long, the websocket will error out
 
     // We can go to library tab
     router.push("/dashboard");
