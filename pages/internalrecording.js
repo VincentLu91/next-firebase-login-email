@@ -149,11 +149,11 @@ const InternalRecording = () => {
       setIsTranscribing(false);
     };
 
-    window.socket.onclose = (event) => {
+    /*window.socket.onclose = (event) => {
       console.log(event);
       //window.socket = null;
       setIsTranscribing(false);
-    };
+    };*/
 
     window.socket.onopen = (e) => {
       // solution to reopen websocket instance:
