@@ -22,6 +22,7 @@ const Library = () => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user.currentUser);
   const [cloudRecordingList, setCloudRecordingList] = React.useState([]);
+  const [search, setNewSearch] = React.useState("");
 
   const downloadAudio = async (fileName) => {
     const uri = getDownloadURL(ref(storage, fileName));
@@ -97,14 +98,27 @@ const Library = () => {
     router.push("/audioplayer");
   }
 
+  const handleSearchChange = (e) => {
+    setNewSearch(e.target.value);
+  };
+
+  const filtered = !search
+    ? cloudRecordingList
+    : cloudRecordingList.filter(
+        (item) =>
+          item.fileName.toLowerCase().includes(search.toLowerCase()) ||
+          item.transcript.toLowerCase().includes(search.toLowerCase())
+      );
+
   return (
     <div className="title">
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
       <h2>List of recordings and transcriptions</h2>
+      <input type="text" value={search} onChange={handleSearchChange} />
       <ul className="no-bullet">
-        {cloudRecordingList.map(function (item) {
+        {filtered.map(function (item) {
           console.log("item", item);
           return (
             <li key={item.originalFilename}>
@@ -123,7 +137,8 @@ const Library = () => {
           );
         })}
       </ul>
-      <h3>The number of recordings is: {cloudRecordingList.length}</h3>
+      <h3>The total number of recordings is: {cloudRecordingList.length}</h3>
+      <h3>The filtered number of recordings is: {filtered.length}</h3>
       <style jsx>{libraryStyles}</style>
     </div>
   );
