@@ -134,7 +134,7 @@ const ManageSubscriptions = () => {
       console.log(error);
       alert("Failed");
     }
-    //setSubscription(null);
+    setSubscription(null); // personally, I don't want any orphan subscription objects upon renewal
     await checkAuth(currentUser);
     setLoading(false);
     //window.location.reload(true); // workaround for screen refresh
@@ -144,8 +144,18 @@ const ManageSubscriptions = () => {
   const cancelPlan = async (currentSubscriptionId) => {
     await checkAuth(currentUser);
     setLoading(true);
-    await axios.post("http://localhost:8080/stripe/cancel-subscription", {
+    /*await axios.post("http://localhost:8080/stripe/cancel-subscription", {
       stripeSubscriptionId: currentSubscriptionId,
+    });*/
+    const functions = getFunctions();
+    const addMessage = httpsCallable(functions, "cancelSubscription");
+    addMessage({
+      stripeSubscriptionId: currentSubscriptionId,
+    }).then((result) => {
+      // Read result of the Cloud Function.
+      /** @type {any} */
+      const data = result.data;
+      console.log(data);
     });
     setSubscription(null);
     await checkAuth(currentUser);
