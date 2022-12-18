@@ -108,7 +108,7 @@ const Recording = () => {
     startRecording();
     // call transcription function later
     setIsTranscribing(true);
-    const response = await fetch("http://localhost:3001/api/token");
+    const response = await fetch("/api/token");
     const data = await response.json();
     console.log("DATOKEN", data);
     if (data.error) {
