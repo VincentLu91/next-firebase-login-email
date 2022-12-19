@@ -134,7 +134,7 @@ const ManageSubscriptions = () => {
       console.log(error);
       alert("Failed");
     }
-    setSubscription(null); // personally, I don't want any orphan subscription objects upon renewal
+    //setSubscription(null); // reverting back to commented code; not needed
     await checkAuth(currentUser);
     setLoading(false);
     //window.location.reload(true); // workaround for screen refresh
