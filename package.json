@@ -21,6 +21,7 @@
     "moment": "^2.29.1",
     "next": "12.0.10",
     "next-sanity-image": "^3.2.1",
+    "nodemailer": "^6.8.0",
     "npm-check-updates": "^12.2.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
@@ -29,7 +30,8 @@
     "react-select": "^5.2.2",
     "recordrtc": "^5.6.2",
     "redux-persist": "^6.0.0",
-    "styled-jsx": "^5.0.0"
+    "styled-jsx": "^5.0.0",
+    "twilio": "^3.84.0"
   },
   "devDependencies": {
     "eslint": "8.8.0",
