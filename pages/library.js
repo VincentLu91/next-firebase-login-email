@@ -63,7 +63,7 @@ const Library = () => {
           console.log(
             "The user is inauthenticated, redirecting back to signin page"
           );
-          router.push("/");
+          router.push("/signin");
         }
       });
     },
