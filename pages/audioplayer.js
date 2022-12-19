@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import Slider from "../components/slider/Slider";
 import ControlPanel from "../components/controls/ControlPanel";
 import { useDispatch, useSelector } from "react-redux";
-import { storage, auth } from "../firebase";
+import db, { storage, auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { setCurrentUser } from "../redux/user/actions";
 import { ref, getDownloadURL } from "firebase/storage";
 import getBlobDuration from "get-blob-duration";
@@ -30,6 +31,53 @@ function AudioPlayer() {
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
+
+  const currentUser = useSelector((state) => state.user.currentUser);
+  const [subscription, setSubscription] = useState(null);
+
+  async function getSubscriptionsInfo(user) {
+    //if (!userContext.user) return;
+    const subscriptionsRef = collection(
+      db,
+      //`customers/${userContext.user.uid}/subscriptions`
+      `customers/${user.uid}/subscriptions` // why does this not work? update: it works, I had to call this fn in checkAuth()
+      //`customers/CvKhT7Q8Ubeo4ImF3qToeJZBEJ22/subscriptions` // why does this work? because it identifies the ID upon useEffect
+    );
+    const q = query(subscriptionsRef, orderBy("created"));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((subscription) => {
+      console.log("subscription: ", subscription.id, subscription.data());
+      setSubscription({
+        role: subscription.data().role,
+        subscriptionId: subscription.id,
+        current_period_start: subscription.data().current_period_start,
+        current_period_end: subscription.data().current_period_end,
+      });
+    });
+  }
+
+  const checkAuth = useCallback(
+    async (user) => {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // User is signed in, see docs for a list of available properties
+          // https://firebase.google.com/docs/reference/js/firebase.User
+          const uid = user.uid;
+          console.log("The user is authenticated with the uid: ", uid);
+          getSubscriptionsInfo(user);
+          // ...
+        } else {
+          // User is signed out
+          // ...
+          console.log(
+            "The user is inauthenticated, redirecting back to signin page"
+          );
+          router.push("/");
+        }
+      });
+    },
+    [router]
+  );
 
   const getSummary = async (transcript) => {
     if (sound == null || transcript == null) {
@@ -139,6 +187,15 @@ function AudioPlayer() {
   }, [dispatch, sound]);
 
   const audioRef = useRef();
+
+  // create useEffect to track user's subscriptions...
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(currentUser);
+    //getSubscriptionsInfo();
+  }, [checkAuth, currentUser]);
+  console.log(currentUser);
+  if (!subscription) return null;
 
   const onChange = (e) => {
     const sliderVal = e.target.value;
