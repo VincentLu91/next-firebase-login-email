@@ -312,6 +312,7 @@ const Recording = () => {
         alignItems: "center",
       }}
     >
+      <h2>For best results, record audio on Chrome</h2>
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>

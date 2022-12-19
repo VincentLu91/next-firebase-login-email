@@ -244,6 +244,7 @@ function AudioPlayer() {
 
   return (
     <div>
+      <h2>For best results, play the recording on Chrome</h2>
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
