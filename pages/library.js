@@ -161,8 +161,8 @@ const Library = () => {
     ? cloudRecordingList
     : cloudRecordingList.filter(
         (item) =>
-          item.fileName.toLowerCase().includes(search.toLowerCase()) ||
-          item.transcript.toLowerCase().includes(search.toLowerCase())
+          item.fileName?.toLowerCase().includes(search.toLowerCase()) ||
+          item.transcript?.toLowerCase().includes(search.toLowerCase())
       );
 
   return (
