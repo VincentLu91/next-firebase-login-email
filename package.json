@@ -32,7 +32,6 @@
     "recordrtc": "^5.6.2",
     "redux-persist": "^6.0.0",
     "styled-jsx": "^5.0.0",
-    "superagent": "^8.0.6",
     "telnyx": "^1.23.0",
     "twilio": "^3.84.0"
   },
