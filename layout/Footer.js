@@ -13,7 +13,6 @@ const Footer = () => {
       <Link href="/termsofuse/">
         <a>Terms of Use</a>
       </Link>
-      <footer>Copyright 2022 recreate.ai</footer>
     </div>
   );
 };

@@ -23,6 +23,7 @@
     "next-sanity-image": "^3.2.1",
     "nodemailer": "^6.8.0",
     "npm-check-updates": "^12.2.1",
+    "pubnub": "^7.2.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-media-recorder": "^1.6.3",
@@ -31,6 +32,8 @@
     "recordrtc": "^5.6.2",
     "redux-persist": "^6.0.0",
     "styled-jsx": "^5.0.0",
+    "superagent": "^8.0.6",
+    "telnyx": "^1.23.0",
     "twilio": "^3.84.0"
   },
   "devDependencies": {

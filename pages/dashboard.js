@@ -112,6 +112,9 @@ const Dashboard = () => {
           Recording
         </button>
         <button onClick={() => router.push("/library")}>Library</button>
+        <button onClick={() => router.push("/phonerecording")}>
+          Phone Recording
+        </button>
       </p>
 
       <style jsx>{dashboardStyles}</style>
