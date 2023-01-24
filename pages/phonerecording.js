@@ -1,4 +1,3 @@
-//import { useReactMediaRecorder } from "react-media-recorder";
 import * as React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +8,6 @@ import db, { storage, auth } from "../firebase";
 import { uploadBytes, ref } from "firebase/storage";
 import { collection, addDoc } from "firebase/firestore";
 import { setCurrentUser } from "../redux/user/actions";
-//import RecordRTC, { StereoAudioRecorder } from "recordrtc";
 import { useRouter } from "next/router";
 import { onAuthStateChanged } from "firebase/auth";
 import signInStyles from "../styles/signinStyles";
@@ -23,16 +21,14 @@ const PhoneRecording = () => {
   const { subscribe, unSubscribeAll, pubnubDispatch } = usePubnub();
 
   React.useEffect(() => {
-    pubnubDispatch({ type: 'SET_TRANSCRIPT_CALLBACK', payload: setTranscript })
+    pubnubDispatch({ type: "SET_TRANSCRIPT_CALLBACK", payload: setTranscript });
   }, [pubnubDispatch]);
 
   const router = useRouter();
-  /*const { status, startRecording, stopRecording, mediaBlobUrl } =
-    useReactMediaRecorder({ audio: true });*/ // could also put video and screen props as true!
 
   const [filename, setFilename] = React.useState("");
   const [liveTranscript, setLiveTranscript] = React.useState("");
- 
+
   const [isTranscribing, setIsTranscribing] = React.useState(false);
   const [isDialed, setIsDialed] = React.useState(false);
   const [call_control_id, setCallControlID] = React.useState(null);
@@ -50,12 +46,6 @@ const PhoneRecording = () => {
   console.log("Phone Recording CurrentUser: >>>>>>>>>>>>>>>>>>>>", currentUser);
   console.log("Phone Recording isRecording: ", isRecording);
   console.log("Firebase storage object: ", storage._bucket);
-
-  let recorder;
-
-  /*const telnyx = Telnyx(
-    "KEY017EE15F9667935CDD8D6B422B40D671_Ko22qTGdS4engYHoawMjhB"
-  );*/
 
   // this is to check for the userID upon page refresh in the event it gets wiped out.
   useEffect(() => {
@@ -127,7 +117,9 @@ const PhoneRecording = () => {
     const to = "+16472181328";
     const from = "+18885390817";
     const res_dial = await axios.get(
-      `/api/dial?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&uid=${currentUser.uid}`
+      `/api/dial?from=${encodeURIComponent(from)}&to=${encodeURIComponent(
+        to
+      )}&uid=${currentUser.uid}`
     );
     console.log("call_control_id is: ", res_dial.data);
     console.log("callStatus is: ", res_dial.status);
@@ -206,28 +198,27 @@ const PhoneRecording = () => {
     setTranscript(newTranscript);
   };
 
-  /*function renderView() {
-    if (status === "recording" || status === "idle") {
-      // while recording or not recording yet
-      if (isTranscribing) {
-        return (
-          <div className="title">
-            <button onClick={stopRecordingAudio}>Stop Recording</button>
-           <h1>Transcript below</h1>
-            <p>{liveTranscript}</p>
-          </div>
-        );
-      } else {
-        return (
-          <div className="title">
-            <button onClick={startRecordingAudio}>Start Recording</button>
-            <h1>Transcript below</h1>
-            
-          </div>
-        );
-      }
+  function renderView() {
+    //if (status === "recording") { // to be replaced with data.event_type from pages/api/telnyx_events.js upon publish
+    // while recording or not recording yet
+    if (isTranscribing) {
+      return (
+        <div className="title">
+          <button onClick={stopRecordingAudio}>Stop Recording</button>
+          <h1>Transcript below</h1>
+          <p>{liveTranscript}</p>
+        </div>
+      );
+    } else {
+      return (
+        <div className="title">
+          <button onClick={startRecordingAudio}>Start Recording</button>
+          <h1>Transcript below</h1>
+        </div>
+      );
     }
-    if (status === "stopped") {
+    //}
+    /*if (status === "stopped") { // to be replaced with data.event_type from pages/api/telnyx_events.js upon publish
       // finished recording
       return (
         <div className="title">
@@ -241,8 +232,8 @@ const PhoneRecording = () => {
           <button onClick={renameRecord}>Rename</button>
         </div>
       );
-    }
-  }*/
+    }*/
+  }
 
   return (
     <div
@@ -263,7 +254,7 @@ const PhoneRecording = () => {
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
-      {/*renderView()*/}
+      {renderView()}
       Transcript: {transcript}
       <style jsx>{signInStyles}</style>
     </div>
