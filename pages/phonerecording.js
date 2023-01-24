@@ -268,6 +268,6 @@ const PhoneRecording = () => {
       <style jsx>{signInStyles}</style>
     </div>
   );
-};*/
+};
 
 export default PhoneRecording;
