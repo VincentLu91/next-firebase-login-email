@@ -10,6 +10,9 @@ import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../redux/user/actions";
 import { onAuthStateChanged } from "firebase/auth";
 import signInStyles from "../styles/signinStyles";
+import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
+import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import Account from "../components/account";
 
 const Signin = () => {
   const dispatch = useDispatch();
@@ -18,7 +21,10 @@ const Signin = () => {
 
   const passwordRef = useRef(null);
 
-  useEffect(() => {
+  const session = useSession();
+  const supabase = useSupabaseClient();
+
+  /*useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       console.log(authUser); // uid
       if (authUser) {
@@ -32,7 +38,7 @@ const Signin = () => {
 
   const signUp = (e) => {
     e.preventDefault();
-    /*auth.*/ createUserWithEmailAndPassword(
+    createUserWithEmailAndPassword(
       auth,
       emailRef.current.value,
       passwordRef.current.value
@@ -46,7 +52,7 @@ const Signin = () => {
   };
   const signIn = (e) => {
     e.preventDefault();
-    /*auth.*/ signInWithEmailAndPassword(
+    signInWithEmailAndPassword(
       auth,
       emailRef.current.value,
       passwordRef.current.value
@@ -83,10 +89,21 @@ const Signin = () => {
       forgotPassword(email).then(() => {
         emailRef.current.value = "";
       });
-  };
+  };*/
 
   return (
-    <>
+    <div className="container" style={{ padding: "50px 0 100px 0" }}>
+      {!session ? (
+        <Auth
+          supabaseClient={supabase}
+          appearance={{ theme: ThemeSupa }}
+          theme="dark"
+        />
+      ) : (
+        <Account session={session} />
+      )}
+
+      {/*<>
       <div className="signin">
         <form action="">
           <h1 className="title">Sign in</h1>
@@ -103,7 +120,8 @@ const Signin = () => {
         </form>
       </div>
       <style jsx>{signInStyles}</style>
-    </>
+  </>*/}
+    </div>
   );
 };
 
