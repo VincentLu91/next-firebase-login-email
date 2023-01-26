@@ -11,20 +11,20 @@ import { useState } from "react";
 function MyApp({ Component, pageProps }) {
   const [supabase] = useState(() => createBrowserSupabaseClient());
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <SessionContextProvider
-          supabaseClient={supabase}
-          initialSession={pageProps.initialSession}
-        >
+    <SessionContextProvider
+      supabaseClient={supabase}
+      initialSession={pageProps.initialSession}
+    >
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
           <PubnubProvider>
             <Layout>
               <Component {...pageProps} />
             </Layout>
           </PubnubProvider>
-        </SessionContextProvider>
-      </PersistGate>
-    </Provider>
+        </PersistGate>
+      </Provider>
+    </SessionContextProvider>
   );
 }
 
