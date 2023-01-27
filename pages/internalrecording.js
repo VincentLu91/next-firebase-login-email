@@ -5,6 +5,7 @@ import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
+import { useUser } from "@supabase/auth-helpers-react";
 
 const ComponentWithNoSSR = dynamic(() => import("../components/Recording"), {
   ssr: false,
@@ -12,7 +13,9 @@ const ComponentWithNoSSR = dynamic(() => import("../components/Recording"), {
 
 const InternalRecording = () => {
   const router = useRouter();
-  const currentUser = useSelector((state) => state.user.currentUser);
+  const user = useUser();
+  // old firebase code
+  /*const currentUser = useSelector((state) => state.user.currentUser);
   const [subscription, setSubscription] = useState(null);
   //console.log(userContext);
   async function getSubscriptionsInfo(user) {
@@ -66,7 +69,28 @@ const InternalRecording = () => {
     //getSubscriptionsInfo();
   }, [checkAuth, currentUser]);
   console.log(currentUser);
-  if (!subscription) return null;
+  if (!subscription) return null;*/
+
+  const checkAuth = useCallback(
+    async (user) => {
+      if (user) {
+        console.log("Supabase user is: ", user);
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(user);
+    //getSubscriptionsInfo();
+  }, [checkAuth, user]);
   return <ComponentWithNoSSR />;
 };
 

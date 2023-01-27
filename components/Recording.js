@@ -13,13 +13,18 @@ import RecordRTC, { StereoAudioRecorder } from "recordrtc"; // only run on the b
 import { useRouter } from "next/router";
 import { onAuthStateChanged } from "firebase/auth";
 import signInStyles from "../styles/signinStyles";
+import { useUser } from "@supabase/auth-helpers-react";
 
 const Recording = () => {
   const router = useRouter();
-  const { status, startRecording, stopRecording, mediaBlobUrl } =
+  const user = useUser();
+
+  // old firebase code
+  const { status, startRecording, stopRecording /*mediaBlobUrl*/ } =
     useReactMediaRecorder({ audio: true }); // could also put video and screen props as true!
 
-  const [filename, setFilename] = React.useState("");
+  // old firebase code
+  /*const [filename, setFilename] = React.useState("");
   const [liveTranscript, setLiveTranscript] = React.useState("");
   const [transcript, setTranscript] = React.useState("");
   const [isTranscribing, setIsTranscribing] = React.useState(false);
@@ -148,15 +153,16 @@ const Recording = () => {
       console.error(event);
       window.socket.close();
       setIsTranscribing(false);
-    };
+    };*/
 
-    /*window.socket.onclose = (event) => {
+  /*window.socket.onclose = (event) => {
       console.log(event);
       //window.socket = null;
       setIsTranscribing(false);
     };*/
 
-    window.socket.onopen = (e) => {
+  // old firebase code
+  /*window.socket.onopen = (e) => {
       // solution to reopen websocket instance:
       // https://stackoverflow.com/questions/47180904/websocket-even-after-firing-onopen-event-still-in-connecting-state
       if (e.target.readyState !== WebSocket.OPEN) return;
@@ -254,17 +260,18 @@ const Recording = () => {
 
     // We can go to library tab
     router.push("/dashboard");
-  }
+  }*/
 
-  function renderView() {
+  // old firebase code
+  /*function renderView() {
     if (status === "recording" || status === "idle") {
       // while recording or not recording yet
       if (isTranscribing) {
         return (
           <div className="title">
-            {/*<p>{status}</p>*/}
+            {<p>{status}</p>}
             <button onClick={stopRecordingAudio}>Stop Recording</button>
-            {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
+            {<video src={mediaBlobUrl} controls autoPlay loop />}
             <h1>Transcript below</h1>
             <p>{liveTranscript}</p>
           </div>
@@ -272,11 +279,10 @@ const Recording = () => {
       } else {
         return (
           <div className="title">
-            {/*<p>{status}</p>*/}
+            {<p>{status}</p>}
             <button onClick={startRecordingAudio}>Start Recording</button>
-            {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
+            {<video src={mediaBlobUrl} controls autoPlay loop />}
             <h1>Transcript below</h1>
-            {/*<p>{liveTranscript}</p>*/}
           </div>
         );
       }
@@ -285,11 +291,11 @@ const Recording = () => {
       // finished recording
       return (
         <div className="title">
-          {/*<TextInput
+          {<TextInput
             placeholder="audio name"
             onChangeText={(text) => setFilename(text)}
             style={{ borderWidth: 1, padding: 8, height: 45, width: 180 }}
-          />*/}
+          />}
           <p>{mediaBlobUrl}</p>
           <p>recordURI is: {recordURI}</p>
           <input
@@ -301,7 +307,7 @@ const Recording = () => {
         </div>
       );
     }
-  }
+  }*/
 
   return (
     <div
@@ -316,7 +322,8 @@ const Recording = () => {
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
-      {renderView()}
+      Placeholder renderView
+      {/*renderView()*/}
       <style jsx>{signInStyles}</style>
     </div>
   );

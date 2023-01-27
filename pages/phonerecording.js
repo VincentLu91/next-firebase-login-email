@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRecordingList, setRecordURI } from "../redux/recording/actions";
 import moment from "moment";
@@ -15,9 +15,11 @@ import signInStyles from "../styles/signinStyles";
 import dynamic from "next/dynamic";
 import axios from "axios";
 import { usePubnub } from "../contexts/pubnub";
+import { useUser } from "@supabase/auth-helpers-react";
 
 const PhoneRecording = () => {
   const [transcript, setTranscript] = React.useState("");
+  const user = useUser();
   const { subscribe, unSubscribeAll, pubnubDispatch } = usePubnub();
 
   React.useEffect(() => {
@@ -41,7 +43,31 @@ const PhoneRecording = () => {
   const isRecording = useSelector(
     (state) => state.recordingReducer.isRecording
   );
-  const recordURI = useSelector((state) => state.recordingReducer.recordURI);
+
+  // newly added supabase code...to check user authentication state for now.
+  const checkAuth = useCallback(
+    async (user) => {
+      if (user) {
+        console.log("Supabase user is: ", user);
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(user);
+    //getSubscriptionsInfo();
+  }, [checkAuth, user]);
+
+  // old firebase code
+  /*const recordURI = useSelector((state) => state.recordingReducer.recordURI);
   const currentUser = useSelector((state) => state.user.currentUser);
   console.log("Phone Recording CurrentUser: >>>>>>>>>>>>>>>>>>>>", currentUser);
   console.log("Phone Recording isRecording: ", isRecording);
@@ -59,7 +85,7 @@ const PhoneRecording = () => {
     return unsubscribe;
   }, [dispatch]);
 
-  /*const uploadAudio = async (audioData) => {
+  const uploadAudio = async (audioData) => {
     //const uriParts = recordURI.split(".");
     let uriParts = mediaBlobUrl.split(".").toString().replace("//", "");
     //uriParts = uriParts.toString().replace("//", "");
@@ -142,6 +168,7 @@ const PhoneRecording = () => {
     setTranscript(liveTranscript);
   }
 
+  // old firebase code
   /*async function renameRecord() {
     if (!filename && filename.length < 1) {
       alert("Filename can not be empty!");
@@ -218,6 +245,7 @@ const PhoneRecording = () => {
       );
     }
     //}
+    // old firebase code
     /*if (status === "stopped") { // to be replaced with data.event_type from pages/api/telnyx_events.js upon publish
       // finished recording
       return (

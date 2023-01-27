@@ -4,10 +4,12 @@ import { useRouter } from "next/router";
 import db, { auth } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { collection, query, getDocs, orderBy } from "firebase/firestore";
+import { useUser } from "@supabase/auth-helpers-react";
 
 const Plan2 = (props) => {
   const router = useRouter();
-  const currentUser = useSelector((state) => state.user.currentUser);
+  const user = useUser();
+  /*const currentUser = useSelector((state) => state.user.currentUser);
   const [subscription, setSubscription] = useState(null);
   //console.log(userContext);
   async function getSubscriptionsInfo(user) {
@@ -61,19 +63,40 @@ const Plan2 = (props) => {
     //getSubscriptionsInfo();
   }, [checkAuth, currentUser]);
   console.log(currentUser);
-  if (!subscription) return null;
+  if (!subscription) return null;*/
+
+  const checkAuth = useCallback(
+    async (user) => {
+      if (user) {
+        console.log("Supabase user is: ", user);
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(user);
+    //getSubscriptionsInfo();
+  }, [checkAuth, user]);
 
   return (
     <>
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
-      {["plan2"].includes(subscription.role) && (
+      {/*["plan2"].includes(subscription.role) && (
         <div>You are in plan2 subscription and thus, viewing Plan2 content</div>
-      )}
-      {!["plan2"].includes(subscription.role) && (
+      )*/}
+      {/*!["plan2"].includes(subscription.role) && (
         <div>You are not in plan2!</div>
-      )}
+      )*/}
     </>
   );
 };

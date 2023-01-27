@@ -17,11 +17,14 @@ import { useRouter } from "next/router";
 //import { printTranscription } from "../../../redux/language/actions";
 import { onAuthStateChanged } from "firebase/auth";
 import libraryStyles from "../styles/libraryStyles";
+import { useUser } from "@supabase/auth-helpers-react";
 
 const Library = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.user.currentUser);
+  const user = useUser();
+  // old firebase code
+  /*const currentUser = useSelector((state) => state.user.currentUser);
   const [subscription, setSubscription] = useState(null);
   const [cloudRecordingList, setCloudRecordingList] = React.useState([]);
   const [search, setNewSearch] = React.useState("");
@@ -163,15 +166,37 @@ const Library = () => {
         (item) =>
           item.fileName?.toLowerCase().includes(search.toLowerCase()) ||
           item.transcript?.toLowerCase().includes(search.toLowerCase())
-      );
+      );*/
 
+  const checkAuth = useCallback(
+    async (user) => {
+      if (user) {
+        console.log("Supabase user is: ", user);
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(user);
+    //getSubscriptionsInfo();
+  }, [checkAuth, user]);
+
+  // below commented out code is also old firebase code
   return (
     <div className="title">
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
       <h2>List of recordings and transcriptions</h2>
-      <input type="text" value={search} onChange={handleSearchChange} />
+      {/*<input type="text" value={search} onChange={handleSearchChange} />
       <ul className="no-bullet">
         {filtered.map(function (item) {
           console.log("item", item);
@@ -194,7 +219,7 @@ const Library = () => {
       </ul>
       <h3>The total number of recordings is: {cloudRecordingList.length}</h3>
       <h3>The filtered number of recordings is: {filtered.length}</h3>
-      <style jsx>{libraryStyles}</style>
+      <style jsx>{libraryStyles}</style>*/}
     </div>
   );
 };

@@ -14,12 +14,14 @@ import translate_config from "../pages/api/translate_config";
 import axios from "axios";
 import { useRouter } from "next/router";
 import Select from "react-select";
+import { useUser } from "@supabase/auth-helpers-react";
 
 import audioPlayerStyles from "../styles/audioPlayerStyles";
 
 function AudioPlayer() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const user = useUser();
   const sound = useSelector((state) => state.recordingReducer.sound);
   const [percentage, setPercentage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -32,7 +34,8 @@ function AudioPlayer() {
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
 
-  const currentUser = useSelector((state) => state.user.currentUser);
+  // old code with firebase:
+  /*const currentUser = useSelector((state) => state.user.currentUser);
   const [subscription, setSubscription] = useState(null);
 
   async function getSubscriptionsInfo(user) {
@@ -77,7 +80,28 @@ function AudioPlayer() {
       });
     },
     [router]
+  );*/
+
+  const checkAuth = useCallback(
+    async (user) => {
+      if (user) {
+        console.log("Supabase user is: ", user);
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
+    },
+    [router]
   );
+
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(user);
+    //getSubscriptionsInfo();
+  }, [checkAuth, user]);
 
   const getSummary = async (transcript) => {
     if (sound == null || transcript == null) {
@@ -126,11 +150,8 @@ function AudioPlayer() {
     }
   };
 
-  async function loadRecording(authUser, sound) {
-    /*const pathReference = ref(
-      storage,
-      `recordings/${authUser.uid}/files/${sound.fileName}`
-    );*/
+  // old firebase code
+  /*async function loadRecording(authUser, sound) {
     const pathReference = ref(storage, sound.originalFilename);
     getDownloadURL(pathReference)
       .then((url) => {
@@ -184,18 +205,18 @@ function AudioPlayer() {
     });
 
     return unsubscribe;
-  }, [dispatch, sound]);
+  }, [dispatch, sound]);*/
 
   const audioRef = useRef();
 
-  // create useEffect to track user's subscriptions...
+  /*// create useEffect to track user's subscriptions...
   useEffect(() => {
     //console.log("Current user is: ", currentUser);
     checkAuth(currentUser);
     //getSubscriptionsInfo();
   }, [checkAuth, currentUser]);
   console.log(currentUser);
-  if (!subscription) return null;
+  if (!subscription) return null;*/
 
   const onChange = (e) => {
     const sliderVal = e.target.value;
@@ -271,9 +292,13 @@ function AudioPlayer() {
       </div>
       {isAudioSelected ? (
         <>
-          <h1 className="h1-center-bold">{sound.fileName}</h1>
+          <h1 className="h1-center-bold">
+            Placeholder sound.fileName{/*sound.fileName*/}
+          </h1>
           <h1 className="h1-center-bold">Transcript:</h1>
-          <h1 className="h1-center-bold">{sound.transcript}</h1>
+          <h1 className="h1-center-bold">
+            Placeholder sound.transcript{/*sound.transcript*/}
+          </h1>
         </>
       ) : (
         <>
@@ -293,7 +318,14 @@ function AudioPlayer() {
       {sound && (
         <div style={{ marginTop: 20, lineHeight: "25px" }}>
           <div>
-            <button onClick={() => getSummary(sound.transcript)}>
+            <button
+              onClick={
+                () =>
+                  console.log(
+                    "placeholder getSummary()"
+                  ) /*getSummary(sound.transcript)*/
+              }
+            >
               Summary
             </button>
             <h2>Summary is: {summary}</h2>
@@ -307,7 +339,16 @@ function AudioPlayer() {
             <b>Selected Value: </b> {language}
           </div>
           <div>
-            <button onClick={() => getTranslation(language)}>Translate</button>
+            <button
+              onClick={
+                () =>
+                  console.log(
+                    "placeholder getTranslation()"
+                  ) /*getTranslation(language)*/
+              }
+            >
+              Translate
+            </button>
             <h2>Translation is: {translation}</h2>
           </div>
         </div>

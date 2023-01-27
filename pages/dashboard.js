@@ -83,6 +83,27 @@ const Dashboard = () => {
   console.log(currentUser);
   if (!subscription) return null;*/
 
+  const checkAuth = useCallback(
+    async (user) => {
+      if (user) {
+        console.log("Supabase user is: ", user);
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(user);
+    //getSubscriptionsInfo();
+  }, [checkAuth, user]);
+
   return (
     <div className="center">
       <h1 className="title">Welcome home</h1>
@@ -93,7 +114,6 @@ const Dashboard = () => {
             //signOut(auth);
             supabase.auth.signOut(); // had to call this twice for some reason
             //dispatch(setSound(null));
-            router.push("/"); // trying to push to signin would require calling it twice, possibly b/c session's not empty yet
             dispatch({ type: "SIGNED_OUT" });
           }}
         >
@@ -122,7 +142,7 @@ const Dashboard = () => {
       </p>
 
       <style jsx>{dashboardStyles}</style>
-      {console.log("Supabase user is: ", user)}
+      {/*console.log("Supabase user is: ", user)*/}
       {console.log("supabase obj is: ", supabase.auth)}
     </div>
   );
