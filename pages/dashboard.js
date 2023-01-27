@@ -19,12 +19,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSound } from "../redux/recording/actions";
 import dashboardStyles from "../styles/dashboardStyles";
 import Image from "next/image";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const Dashboard = () => {
   const router = useRouter();
   const dispatch = useDispatch();
+  const user = useUser();
+  const supabase = useSupabaseClient();
 
-  const currentUser = useSelector((state) => state.user.currentUser);
+  /*const currentUser = useSelector((state) => state.user.currentUser);
   const [subscription, setSubscription] = useState(null);
   //console.log(userContext);
   async function getSubscriptionsInfo(user) {
@@ -78,7 +81,7 @@ const Dashboard = () => {
     //getSubscriptionsInfo();
   }, [checkAuth, currentUser]);
   console.log(currentUser);
-  if (!subscription) return null;
+  if (!subscription) return null;*/
 
   return (
     <div className="center">
@@ -87,10 +90,11 @@ const Dashboard = () => {
         <button
           className="logout"
           onClick={() => {
-            signOut(auth);
+            //signOut(auth);
+            supabase.auth.signOut(); // had to call this twice for some reason
             //dispatch(setSound(null));
+            router.push("/"); // trying to push to signin would require calling it twice, possibly b/c session's not empty yet
             dispatch({ type: "SIGNED_OUT" });
-            router.push("/signin");
           }}
         >
           Sign out
@@ -118,6 +122,8 @@ const Dashboard = () => {
       </p>
 
       <style jsx>{dashboardStyles}</style>
+      {console.log("Supabase user is: ", user)}
+      {console.log("supabase obj is: ", supabase.auth)}
     </div>
   );
 };

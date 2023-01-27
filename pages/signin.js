@@ -24,6 +24,12 @@ const Signin = () => {
   const session = useSession();
   const supabase = useSupabaseClient();
 
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard");
+    }
+  }, [session, router]);
+
   /*useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       console.log(authUser); // uid
@@ -93,16 +99,11 @@ const Signin = () => {
 
   return (
     <div className="container" style={{ padding: "50px 0 100px 0" }}>
-      {!session ? (
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          theme="dark"
-        />
-      ) : (
-        <Account session={session} />
-      )}
-
+      <Auth
+        supabaseClient={supabase}
+        appearance={{ theme: ThemeSupa }}
+        theme="dark"
+      />
       {/*<>
       <div className="signin">
         <form action="">
