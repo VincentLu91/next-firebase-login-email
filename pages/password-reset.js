@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../utils/initSupabase";
+import { useSession } from "@supabase/auth-helpers-react";
+import { useRouter } from "next/router";
 
 const PasswordReset = () => {
-  // tried https://www.youtube.com/watch?v=Tk2KuBOy2zk
-  // but ran into issues. Had to make a few changes, hence the commented LOCs below.
-  //const [password, setPassword] = useState(null);
   const [hash, setHash] = useState(() => {
     if (window.location.hash)
       sessionStorage.setItem("hash", window.location.hash);
@@ -14,6 +13,10 @@ const PasswordReset = () => {
   const [formData, setFormData] = useState({
     password: "",
   });
+
+  let session;
+  const router = useRouter();
+
   console.log("password is: ", formData.password);
   function handleChange(event) {
     setFormData((prevFormData) => {
@@ -27,24 +30,18 @@ const PasswordReset = () => {
   useEffect(() => {
     console.log("test >>>>>", sessionStorage.getItem("hash"));
     setHash(sessionStorage.getItem("hash"));
-    //setHash(window.location.hash);
-    /*  const { data: authListener } = supabase.auth.onAuthStateChange(
-        (event, _session) => {
-          console.log(`Supbase auth event: ${event}`);
-          setSession(_session);
-        }
-      );
-      return () => {
-        authListener.subscription.unsubscribe();
-      };*/
   }, []);
+
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard");
+    }
+  }, [session, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       if (!hash) {
-        //return toast.error("No access token");
         console.log("No access token");
         return;
       } else if (hash) {
@@ -52,10 +49,8 @@ const PasswordReset = () => {
           .substring(1)
           .split("&")
           .map((param) => param.split("="));
-
         let type;
         let accessToken;
-
         for (const [key, value] of hashArr) {
           if (key === "type") {
             type = value;
@@ -63,36 +58,27 @@ const PasswordReset = () => {
             accessToken = value;
           }
         }
-
         if (
           type !== "recovery" ||
           !accessToken ||
           typeof accessToken == "object"
         ) {
-          //return toast("blast");
           console.log("blast");
           return;
         }
-
-        const { data, error } = await supabase.auth.updateUser(
-          /*accessToken,*/ {
-            //password: password,
-            password: formData.password,
-          }
-        );
-
+        const { data, error } = await supabase.auth.updateUser({
+          password: formData.password,
+        });
         console.log("After calling updateUser(), data is: ", data);
         console.log(
           "After calling updateUser(), password is: ",
           formData.password
         );
-
         if (error) {
-          //toast.error(error.message);
           console.log(error.message);
         } else if (!error) {
-          //toast.success("changed");
           console.log("changed");
+          router.push("/signin");
         }
       }
     } catch (error) {
@@ -102,16 +88,6 @@ const PasswordReset = () => {
 
   return (
     <div>
-      {/*<form>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.password)}
-        />
-      </form>
-      <button onClick={handleSubmit} type="submit">
-        Submit
-  </button>*/}
       <form onSubmit={handleSubmit}>
         <input
           placeholder="Password"
