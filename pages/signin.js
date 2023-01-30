@@ -103,6 +103,7 @@ const Signin = () => {
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
         theme="dark"
+        redirectTo="http://localhost:3001/password-reset"
       />
       {/*<>
       <div className="signin">
