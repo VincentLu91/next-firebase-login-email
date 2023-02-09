@@ -26,6 +26,38 @@ const Dashboard = () => {
   const dispatch = useDispatch();
   const user = useUser();
   const supabase = useSupabaseClient();
+  const [emailAddress, setEmailAddress] = useState(null);
+
+  const checkAuth = useCallback(
+    async (user) => {
+      if (user) {
+        console.log("Supabase user is: ", user);
+        let customerInfo = await supabase
+          .from("customers")
+          .select("*")
+          .eq("email_address", user.email);
+        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
+        setEmailAddress(customerInfo.data[0].email_address);
+        let subscriptionResponse = await supabase
+          .from("subscriptions")
+          .select()
+          .eq("customer_id", customerInfo.data[0].id);
+        console.log("subscriptionResponse is: ", subscriptionResponse);
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
+    },
+    [router, supabase]
+  );
+
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(user);
+  }, [checkAuth, user]);
 
   /*const currentUser = useSelector((state) => state.user.currentUser);
   const [subscription, setSubscription] = useState(null);
@@ -83,30 +115,9 @@ const Dashboard = () => {
   console.log(currentUser);
   if (!subscription) return null;*/
 
-  const checkAuth = useCallback(
-    async (user) => {
-      if (user) {
-        console.log("Supabase user is: ", user);
-      } else {
-        // User is signed out
-        console.log(
-          "The user is inauthenticated, redirecting back to signin page"
-        );
-        router.push("/signin");
-      }
-    },
-    [router]
-  );
-
-  useEffect(() => {
-    //console.log("Current user is: ", currentUser);
-    checkAuth(user);
-    //getSubscriptionsInfo();
-  }, [checkAuth, user]);
-
   return (
     <div className="center">
-      <h1 className="title">Welcome home</h1>
+      <h1 className="title">Welcome home {emailAddress}</h1>
       <p>
         <button
           className="logout"
