@@ -14,7 +14,7 @@ import translate_config from "../pages/api/translate_config";
 import axios from "axios";
 import { useRouter } from "next/router";
 import Select from "react-select";
-import { useUser } from "@supabase/auth-helpers-react";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 import audioPlayerStyles from "../styles/audioPlayerStyles";
 
@@ -22,6 +22,7 @@ function AudioPlayer() {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useUser();
+  const supabase = useSupabaseClient();
   const sound = useSelector((state) => state.recordingReducer.sound);
   const [percentage, setPercentage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -33,6 +34,39 @@ function AudioPlayer() {
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
+
+  const checkAuth = useCallback(
+    async (user) => {
+      if (user) {
+        console.log("Supabase user is: ", user);
+        let customerInfo = await supabase
+          .from("customers")
+          .select("*")
+          .eq("email_address", user.email);
+        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
+        let subscriptionResponse = await supabase
+          .from("subscriptions")
+          .select()
+          .eq("customer_id", customerInfo.data[0].id);
+        console.log(
+          "subscriptionResponse is: ",
+          subscriptionResponse.data[0].stripe_product_name
+        );
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
+    },
+    [router, supabase]
+  );
+
+  useEffect(() => {
+    //console.log("Current user is: ", currentUser);
+    checkAuth(user);
+  }, [checkAuth, user]);
 
   // old code with firebase:
   /*const currentUser = useSelector((state) => state.user.currentUser);
@@ -81,27 +115,6 @@ function AudioPlayer() {
     },
     [router]
   );*/
-
-  const checkAuth = useCallback(
-    async (user) => {
-      if (user) {
-        console.log("Supabase user is: ", user);
-      } else {
-        // User is signed out
-        console.log(
-          "The user is inauthenticated, redirecting back to signin page"
-        );
-        router.push("/signin");
-      }
-    },
-    [router]
-  );
-
-  useEffect(() => {
-    //console.log("Current user is: ", currentUser);
-    checkAuth(user);
-    //getSubscriptionsInfo();
-  }, [checkAuth, user]);
 
   const getSummary = async (transcript) => {
     if (sound == null || transcript == null) {

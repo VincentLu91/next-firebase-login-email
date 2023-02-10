@@ -5,26 +5,21 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateRecordingList, setRecordURI } from "../redux/recording/actions";
 import moment from "moment";
 import getBlobDuration from "get-blob-duration";
-import db, { storage, auth } from "../firebase";
-import { uploadBytes, ref } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
 import { setCurrentUser } from "../redux/user/actions";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc"; // only run on the browser
 import { useRouter } from "next/router";
-import { onAuthStateChanged } from "firebase/auth";
 import signInStyles from "../styles/signinStyles";
-import { useUser } from "@supabase/auth-helpers-react";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const Recording = () => {
   const router = useRouter();
   const user = useUser();
+  const supabase = useSupabaseClient();
 
-  // old firebase code
-  const { status, startRecording, stopRecording /*mediaBlobUrl*/ } =
+  const { status, startRecording, stopRecording, mediaBlobUrl } =
     useReactMediaRecorder({ audio: true }); // could also put video and screen props as true!
 
-  // old firebase code
-  /*const [filename, setFilename] = React.useState("");
+  const [filename, setFilename] = React.useState("");
   const [liveTranscript, setLiveTranscript] = React.useState("");
   const [transcript, setTranscript] = React.useState("");
   const [isTranscribing, setIsTranscribing] = React.useState(false);
@@ -37,40 +32,18 @@ const Recording = () => {
     (state) => state.recordingReducer.isRecording
   );
   const recordURI = useSelector((state) => state.recordingReducer.recordURI);
-  const currentUser = useSelector((state) => state.user.currentUser);
-  console.log("Internal Recording CurrentUser: ", currentUser);
   console.log("Internal Recording isRecording: ", isRecording);
-  console.log("Firebase storage object: ", storage._bucket);
 
   let recorder;
 
-  // this is to check for the userID upon page refresh in the event it gets wiped out.
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      console.log(authUser); // uid
-      if (authUser) {
-        dispatch(setCurrentUser(authUser));
-      }
-    });
-
-    return unsubscribe;
-  }, [dispatch]);
-
   const uploadAudio = async (audioData) => {
-    //const uriParts = recordURI.split(".");
     let uriParts = mediaBlobUrl.split(".").toString().replace("//", "");
-    //uriParts = uriParts.toString().replace("//", "");
-    //const uriParts = mediaBlobUrl.split(".").replace(/\//g, "");
     const fileType = uriParts[uriParts.length - 1];
-    const fileName =
-      //audioData.filename + "_" + currentUser + `${Date.now()}.${fileType}`;
-      audioData.filename + "_" + currentUser.uid + `${Date.now()}.${fileType}`;
-    audioData.originalFilename = fileName;
-    console.log("FILE NAME", fileName);
-    audioData.fileName = fileName;
-
-    //delete filename
-    delete audioData.filename;
+    const file_name =
+      audioData.file_name + "_" + user.id + `${Date.now()}.${fileType}`;
+    audioData.original_file_name = file_name;
+    console.log("FILE NAME", file_name);
+    audioData.file_name = file_name;
 
     try {
       const blob = await new Promise((resolve, reject) => {
@@ -91,16 +64,33 @@ const Recording = () => {
         xhr.send(null);
       });
       if (blob != null) {
-        const storageRef = ref(storage, fileName);
-        uploadBytes(storageRef, blob).then((snapshot) => {
-          const docRef = addDoc(
-            //collection(db, `customers/${userContext.user.uid}/checkout_sessions`),
-            //collection(db, `customers/${user.uid}/checkout_sessions`),
-            collection(db, `recordings/${currentUser.uid}/files`),
-            audioData
-          );
-          console.log("snapshot is: ", snapshot);
-        });
+        console.log("blob is: ", blob);
+        const arrayBuffer = await blob.arrayBuffer();
+        console.log("arrayBuffer is: ", arrayBuffer);
+        const blobResponse = await supabase.storage
+          .from("recreate-ai-storage-bucket")
+          .upload(file_name, arrayBuffer, {
+            // works with blob as well but it's not supported in React Native
+            contentType: "audio/mp3",
+          });
+        if (blobResponse.error) {
+          console.log("blobResponse Error: ", blobResponse.error);
+        }
+        if (blobResponse.data) {
+          console.log("blobResponse data: ", blobResponse.data);
+          let micRecordingResponse = await supabase
+            .from("mic_recordings")
+            .insert([audioData])
+            .select();
+          if (micRecordingResponse.error) {
+            console.log("Cannot insert, see error: ");
+            console.log(micRecordingResponse.error);
+          }
+          if (micRecordingResponse.data) {
+            console.log("micRecording Success!");
+            console.log(micRecordingResponse.data);
+          }
+        }
       } else {
         console.log("erroor with blob");
       }
@@ -153,16 +143,15 @@ const Recording = () => {
       console.error(event);
       window.socket.close();
       setIsTranscribing(false);
-    };*/
+    };
 
-  /*window.socket.onclose = (event) => {
+    /*window.socket.onclose = (event) => {
       console.log(event);
       //window.socket = null;
       setIsTranscribing(false);
     };*/
 
-  // old firebase code
-  /*window.socket.onopen = (e) => {
+    window.socket.onopen = (e) => {
       // solution to reopen websocket instance:
       // https://stackoverflow.com/questions/47180904/websocket-even-after-firing-onopen-event-still-in-connecting-state
       if (e.target.readyState !== WebSocket.OPEN) return;
@@ -234,22 +223,26 @@ const Recording = () => {
       filename,
       recordingdate: recordingdate,
       duration: duration,
-      //duration: durationSeconds,
       transcript: transcript,
     });
+
+    let customerInfo = await supabase
+      .from("customers")
+      .select("*")
+      .eq("email_address", user.email);
 
     //newRecordingList.reverse()   //sorting
     //props.setRecordinglistProp(newRecordingList);
     dispatch(updateRecordingList(newRecordingList));
-    console.log("In Internal Recording, currentUser is: ", currentUser);
+    console.log("In Internal Recording, currentUser is: ", user);
     const audioData = {
       //user: currentUser,
-      user: currentUser.uid,
-      filename,
-      recordingdate: recordingdate,
+      customer_id: customerInfo.data[0].id,
+      file_name: filename,
+      //recordingdate: recordingdate,
       duration: duration,
       //duration: durationSeconds,
-      transcript: transcript,
+      full_transcript: transcript,
     };
     uploadAudio(audioData);
 
@@ -260,10 +253,9 @@ const Recording = () => {
 
     // We can go to library tab
     router.push("/dashboard");
-  }*/
+  }
 
-  // old firebase code
-  /*function renderView() {
+  function renderView() {
     if (status === "recording" || status === "idle") {
       // while recording or not recording yet
       if (isTranscribing) {
@@ -271,7 +263,7 @@ const Recording = () => {
           <div className="title">
             {<p>{status}</p>}
             <button onClick={stopRecordingAudio}>Stop Recording</button>
-            {<video src={mediaBlobUrl} controls autoPlay loop />}
+            {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
             <h1>Transcript below</h1>
             <p>{liveTranscript}</p>
           </div>
@@ -281,7 +273,7 @@ const Recording = () => {
           <div className="title">
             {<p>{status}</p>}
             <button onClick={startRecordingAudio}>Start Recording</button>
-            {<video src={mediaBlobUrl} controls autoPlay loop />}
+            {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
             <h1>Transcript below</h1>
           </div>
         );
@@ -291,11 +283,6 @@ const Recording = () => {
       // finished recording
       return (
         <div className="title">
-          {<TextInput
-            placeholder="audio name"
-            onChangeText={(text) => setFilename(text)}
-            style={{ borderWidth: 1, padding: 8, height: 45, width: 180 }}
-          />}
           <p>{mediaBlobUrl}</p>
           <p>recordURI is: {recordURI}</p>
           <input
@@ -307,7 +294,7 @@ const Recording = () => {
         </div>
       );
     }
-  }*/
+  }
 
   return (
     <div
@@ -323,7 +310,7 @@ const Recording = () => {
         Back to Dashboard
       </button>
       Placeholder renderView
-      {/*renderView()*/}
+      {renderView()}
       <style jsx>{signInStyles}</style>
     </div>
   );
