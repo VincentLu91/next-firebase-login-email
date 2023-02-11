@@ -309,7 +309,6 @@ const Recording = () => {
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
-      Placeholder renderView
       {renderView()}
       <style jsx>{signInStyles}</style>
     </div>

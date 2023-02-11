@@ -2,11 +2,6 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Slider from "../components/slider/Slider";
 import ControlPanel from "../components/controls/ControlPanel";
 import { useDispatch, useSelector } from "react-redux";
-import db, { storage, auth } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { collection, query, getDocs, orderBy } from "firebase/firestore";
-import { setCurrentUser } from "../redux/user/actions";
-import { ref, getDownloadURL } from "firebase/storage";
 import getBlobDuration from "get-blob-duration";
 // import trainML's config code
 import summarize_config from "../pages/api/summarize_config";
@@ -30,6 +25,7 @@ function AudioPlayer() {
   const [audioURL, setAudioURL] = useState(null);
   const [isAudioSelected, setIsAudioSelected] = useState(false);
   const [durationSeconds, setDurationSeconds] = useState(0);
+  const [customer, setCustomer] = useState(null);
 
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
@@ -44,6 +40,7 @@ function AudioPlayer() {
           .select("*")
           .eq("email_address", user.email);
         console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
+        setCustomer(customerInfo.data[0]);
         let subscriptionResponse = await supabase
           .from("subscriptions")
           .select()
@@ -64,57 +61,8 @@ function AudioPlayer() {
   );
 
   useEffect(() => {
-    //console.log("Current user is: ", currentUser);
     checkAuth(user);
   }, [checkAuth, user]);
-
-  // old code with firebase:
-  /*const currentUser = useSelector((state) => state.user.currentUser);
-  const [subscription, setSubscription] = useState(null);
-
-  async function getSubscriptionsInfo(user) {
-    //if (!userContext.user) return;
-    const subscriptionsRef = collection(
-      db,
-      //`customers/${userContext.user.uid}/subscriptions`
-      `customers/${user.uid}/subscriptions` // why does this not work? update: it works, I had to call this fn in checkAuth()
-      //`customers/CvKhT7Q8Ubeo4ImF3qToeJZBEJ22/subscriptions` // why does this work? because it identifies the ID upon useEffect
-    );
-    const q = query(subscriptionsRef, orderBy("created"));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((subscription) => {
-      console.log("subscription: ", subscription.id, subscription.data());
-      setSubscription({
-        role: subscription.data().role,
-        subscriptionId: subscription.id,
-        current_period_start: subscription.data().current_period_start,
-        current_period_end: subscription.data().current_period_end,
-      });
-    });
-  }
-
-  const checkAuth = useCallback(
-    async (user) => {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
-          const uid = user.uid;
-          console.log("The user is authenticated with the uid: ", uid);
-          getSubscriptionsInfo(user);
-          // ...
-        } else {
-          // User is signed out
-          // ...
-          console.log(
-            "The user is inauthenticated, redirecting back to signin page"
-          );
-          router.push("/signin");
-        }
-      });
-    },
-    [router]
-  );*/
 
   const getSummary = async (transcript) => {
     if (sound == null || transcript == null) {
@@ -163,40 +111,6 @@ function AudioPlayer() {
     }
   };
 
-  // old firebase code
-  /*async function loadRecording(authUser, sound) {
-    const pathReference = ref(storage, sound.originalFilename);
-    getDownloadURL(pathReference)
-      .then((url) => {
-        // Insert url into an <img> tag to "download"
-        console.log("Audio downloaded: ", url);
-        setAudioURL(url);
-      })
-      .catch((error) => {
-        // A full list of error codes is available at
-        // https://firebase.google.com/docs/storage/web/handle-errors
-        switch (error.code) {
-          case "storage/object-not-found":
-            // File doesn't exist
-            break;
-          case "storage/unauthorized":
-            // User doesn't have permission to access the object
-            break;
-          case "storage/canceled":
-            // User canceled the upload
-            break;
-
-          // ...
-
-          case "storage/unknown":
-            // Unknown error occurred, inspect the server response
-            break;
-          default:
-            break;
-        }
-      });
-  }
-
   async function urlToDuration(audioURL) {
     const durationSeconds = await getBlobDuration(audioURL);
     console.log("durationSeconds is: ", durationSeconds);
@@ -204,32 +118,22 @@ function AudioPlayer() {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      console.log("authUser is: ", authUser); // uid
-      if (authUser) {
-        dispatch(setCurrentUser(authUser));
-        if (sound) {
-          loadRecording(authUser, sound);
-          setIsAudioSelected(true);
-        } else {
-          setIsAudioSelected(false);
-        }
+    console.log("authUser is: ", customer); // uid
+    if (customer) {
+      if (sound) {
+        const uri = supabase.storage
+          .from("recreate-ai-storage-bucket")
+          .getPublicUrl(sound.original_file_name);
+        console.log("uri is: ", uri.data.publicUrl);
+        setAudioURL(uri.data.publicUrl);
+        setIsAudioSelected(true);
+      } else {
+        setIsAudioSelected(false);
       }
-    });
-
-    return unsubscribe;
-  }, [dispatch, sound]);*/
+    }
+  }, [dispatch, sound, customer, supabase]);
 
   const audioRef = useRef();
-
-  /*// create useEffect to track user's subscriptions...
-  useEffect(() => {
-    //console.log("Current user is: ", currentUser);
-    checkAuth(currentUser);
-    //getSubscriptionsInfo();
-  }, [checkAuth, currentUser]);
-  console.log(currentUser);
-  if (!subscription) return null;*/
 
   const onChange = (e) => {
     const sliderVal = e.target.value;
@@ -305,13 +209,9 @@ function AudioPlayer() {
       </div>
       {isAudioSelected ? (
         <>
-          <h1 className="h1-center-bold">
-            Placeholder sound.fileName{/*sound.fileName*/}
-          </h1>
+          <h1 className="h1-center-bold">{sound.file_name}</h1>
           <h1 className="h1-center-bold">Transcript:</h1>
-          <h1 className="h1-center-bold">
-            Placeholder sound.transcript{/*sound.transcript*/}
-          </h1>
+          <h1 className="h1-center-bold">{sound.full_transcript}</h1>
         </>
       ) : (
         <>
