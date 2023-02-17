@@ -90,6 +90,8 @@ const Recording = () => {
           if (micRecordingResponse.data) {
             console.log("micRecording Success!");
             console.log(micRecordingResponse.data);
+            // refresh the page so the websocket doesn't remain open
+            window.location.reload(true);
           }
         }
       } else {
