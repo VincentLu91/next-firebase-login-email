@@ -32,8 +32,8 @@ const Library = () => {
           .from("subscriptions")
           .select()
           .eq("customer_id", customerInfo.data[0].id);
-          // we don't have to check subscriptions because if the user cancels plan, they could still listen
-          // to existing audio/transcripts. 
+        // we don't have to check subscriptions because if the user cancels plan, they could still listen
+        // to existing audio/transcripts.
         /*console.log(
           "subscriptionResponse is: ",
           subscriptionResponse.data[0].stripe_product_name
@@ -67,17 +67,15 @@ const Library = () => {
   // function to delete a recording:
   async function deleteRecording(original_file_name, customer) {
     console.log("deleting recording: ", original_file_name);
-    const { data, error } = await supabase
+    await supabase
       .from("mic_recordings")
       .delete()
       .eq("customer_id", customer.id)
       .eq("original_file_name", original_file_name);
-    if (error) {
-      console.log("Error deleting: ", error);
-    }
-    if (data) {
-      console.log("Data deleting: ", data);
-    }
+    const storageDeleteResponse = await supabase.storage
+      .from("recreate-ai-storage-bucket")
+      .remove([original_file_name]);
+    console.log("storageDeleteResponse is: ", storageDeleteResponse);
     router.push("/dashboard");
   }
 
