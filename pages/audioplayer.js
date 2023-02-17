@@ -45,10 +45,11 @@ function AudioPlayer() {
           .from("subscriptions")
           .select()
           .eq("customer_id", customerInfo.data[0].id);
-        console.log(
+        // the below could be commented out for now, because users who cancel plan should still access recordings
+        /*console.log(
           "subscriptionResponse is: ",
           subscriptionResponse.data[0].stripe_product_name
-        );
+        );*/
       } else {
         // User is signed out
         console.log(

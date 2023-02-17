@@ -7,6 +7,7 @@ const Plan1 = (props) => {
   const user = useUser();
   const supabase = useSupabaseClient();
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const checkAuth = useCallback(
     async (user) => {
@@ -21,11 +22,24 @@ const Plan1 = (props) => {
           .from("subscriptions")
           .select()
           .eq("customer_id", customerInfo.data[0].id);
-        console.log(
-          "subscriptionResponse is: ",
-          subscriptionResponse.data[0].stripe_product_name
-        );
-        setSubscriptionInfo(subscriptionResponse.data[0].stripe_product_name);
+        if (!subscriptionResponse) {
+          setIsSubscribed(false);
+          setSubscriptionInfo(null);
+        } else {
+          if (!subscriptionResponse.data[0]) {
+            setIsSubscribed(false);
+            setSubscriptionInfo(null);
+          } else {
+            console.log(
+              "subscriptionResponse is: ",
+              subscriptionResponse.data[0].stripe_product_name
+            );
+            setIsSubscribed(true);
+            setSubscriptionInfo(
+              subscriptionResponse.data[0].stripe_product_name
+            );
+          }
+        }
       } else {
         // User is signed out
         console.log(

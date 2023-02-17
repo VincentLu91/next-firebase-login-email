@@ -21,6 +21,7 @@
     "cors": "^2.8.5",
     "dayjs": "^1.11.7",
     "express": "^4.17.2",
+    "file2arraybuffer": "^1.2.2",
     "firebase": "^9.6.6",
     "get-blob-duration": "^1.2.0",
     "moment": "^2.29.1",
@@ -36,6 +37,7 @@
     "react-select": "^5.2.2",
     "recordrtc": "^5.6.2",
     "redux-persist": "^6.0.0",
+    "stripe": "^11.10.0",
     "styled-jsx": "^5.0.0",
     "telnyx": "^1.23.0",
     "twilio": "^3.84.0"

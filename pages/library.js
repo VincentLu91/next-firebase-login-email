@@ -32,11 +32,13 @@ const Library = () => {
           .from("subscriptions")
           .select()
           .eq("customer_id", customerInfo.data[0].id);
-        console.log(
+          // we don't have to check subscriptions because if the user cancels plan, they could still listen
+          // to existing audio/transcripts. 
+        /*console.log(
           "subscriptionResponse is: ",
           subscriptionResponse.data[0].stripe_product_name
         );
-        setSubscriptionInfo(subscriptionResponse.data[0].stripe_product_name);
+        setSubscriptionInfo(subscriptionResponse.data[0].stripe_product_name);*/
         let micRecordingInfo = await supabase
           .from("mic_recordings")
           .select("*")

@@ -15,152 +15,206 @@ import axios from "axios";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { setSound } from "../redux/recording/actions";
 import dashboardStyles from "../styles/dashboardStyles";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const ManageSubscriptions = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.user.currentUser);
+  const supabase = useSupabaseClient();
+  const user = useUser();
   const [products, setProducts] = useState([]);
-  const [subscription, setSubscription] = useState(null);
+  const [customer, setCustomer] = useState(null);
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const getSubscriptionsInfo = useCallback(async (user) => {
-    const subscriptionsRef = collection(
-      db,
-      `customers/${user.uid}/subscriptions`
-    );
-    const q = query(subscriptionsRef);
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((subscription) => {
-      setSubscription({
-        role: subscription.data().role,
-        subscriptionId: subscription.id,
-        current_period_start: subscription.data().current_period_start,
-        current_period_end: subscription.data().current_period_end,
-      });
-    });
-  }, []);
-
   const checkAuth = useCallback(
     async (user) => {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
-          getSubscriptionsInfo(user);
+      if (user) {
+        console.log("Supabase user is: ", user);
+        let customerInfo = await supabase
+          .from("customers")
+          .select("*")
+          .eq("email_address", user.email);
+        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
+        setCustomer(customerInfo.data[0]);
+        let subscriptionResponse = await supabase
+          .from("subscriptions")
+          .select()
+          .eq("customer_id", customerInfo.data[0].id);
+
+        console.log("subscription REsponse >>>>>>", subscriptionResponse);
+        if (!subscriptionResponse) {
+          setIsSubscribed(false);
+          setSubscriptionInfo(null);
         } else {
-          // User is signed out
-          router.push("/signin");
+          if (!subscriptionResponse.data[0]) {
+            setIsSubscribed(false);
+            setSubscriptionInfo(null);
+          } else {
+            console.log(
+              "subscriptionResponse is: ",
+              subscriptionResponse.data[0].stripe_product_name
+            );
+            setIsSubscribed(true);
+            setSubscriptionInfo(subscriptionResponse.data[0]);
+          }
         }
-      });
+        let micRecordingInfo = await supabase
+          .from("mic_recordings")
+          .select("*")
+          .eq("customer_id", customerInfo.data[0].id);
+        // setCloudRecordingList(micRecordingInfo.data);
+      } else {
+        // User is signed out
+        console.log(
+          "The user is inauthenticated, redirecting back to signin page"
+        );
+        router.push("/signin");
+      }
     },
-    [router, getSubscriptionsInfo]
+    [router, supabase]
   );
 
-  // create useEffect to track user's subscriptions...
+  // this is to check for the user status and subscriptions before loading all recording objects
   useEffect(() => {
-    checkAuth(currentUser);
-  }, [checkAuth, currentUser]);
+    checkAuth(user);
+  }, [checkAuth, user]);
 
   const getProductsDisplay = useCallback(async () => {
-    const productsRef = collection(db, "products");
-    const q = query(productsRef, where("active", "==", true));
-    const querySnapshot = await getDocs(q);
-    const products = {};
-    querySnapshot.forEach(async (productDoc) => {
-      products[productDoc.id] = productDoc.data();
-      const priceSnapshotList = query(
-        collection(db, `products/${productDoc.id}/prices`)
-      );
-      const priceSnapshot = await getDocs(priceSnapshotList);
-      priceSnapshot.forEach((priceDoc) => {
-        products[productDoc.id].prices = {
-          priceId: priceDoc.id,
-          priceData: priceDoc.data(),
-        };
-      });
-    });
+    let products = await supabase
+      .from("products")
+      .select("*, prices(*)")
+      .eq("active", true);
+    console.log("Products are: ", products);
     setProducts(products);
-  }, []);
+  }, [supabase]);
   useEffect(() => {
     getProductsDisplay();
   }, [getProductsDisplay]);
 
   // have no subscription
   const checkOut = async (priceId) => {
-    const docRef = await addDoc(
-      collection(db, `customers/${currentUser.user.uid}/checkout_sessions`),
+    const stripe = await loadStripe(
+      "pk_test_51Jx1cdLBlaDAR7THzsOatgkQk8OYrYzoeZzljbQTVZvd8rcGrlrWxqmDxuLtA2waXPYnOHBIlxjWI4PMjjF8Otxa00naRp98mK"
+    );
+    // user/customer objects should already be present including stripe customer id
+    // make request to backend to get session data
+    // redirect user to sessions url
+
+    const response = await axios.post(
+      "http://localhost:3001/api/checkout_session", // I could rewrite this with environment specific URLs
       {
-        price: priceId,
-        success_url: window.location.origin,
-        cancel_url: window.location.origin,
+        success_url: `${window.location.origin}/subscription-checkout`,
+        cancel_url: window.location.href,
+        stripe_customer_id: customer?.stripe_customer_id,
+        price_id: priceId,
       }
     );
-    onSnapshot(docRef, async (snap) => {
-      const { error, sessionId } = snap.data();
-      if (error) {
-        alert(error.message);
-      }
-      if (sessionId) {
-        const stripe = await loadStripe(
-          "pk_test_51Jx1cdLBlaDAR7THzsOatgkQk8OYrYzoeZzljbQTVZvd8rcGrlrWxqmDxuLtA2waXPYnOHBIlxjWI4PMjjF8Otxa00naRp98mK"
-        );
-        stripe.redirectToCheckout({ sessionId });
-      }
-    });
+    window.location.href = response.data.url; // by calling the API to start checkout, redirect user to checkout page
+
+    /*let customerResponse = await supabase
+      .from("customers")
+      .insert([{}])
+      .select();
+    if (customerResponse.error) {
+      console.log("Cannot insert, see error: ");
+      console.log(customerResponse.error);
+    }
+    if (customerResponse.data) {
+      console.log("Customer Success!");
+      console.log(customerResponse.data);
+    }*/
+  };
+
+  console.log("customer", customer);
+
+  const updateSubscription = async (subscriptionObj, stripe_price_id) => {
+    console.log("subscriptionObj is: ", subscriptionObj);
+    //console.log("stripe_price_id is: ", stripe_price_id);
+    let priceResponse = await supabase
+      .from("prices")
+      .select("*")
+      .eq("stripe_price_id", stripe_price_id);
+    console.log("priceResponse when switching plans is: ", priceResponse);
+    let productResponse = await supabase
+      .from("products")
+      .select("*")
+      .eq("stripe_product_id", priceResponse.data[0].stripe_product_id);
+    console.log("productResponse when switching plans is: ", productResponse);
+    let subscriptionUpdateResponse = await supabase
+      .from("subscriptions")
+      .update([
+        {
+          //stripe_subscription_id: res.data.subscription, // subscription id is the same no matter the product
+          stripe_price_id: subscriptionObj.id,
+          stripe_product_id: subscriptionObj.product,
+          price_id: priceResponse.data[0].id,
+          product_id: priceResponse.data[0].product_id,
+          stripe_product_name: productResponse.data[0].product_name,
+          //cancel_at_period_end: false,
+        },
+      ])
+      .eq("customer_id", customer.id)
+      .select();
+    console.log("subscriptionUpdateResponse is: ", subscriptionUpdateResponse);
   };
 
   //Stripe APIs
-  const switchPlan = async (currentSubscriptionId, newPriceId) => {
-    await checkAuth(currentUser);
+  const switchPlan = async (subscription_id, stripe_price_id) => {
+    // https://stripe.com/docs/billing/subscriptions/upgrade-downgrade
+    await checkAuth(user);
     setLoading(true);
-    try {
-      const functions = getFunctions();
-      const addMessage = httpsCallable(functions, "stripeSwitchPlans");
-      console.log(currentUser);
-      addMessage({
-        stripeSubscriptionId: currentSubscriptionId,
-        newPriceId: newPriceId,
-        customerId: currentUser.uid,
-      }).then((result) => {
-        // Read result of the Cloud Function.
-        /** @type {any} */
-        const data = result.data;
-        console.log(data);
+    await axios
+      .post("/api/switch-plan", { subscription_id, stripe_price_id })
+      .then((subscriptionRes) => {
+        //console.log("subscription is: ", subscriptionRes.data.plan);
+        //console.log("stripe_price_id is: ", stripe_price_id);
+        updateSubscription(subscriptionRes.data.plan, stripe_price_id);
       });
-    } catch (error) {
-      console.log(error);
-      alert("Failed");
-    }
     //setSubscription(null); // reverting back to commented code; not needed
-    await checkAuth(currentUser);
+    await checkAuth(user);
     setLoading(false);
     //window.location.reload(true); // workaround for screen refresh
-    router.push("/dashboard");
+    await checkAuth(user); // no need to router.push('/dashboard') anymore.
   };
 
-  const cancelPlan = async (currentSubscriptionId) => {
-    await checkAuth(currentUser);
+  const deleteSubscription = async (stripe_subscription_id) => {
+    console.log(
+      "in deleteSubscription(), stripe_subscription_id is: ",
+      stripe_subscription_id
+    );
+    let deletedSubscription = await supabase
+      .from("subscriptions")
+      .delete()
+      .eq("stripe_subscription_id", stripe_subscription_id);
+    console.log("deletedSubscription in the works: ", deletedSubscription);
+    if (deletedSubscription.error) {
+      console.log("Cannot delete subscription");
+      console.log(deletedSubscription.error);
+    }
+    if (deletedSubscription.data) {
+      console.log("Subscription deletion success");
+      console.log(deletedSubscription.data);
+    }
+  };
+
+  const cancelPlan = async (subscription_id) => {
+    // https://stripe.com/docs/billing/subscriptions/cancel
+    await checkAuth(user);
     setLoading(true);
-    /*await axios.post("http://localhost:8080/stripe/cancel-subscription", {
-      stripeSubscriptionId: currentSubscriptionId,
-    });*/
-    const functions = getFunctions();
-    const addMessage = httpsCallable(functions, "cancelSubscription");
-    addMessage({
-      stripeSubscriptionId: currentSubscriptionId,
-    }).then((result) => {
-      // Read result of the Cloud Function.
-      /** @type {any} */
-      const data = result.data;
-      console.log(data);
-    });
-    setSubscription(null);
-    await checkAuth(currentUser);
+    //perform the cancellation of plan. For now, when cancelling, delete the whole subscription record to test things
+    await axios
+      .post("/api/cancel-plan", { subscription_id })
+      .then((subscriptionRes) => {
+        //console.log("subscriptionRes to delete is: ", subscriptionRes.data.id);
+        deleteSubscription(subscriptionRes.data.id);
+      });
+    //setSubscriptionInfo(null);
+    await checkAuth(user);
     setLoading(false);
-    window.location.reload(true);
+    //window.location.reload(true);
     //router.push("/dashboard");
   };
   return (
@@ -175,37 +229,42 @@ const ManageSubscriptions = () => {
         </div>
       )}
       <div className="plans-container">
-        {Object.entries(products).map(([productId, productData]) => {
-          const isCurrentPlan = productData?.name
+        {Object.entries(products.data || {}).map(([productId, productData]) => {
+          console.log(productData, subscriptionInfo);
+          const isCurrentPlan = productData?.product_name
             ?.toLowerCase()
-            .includes(subscription?.role);
+            .includes(subscriptionInfo?.stripe_product_name);
           return (
             <div className="plans" key={productId}>
               <div>
-                {productData.name} - {productData.description}
+                {productData.product_name} - {productData.description}
               </div>
               <button
                 className={isCurrentPlan && "subscribed" ? "subscribed" : null}
                 disabled={isCurrentPlan}
                 onClick={() =>
-                  subscription?.role
+                  subscriptionInfo?.stripe_product_name
                     ? isCurrentPlan
                       ? undefined
                       : switchPlan(
-                          subscription.subscriptionId,
-                          productData.prices.priceId
+                          subscriptionInfo.stripe_subscription_id,
+                          productData.prices[0].stripe_price_id
                         )
-                    : checkOut(productData.prices.priceId)
+                    : checkOut(productData.prices[0].stripe_price_id)
                 }
               >
-                {subscription?.role
+                {subscriptionInfo?.stripe_product_name
                   ? isCurrentPlan
                     ? "Subscribed"
                     : "Switch Plan"
                   : "Buy Plan"}
               </button>
               {isCurrentPlan && (
-                <button onClick={() => cancelPlan(subscription.subscriptionId)}>
+                <button
+                  onClick={() =>
+                    cancelPlan(subscriptionInfo.stripe_subscription_id)
+                  }
+                >
                   Cancel
                 </button>
               )}

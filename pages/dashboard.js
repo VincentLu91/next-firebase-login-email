@@ -20,13 +20,30 @@ const Dashboard = () => {
           .from("customers")
           .select("*")
           .eq("email_address", user.email);
-        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
-        setEmailAddress(customerInfo.data[0].email_address);
-        let subscriptionResponse = await supabase
-          .from("subscriptions")
-          .select()
-          .eq("customer_id", customerInfo.data[0].id);
-        console.log("subscriptionResponse is: ", subscriptionResponse);
+        console.log("customerInfo is: ", customerInfo.data[0]);
+        if (!customerInfo.data[0]) {
+          // say if the user created their account for the first time, then create a customer row for them.
+          customerInfo = await supabase
+            .from("customers")
+            .insert([{ email_address: user.email }])
+            .select();
+          if (customerInfo.error) {
+            console.log("Cannot create customer, see error: ");
+            console.log(customerInfo.error);
+          }
+          if (customerInfo.data) {
+            console.log("Customer Success!");
+            console.log(customerInfo.data);
+          }
+        } else {
+          //console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
+          setEmailAddress(customerInfo.data[0].email_address);
+          let subscriptionResponse = await supabase
+            .from("subscriptions")
+            .select()
+            .eq("customer_id", customerInfo.data[0].id);
+          console.log("subscriptionResponse is: ", subscriptionResponse);
+        }
       } else {
         // User is signed out
         console.log(

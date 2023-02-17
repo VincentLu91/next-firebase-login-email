@@ -10,6 +10,7 @@ import RecordRTC, { StereoAudioRecorder } from "recordrtc"; // only run on the b
 import { useRouter } from "next/router";
 import signInStyles from "../styles/signinStyles";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import fileToArrayBuffer from "file2arraybuffer";
 
 const Recording = () => {
   const router = useRouter();

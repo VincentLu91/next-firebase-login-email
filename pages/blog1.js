@@ -8,6 +8,7 @@ const BlogPage = (props) => {
   const user = useUser();
   const supabase = useSupabaseClient();
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const checkAuth = useCallback(
     async (user) => {
@@ -22,11 +23,25 @@ const BlogPage = (props) => {
           .from("subscriptions")
           .select()
           .eq("customer_id", customerInfo.data[0].id);
-        console.log(
-          "subscriptionResponse is: ",
-          subscriptionResponse.data[0].stripe_product_name
-        );
-        setSubscriptionInfo(subscriptionResponse.data[0].stripe_product_name);
+        //console.log("subscriptionResponse[0] is: ", subscriptionResponse);
+        if (!subscriptionResponse) {
+          setIsSubscribed(false);
+          setSubscriptionInfo(null);
+        } else {
+          if (!subscriptionResponse.data[0]) {
+            setIsSubscribed(false);
+            setSubscriptionInfo(null);
+          } else {
+            console.log(
+              "subscriptionResponse is: ",
+              subscriptionResponse.data[0].stripe_product_name
+            );
+            setIsSubscribed(true);
+            setSubscriptionInfo(
+              subscriptionResponse.data[0].stripe_product_name
+            );
+          }
+        }
       } else {
         // User is signed out
         console.log(
@@ -47,6 +62,7 @@ const BlogPage = (props) => {
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
+      {subscriptionInfo}
       {["plan2", "plan3", "plan4"].includes(subscriptionInfo) && (
         <div>This is blog one</div>
       )}

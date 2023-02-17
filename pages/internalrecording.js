@@ -1,8 +1,5 @@
 import dynamic from "next/dynamic";
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import db, { auth } from "../firebase";
-import { collection, query, getDocs, orderBy } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -15,6 +12,9 @@ const InternalRecording = () => {
   const router = useRouter();
   const user = useUser();
   const supabase = useSupabaseClient();
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
   const checkAuth = useCallback(
     async (user) => {
       if (user) {
@@ -28,10 +28,24 @@ const InternalRecording = () => {
           .from("subscriptions")
           .select()
           .eq("customer_id", customerInfo.data[0].id);
-        console.log(
-          "subscriptionResponse is: ",
-          subscriptionResponse.data[0].stripe_product_name
-        );
+        if (!subscriptionResponse) {
+          setIsSubscribed(false);
+          setSubscriptionInfo(null);
+        } else {
+          if (!subscriptionResponse.data[0]) {
+            setIsSubscribed(false);
+            setSubscriptionInfo(null);
+          } else {
+            console.log(
+              "subscriptionResponse is: ",
+              subscriptionResponse.data[0].stripe_product_name
+            );
+            setIsSubscribed(true);
+            setSubscriptionInfo(
+              subscriptionResponse.data[0].stripe_product_name
+            );
+          }
+        }
       } else {
         // User is signed out
         console.log(
@@ -47,7 +61,19 @@ const InternalRecording = () => {
     //console.log("Current user is: ", currentUser);
     checkAuth(user);
   }, [checkAuth, user]);
-  return <ComponentWithNoSSR />;
+
+  function isUserSubscribed() {
+    if (isSubscribed) {
+      return <ComponentWithNoSSR />;
+    } else {
+      return (
+        <>
+        <h1> You are not subscribed!!</h1>
+        </>
+      )
+    }
+  }
+  return <div>{isUserSubscribed()}</div>;
 };
 
 export default InternalRecording;
