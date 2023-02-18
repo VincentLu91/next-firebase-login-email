@@ -10,6 +10,7 @@ export const config = {
     bodyParser: false,
   },
 };
+// current ngrok link: http://fef8-142-114-125-127.ngrok.io
 
 export default async function handler(req, res) {
   // This is your Stripe CLI webhook secret for testing your endpoint locally.
