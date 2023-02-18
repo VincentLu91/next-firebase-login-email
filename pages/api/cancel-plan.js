@@ -3,6 +3,7 @@ const stripe = require("stripe")(
   "sk_test_51Jx1cdLBlaDAR7THINnFtmhlbxt3oaeehIMdTtpTitqJtX5eTtBenCXEF1bnHUN8xvpzUSAxgFhut1BfRu1bZljo00F6QMtxgc"
 );
 
+
 export default async function handler(req, res) {
   // https://stripe.com/docs/billing/subscriptions/cancel
   console.log("subscription request body is: ", req.body);
@@ -13,8 +14,8 @@ export default async function handler(req, res) {
       cancel_at_period_end: true,
     });
     console.log("Deleted subscription is: ", subscription);
-    let deletedSubscription = await stripe.subscriptions.del(subscription_id);
-    console.log("deletedSubscription is: ", deletedSubscription);
+    /*let deletedSubscription = await stripe.subscriptions.del(subscription_id);
+    console.log("deletedSubscription is: ", deletedSubscription);*/
     res.json(subscription);
   } catch (error) {
     res.status(500).json({ error });
