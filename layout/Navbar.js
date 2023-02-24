@@ -4,7 +4,7 @@ const Navbar = () => {
   return (
     <nav>
       <div className="logo">
-        <h1>test demo</h1>
+        <h1>recreate.AI</h1>
       </div>
       <Link href="/">
         <a>Home</a>
