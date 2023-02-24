@@ -1,6 +1,5 @@
 import Telnyx from "telnyx";
-import db from "../../firebase";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { supabase } from "../../utils/initSupabase";
 
 import { publishMessage } from "../../lib/pubnub";
 
@@ -51,29 +50,49 @@ export default async function handler(req, res) {
       }
     }*/
 
-    const uid = Buffer.from(data.payload.client_state, "base64").toString();
-    const { occurred_at, id, payload: { call_control_id, transcription_data } } = data
-    addDoc(
-      collection(db, `recordings/${uid}/transcripts`),
-      { occurred_at, id, call_control_id, transcription_data }
-     );
-    const transcriptsRef = collection(db, `recordings/${uid}/transcripts`);
-    const transcriptQuery = query(transcriptsRef, where("call_control_id", "==", call_control_id))
-    const transcriptData = await getDocs(transcriptQuery);
-    const transcripts = [];
-    transcriptData.forEach((doc) => {
-      transcripts.push(doc.data());
-    });
-    // TODO: maybe offload to db
-    transcripts.sort((x, y) => {
-      return new Date(x.occurred_at) - new Date(y.occurred_at)
-    });
-    const transcript = transcripts.map(item => item.transcription_data.transcript).join("");
-    console.log("transcript is: ", transcript);
-    publishMessage(data.payload.call_control_id, {
-      transcript,
-      action: data.event_type,
-    });
+    const customer_id = Buffer.from(
+      data.payload.client_state,
+      "base64"
+    ).toString();
+    const {
+      occurred_at,
+      id,
+      payload: { call_control_id, transcription_data },
+    } = data;
+
+    const callRecordingResponse = await supabase
+      .from("call_recordings")
+      .upsert(
+        { telnyx_call_control_id: call_control_id, customer_id },
+        { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
+      )
+      .select();
+
+    if (callRecordingResponse.data) {
+      let telnyxChunkResponse = await supabase
+        .from("telnyx_transcript_chunks")
+        .insert({
+          occurred_at,
+          call_recording_id: callRecordingResponse.data[0].id,
+          transcription_data,
+        });
+
+      if (!telnyxChunkResponse.error) {
+        telnyxChunkResponse = await supabase
+          .from("telnyx_transcript_chunks")
+          .select()
+          .eq("call_recording_id", callRecordingResponse.data[0].id)
+          .order("occurred_at", { ascending: true });
+
+        const transcript = telnyxChunkResponse.data
+          .map((item) => item.transcription_data.transcript)
+          .join("");
+        publishMessage(data.payload.call_control_id, {
+          transcript,
+          action: data.event_type,
+        });
+      }
+    }
   } else if (data.event_type === "call.answered") {
     // call transcription function
     const transcription_call = telnyx.Call({
@@ -84,6 +103,103 @@ export default async function handler(req, res) {
     } catch (e) {
       console.log(e);
     }
+  } else if (data.event_type === "call.recording.saved") {
+    let callRecordingMp3Url;
+    let callRecordingMp3FileName;
+    let callRecordingMp3Duration;
+    // store the recording_id so I could get the mp3 url
+
+    console.log("data download urls is: ", data.payload.recording_id);
+    const recording_id = data.payload.recording_id;
+    // download file from telnyx using recoird id
+    // upload file to supabase
+    // send url and call_recording_id to frontend
+
+    // next, store the recording_id in the table. Use upsert or update
+    const callRecordingResponse = await supabase
+      .from("call_recordings")
+      .update({ recording_id: data.payload.recording_id })
+      .eq("telnyx_call_control_id", data.payload.call_control_id)
+      .select();
+    if (callRecordingResponse.error) {
+      console.log(
+        "cannot capture recording_id due to error: ",
+        callRecordingResponse.error
+      );
+    }
+    if (callRecordingResponse.data) {
+      console.log("saved recording data is: ", callRecordingResponse.data[0]);
+      // download file from telnyx using recoird id, data.payload.recording_id
+      var myHeaders = new Headers();
+      myHeaders.append("x-api-user", "vincentlu299@gmail.com");
+      myHeaders.append("x-api-token", "5HrYQZpYSu-__anTZNVmhw");
+      myHeaders.append("Accept", "application/json");
+      myHeaders.append("Content-Type", "application/json");
+
+      var requestOptions = {
+        method: "GET",
+        headers: myHeaders,
+        redirect: "follow",
+      };
+      try {
+        const response = await fetch(
+          `https://api.telnyx.com/recordings/${recording_id}`,
+          requestOptions
+        ); // so we could get the value out of the promise for reference in later steps below
+        const result = await response.json(); // instead of text() which was found in the Postman snippet
+        callRecordingMp3Url = result.data.download_urls.mp3;
+        //console.log("callRecordingMp3Url is: ", callRecordingMp3Url); // instead of request, this saves the value
+        callRecordingMp3FileName = result.data.call.id + ".mp3"; // basically recording_id.mp3
+        console.log("callRecordingMp3FileName is: ", callRecordingMp3FileName);
+        console.log("result.data is: ", result.data);
+        callRecordingMp3Duration = result.data.duration;
+      } catch (error) {
+        console.log("Call recording fetch error: ", error);
+      }
+      console.log("callRecordingMp3Url is: ", callRecordingMp3Url);
+      const downloadRecordingResponse = await fetch(callRecordingMp3Url);
+      const blob = await downloadRecordingResponse.blob();
+      const arrayBuffer = await blob.arrayBuffer();
+      // upload file to supabase
+      const blobResponse = await supabase.storage
+        .from("recreate-ai-storage-bucket")
+        .upload(callRecordingMp3FileName, arrayBuffer, {
+          // works with blob as well but it's not supported in React Native
+          contentType: "audio/mp3",
+        });
+      if (blobResponse.error) {
+        console.log("call recording blobResponse Error: ", blobResponse.error);
+      }
+      if (blobResponse.data) {
+        console.log("call recording blobResponse data: ", blobResponse.data);
+        let uploadRecordingResponse = await supabase
+          .from("call_recordings")
+          .update({
+            mp3_file_name: callRecordingMp3FileName,
+            durationMillis: callRecordingMp3Duration,
+          })
+          .select()
+          .eq("recording_id", recording_id);
+        if (uploadRecordingResponse.error) {
+          console.log("Cannot update mp3 name, see error: ");
+          console.log(uploadRecordingResponse.error);
+        }
+        if (uploadRecordingResponse.data) {
+          console.log("uploadRecordingResponse Success!");
+          console.log(uploadRecordingResponse.data);
+          // refresh the page so the websocket doesn't remain open
+        }
+      }
+    }
+    publishMessage(data.payload.call_control_id, {
+      url: callRecordingMp3Url,
+      call_recording_id: callRecordingResponse.data
+        ? callRecordingResponse.data[0].id
+        : null,
+      action: data.event_type,
+    });
+    // seems to work in uploading. just need to render the UI to display call recordings now...
+    // but I can't find storage items. Edit: I CAN find it, but it takes a bit of browsing. No search bars...
   }
   res.status(200).json({ name: "John Doe" });
   //} catch (error) {}

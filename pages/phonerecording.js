@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateRecordingList, setRecordURI } from "../redux/recording/actions";
+import { updateRecordingList } from "../redux/recording/actions";
 import moment from "moment";
 import getBlobDuration from "get-blob-duration";
 import db, { storage, auth } from "../firebase";
@@ -15,15 +15,22 @@ import signInStyles from "../styles/signinStyles";
 import dynamic from "next/dynamic";
 import axios from "axios";
 import { usePubnub } from "../contexts/pubnub";
-import { useUser } from "@supabase/auth-helpers-react";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const PhoneRecording = () => {
   const [transcript, setTranscript] = React.useState("");
+  const [callRecordingData, setCallRecordingData] = React.useState(undefined);
+
+  const supabase = useSupabaseClient();
   const user = useUser();
   const { subscribe, unSubscribeAll, pubnubDispatch } = usePubnub();
 
   React.useEffect(() => {
     pubnubDispatch({ type: "SET_TRANSCRIPT_CALLBACK", payload: setTranscript });
+    pubnubDispatch({
+      type: "SET_CALL_RECORDING_SAVED_CALLBACK",
+      payload: setCallRecordingData,
+    });
   }, [pubnubDispatch]);
 
   const router = useRouter();
@@ -32,9 +39,13 @@ const PhoneRecording = () => {
   const [liveTranscript, setLiveTranscript] = React.useState("");
 
   const [isTranscribing, setIsTranscribing] = React.useState(false);
-  const [isDialed, setIsDialed] = React.useState(false);
-  const [call_control_id, setCallControlID] = React.useState(null);
+  //const [isDialed, setIsDialed] = React.useState(false);
+  const [callControlID, setCallControlID] = React.useState(null);
   const [callStatus, setCallStatus] = React.useState();
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [customer, setCustomer] = useState(null);
+
   const dispatch = useDispatch();
   const recordingList = useSelector(
     (state) => state.recordingReducer.recordingList
@@ -49,6 +60,34 @@ const PhoneRecording = () => {
     async (user) => {
       if (user) {
         console.log("Supabase user is: ", user);
+        let customerInfo = await supabase
+          .from("customers")
+          .select("*")
+          .eq("email_address", user.email);
+        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
+        setCustomer(customerInfo.data[0]);
+        let subscriptionResponse = await supabase
+          .from("subscriptions")
+          .select()
+          .eq("customer_id", customerInfo.data[0].id);
+        if (!subscriptionResponse) {
+          setIsSubscribed(false);
+          setSubscriptionInfo(null);
+        } else {
+          if (!subscriptionResponse.data[0]) {
+            setIsSubscribed(false);
+            setSubscriptionInfo(null);
+          } else {
+            console.log(
+              "subscriptionResponse is: ",
+              subscriptionResponse.data[0].stripe_product_name
+            );
+            setIsSubscribed(true);
+            setSubscriptionInfo(
+              subscriptionResponse.data[0].stripe_product_name
+            );
+          }
+        }
       } else {
         // User is signed out
         console.log(
@@ -57,7 +96,7 @@ const PhoneRecording = () => {
         router.push("/signin");
       }
     },
-    [router]
+    [router, supabase]
   );
 
   useEffect(() => {
@@ -66,119 +105,74 @@ const PhoneRecording = () => {
     //getSubscriptionsInfo();
   }, [checkAuth, user]);
 
-  // old firebase code
-  /*const recordURI = useSelector((state) => state.recordingReducer.recordURI);
-  const currentUser = useSelector((state) => state.user.currentUser);
-  console.log("Phone Recording CurrentUser: >>>>>>>>>>>>>>>>>>>>", currentUser);
-  console.log("Phone Recording isRecording: ", isRecording);
-  console.log("Firebase storage object: ", storage._bucket);
-
-  // this is to check for the userID upon page refresh in the event it gets wiped out.
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
-      console.log(authUser); // uid
-      if (authUser) {
-        dispatch(setCurrentUser(authUser));
-      }
-    });
-
-    return unsubscribe;
-  }, [dispatch]);
-
-  const uploadAudio = async (audioData) => {
-    //const uriParts = recordURI.split(".");
-    let uriParts = mediaBlobUrl.split(".").toString().replace("//", "");
-    //uriParts = uriParts.toString().replace("//", "");
-    //const uriParts = mediaBlobUrl.split(".").replace(/\//g, "");
-    const fileType = uriParts[uriParts.length - 1];
-    const fileName =
-      //audioData.filename + "_" + currentUser + `${Date.now()}.${fileType}`;
-      audioData.filename + "_" + currentUser.uid + `${Date.now()}.${fileType}`;
-    audioData.originalFilename = fileName;
-    console.log("FILE NAME", fileName);
-    audioData.fileName = fileName;
-
-    //delete filename
-    delete audioData.filename;
-
-    try {
-      const blob = await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.onload = () => {
-          try {
-            resolve(xhr.response);
-          } catch (error) {
-            console.log("error:", error);
-          }
-        };
-        xhr.onerror = (e) => {
-          console.log(e);
-          reject(new TypeError("Network request failed"));
-        };
-        xhr.responseType = "blob";
-        xhr.open("GET", mediaBlobUrl, true);
-        xhr.send(null);
-      });
-      if (blob != null) {
-        const storageRef = ref(storage, fileName);
-        uploadBytes(storageRef, blob).then((snapshot) => {
-          const docRef = addDoc(
-            //collection(db, `customers/${userContext.user.uid}/checkout_sessions`),
-            //collection(db, `customers/${user.uid}/checkout_sessions`),
-            collection(db, `recordings/${currentUser.uid}/files`),
-            audioData
-          );
-          console.log("snapshot is: ", snapshot);
-        });
-      } else {
-        console.log("erroor with blob");
-      }
-    } catch (error) {
-      console.log("error:", error);
-    }
-  };*/
-
-  const telnyxDial = async () => {
+  const startRecordingAudio = async () => {
     // call the "dial" API endpoint
     const to = "+16472181328";
     const from = "+18885390817";
     const res_dial = await axios.get(
       `/api/dial?from=${encodeURIComponent(from)}&to=${encodeURIComponent(
         to
-      )}&uid=${currentUser.uid}`
+      )}&customer_id=${customer.id}`
     );
     console.log("call_control_id is: ", res_dial.data);
-    console.log("callStatus is: ", res_dial.status);
+    //console.log("callStatus is: ", res_dial.status);
     setCallControlID(res_dial.data);
     subscribe(res_dial.data);
-    setIsDialed(true);
-    setCallStatus(res_dial.status);
-  };
-
-  const startRecordingAudio = async () => {
-    //telnyxCallRecording();
-    telnyxDial();
-    //const telnyx_events = await axios.get(`/api/telnyx_events`);
+    //setIsDialed(true);
+    //setCallStatus(res_dial.status);
+    setIsTranscribing(true);
+    setTranscript("");
   };
 
   //Trigger call (or telnyx action) -> send event data to webhook -> webhook is ngrok -> tunnel data to port -> next app is listening on port
 
-  async function stopRecordingAudio() {
+  const stopRecordingAudio = useCallback(async () => {
     setIsTranscribing(false);
-    setTranscript(liveTranscript);
-  }
+    //setTranscript("");
+    unSubscribeAll();
+  }, [unSubscribeAll]);
+
+  useEffect(() => {
+    if (callRecordingData !== undefined) {
+      stopRecordingAudio();
+      if (callRecordingData === null) {
+        alert("Unable to save call recording :(");
+      }
+    }
+  }, [callRecordingData, stopRecordingAudio]);
 
   // old firebase code
-  /*async function renameRecord() {
+  async function renameRecord() {
+    // this I have to work through. get the call recording URL. Then update
+    // supabase record with filename and duration. That function is my focus now.
+    // also the transcript...find a way to save that.
     if (!filename && filename.length < 1) {
       alert("Filename can not be empty!");
       return;
     }
-    setRecordURI(mediaBlobUrl);
 
-    const durationSeconds = await getBlobDuration(mediaBlobUrl); // or it could just be mediaBlobUrl
-    const durationMillis = durationSeconds * 1000;
-    console.log("durationSeconds is: ", durationSeconds);
+    console.log("filename", filename);
+    // save to supabase
+    setCallRecordingData(undefined);
+
+    //const durationSeconds = await getBlobDuration(mediaBlobUrl); // or it could just be mediaBlobUrl
+    const callRecordingResponse = await supabase
+      .from("call_recordings")
+      .select("*")
+      .eq("telnyx_call_control_id", callControlID);
+    if (callRecordingResponse.error) {
+      console.log(
+        "durationMillisResponse error: ",
+        callRecordingResponse.error
+      );
+    }
+    if (callRecordingResponse.data) {
+      console.log(
+        "durationMillisResponse data durationMillis: ",
+        callRecordingResponse.data[0].durationMillis
+      );
+    }
+    const durationMillis = callRecordingResponse.data[0].durationMillis;
     const momentduration = moment.duration(durationMillis);
     let duration = moment
       .utc(momentduration.as("milliseconds"))
@@ -189,78 +183,65 @@ const PhoneRecording = () => {
     const recordingdate = moment().format("MMMM Do YYYY");
     const newRecordingList = [...recordingList];
     newRecordingList.push({
-      filepath: mediaBlobUrl,
+      filepath: callRecordingResponse.data[0].mp3_file_name,
       filename,
       recordingdate: recordingdate,
       duration: duration,
       //duration: durationSeconds,
       transcript: transcript,
     });
-
     //newRecordingList.reverse()   //sorting
     //props.setRecordinglistProp(newRecordingList);
     dispatch(updateRecordingList(newRecordingList));
-    console.log("In Phone Recording, currentUser is: ", currentUser);
-    const audioData = {
-      //user: currentUser,
-      user: currentUser.uid,
-      filename,
-      recordingdate: recordingdate,
-      duration: duration,
-      //duration: durationSeconds,
-      transcript: transcript,
-    };
-    //uploadAudio(audioData);
-
+    console.log("In Phone Recording, currentUser is: ", customer);
+    console.log("In Phone Recording, newRecordingList is: ", newRecordingList); // only returns list on same page
+    // here, update the record with filename, duration (formatted) and transcript
+    const updateCallResponse = await supabase
+      .from("call_recordings")
+      .update({ file_name: filename, duration, full_transcript: transcript })
+      .eq("telnyx_call_control_id", callControlID)
+      .select();
+    if (updateCallResponse.error) console.log(updateCallResponse.error);
+    if (updateCallResponse.data) console.log(updateCallResponse.data[0]);
     // Reset the field
     setFilename("");
-    dispatch(setRecordURI(null));
-    //alert("entered..."); // if I hold the alert for too long, the websocket will error out
-
     // We can go to library tab
     router.push("/dashboard");
-  }*/
-
-  const setCallTranscript = (newTranscript) => {
-    setTranscript(newTranscript);
-  };
+  }
 
   function renderView() {
     //if (status === "recording") { // to be replaced with data.event_type from pages/api/telnyx_events.js upon publish
     // while recording or not recording yet
-    if (isTranscribing) {
+
+    if (callRecordingData) {
       return (
         <div className="title">
-          <button onClick={stopRecordingAudio}>Stop Recording</button>
-          <h1>Transcript below</h1>
-          <p>{liveTranscript}</p>
-        </div>
-      );
-    } else {
-      return (
-        <div className="title">
-          <button onClick={startRecordingAudio}>Start Recording</button>
-          <h1>Transcript below</h1>
-        </div>
-      );
-    }
-    //}
-    // old firebase code
-    /*if (status === "stopped") { // to be replaced with data.event_type from pages/api/telnyx_events.js upon publish
-      // finished recording
-      return (
-        <div className="title">
-          <p>{mediaBlobUrl}</p>
-          <p>recordURI is: {recordURI}</p>
           <input
             value={filename}
             name="filename"
             onChange={(e) => setFilename(e.target.value)}
           />
           <button onClick={renameRecord}>Rename</button>
+          <div>URL: {callRecordingData.url}</div>
         </div>
       );
-    }*/
+    }
+
+    if (isTranscribing) {
+      return (
+        <div className="title">
+          <button onClick={stopRecordingAudio}>Stop Recording</button>
+          <h1>Transcript below</h1>
+          <p>{transcript}</p>
+        </div>
+      );
+    } else {
+      return (
+        <div className="title">
+          <button onClick={startRecordingAudio}>Start Recording</button>
+        </div>
+      );
+    }
   }
 
   return (
@@ -283,7 +264,6 @@ const PhoneRecording = () => {
         Back to Dashboard
       </button>
       {renderView()}
-      Transcript: {transcript}
       <style jsx>{signInStyles}</style>
     </div>
   );

@@ -13,8 +13,15 @@ const reducer = (state, action) => {
     case "SET_TRANSCRIPT_CALLBACK": {
       return { ...state, transcriptCallback: action.payload };
     }
+    case "SET_CALL_RECORDING_SAVED_CALLBACK": {
+      return { ...state, callRecordingSavedCallback: action.payload };
+    }
+    case "SET_CALL_RECORDING_SAVED": {
+      state.callRecordingSavedCallback({ call_recording_id: action.payload.call_recording_id, url: action.payload.url })
+      return state
+    }
     case "CALL_TRANSCRIPT": {
-      state.transcriptCallback(action.payload.transcript)
+      state.transcriptCallback(action.payload.transcript);
       return state;
     }
     default:
@@ -45,8 +52,19 @@ const PubnubProvider = ({ children }) => {
           }
         },*/
       message: (messageEvent) => {
-        const type = messageEvent.message.action === 'call.transcription' ? 'CALL_TRANSCRIPT' : 'OTHER_STUFF'
-        pubnubDispatch({ type, payload: messageEvent.message })
+        switch (messageEvent.message.action) {
+          case 'call.transcription':
+            pubnubDispatch({
+              type: 'CALL_TRANSCRIPT',
+              payload: messageEvent.message,
+            });
+            break;
+          case 'call.recording.saved':            
+            pubnubDispatch({ type: 'SET_CALL_RECORDING_SAVED', payload: messageEvent.message });
+            break;
+          default:
+          // code block
+        }        
       },
       /*presence: (presenceEvent) => {
           // handle presence
