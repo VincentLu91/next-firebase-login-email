@@ -41,9 +41,23 @@ const Library = () => {
         setSubscriptionInfo(subscriptionResponse.data[0].stripe_product_name);*/
         let micRecordingInfo = await supabase
           .from("mic_recordings")
-          .select("*")
+          .select(
+            "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at"
+          )
           .eq("customer_id", customerInfo.data[0].id);
-        setCloudRecordingList(micRecordingInfo.data);
+        //console.log("micRecordingInfo is: ", micRecordingInfo.data);
+        let callRecordingInfo = await supabase
+          .from("call_recordings")
+          .select(
+            "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at"
+          )
+          .eq("customer_id", customerInfo.data[0].id);
+        //console.log("callRecordingInfo is: ", callRecordingInfo.data);
+        let combinedRecordingInfo = micRecordingInfo.data.concat(
+          callRecordingInfo.data
+        );
+        console.log("combinedRecordingInfo is: ", combinedRecordingInfo);
+        setCloudRecordingList(combinedRecordingInfo);
       } else {
         // User is signed out
         console.log(
@@ -67,11 +81,45 @@ const Library = () => {
   // function to delete a recording:
   async function deleteRecording(original_file_name, customer) {
     console.log("deleting recording: ", original_file_name);
-    await supabase
+    let micDeleteInfo = await supabase
       .from("mic_recordings")
-      .delete()
+      .select("*", { count: "exact", head: true })
       .eq("customer_id", customer.id)
       .eq("original_file_name", original_file_name);
+    let callDeleteInfo = await supabase
+      .from("call_recordings")
+      .select("*", { count: "exact", head: true })
+      .eq("customer_id", customer.id)
+      .eq("original_file_name", original_file_name);
+    if (micDeleteInfo.count > 0) {
+      console.log("mic delete.....");
+      await supabase
+        .from("mic_recordings")
+        .delete()
+        .eq("customer_id", customer.id)
+        .eq("original_file_name", original_file_name);
+    } else if (callDeleteInfo.count > 0) {
+      console.log("call delete.....");
+      let callChunkDeleteInfo = await supabase
+        .from("call_recordings")
+        .select("*")
+        .eq("original_file_name", original_file_name);
+      console.log(
+        "callChunkDeleteInfo ID is: ",
+        callChunkDeleteInfo.data[0].id
+      );
+      // delete from chunks table first since it depends on `call_recording` table
+      await supabase
+        .from("telnyx_transcript_chunks")
+        .delete()
+        .eq("call_recording_id", callChunkDeleteInfo.data[0].id);
+
+      await supabase
+        .from("call_recordings")
+        .delete()
+        .eq("customer_id", customer.id)
+        .eq("original_file_name", original_file_name);
+    }
     const storageDeleteResponse = await supabase.storage
       .from("recreate-ai-storage-bucket")
       .remove([original_file_name]);
@@ -110,7 +158,7 @@ const Library = () => {
         {filtered.map(function (item) {
           //console.log("item", item);
           return (
-            <li key={item.original_file_name}>
+            <li key={item.created_at}>
               <div>{item.file_name}</div>
               <button onClick={() => viewContent(item)}>
                 View Recording And Transcription

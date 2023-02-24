@@ -183,7 +183,7 @@ const PhoneRecording = () => {
     const recordingdate = moment().format("MMMM Do YYYY");
     const newRecordingList = [...recordingList];
     newRecordingList.push({
-      filepath: callRecordingResponse.data[0].mp3_file_name,
+      filepath: callRecordingResponse.data[0].original_file_name,
       filename,
       recordingdate: recordingdate,
       duration: duration,

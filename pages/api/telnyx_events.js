@@ -175,7 +175,7 @@ export default async function handler(req, res) {
         let uploadRecordingResponse = await supabase
           .from("call_recordings")
           .update({
-            mp3_file_name: callRecordingMp3FileName,
+            original_file_name: callRecordingMp3FileName,
             durationMillis: callRecordingMp3Duration,
           })
           .select()
