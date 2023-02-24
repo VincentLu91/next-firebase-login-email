@@ -230,7 +230,7 @@ const PhoneRecording = () => {
     if (isTranscribing) {
       return (
         <div className="title">
-          <button onClick={stopRecordingAudio}>Stop Recording</button>
+          {/*<button onClick={stopRecordingAudio}>Stop Recording</button>*/}
           <h1>Transcript below</h1>
           <p>{transcript}</p>
         </div>
@@ -253,13 +253,13 @@ const PhoneRecording = () => {
         alignItems: "center",
       }}
     >
-      <button
+      {/*<button
         onClick={() => {
           unSubscribeAll();
         }}
       >
         unsubscribe all
-      </button>
+      </button>*/}
       <button onClick={() => router.push("/dashboard")}>
         Back to Dashboard
       </button>
