@@ -16,6 +16,8 @@ import dynamic from "next/dynamic";
 import axios from "axios";
 import { usePubnub } from "../contexts/pubnub";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import PhoneInput from "react-phone-number-input";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 const PhoneRecording = () => {
   const [transcript, setTranscript] = React.useState("");
@@ -45,6 +47,7 @@ const PhoneRecording = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const [customer, setCustomer] = useState(null);
+  const [phoneNumber, setPhoneNumber] = React.useState(null);
 
   const dispatch = useDispatch();
   const recordingList = useSelector(
@@ -106,8 +109,13 @@ const PhoneRecording = () => {
   }, [checkAuth, user]);
 
   const startRecordingAudio = async () => {
+    console.log("phoneNumber is: ", phoneNumber);
+    if (!phoneNumber || !isValidPhoneNumber(phoneNumber)) {
+      alert("Invalid phone number!!");
+      return;
+    }
     // call the "dial" API endpoint
-    const to = "+16472181328";
+    const to = phoneNumber; //"+16472181328";
     const from = "+18885390817";
     const res_dial = await axios.get(
       `/api/dial?from=${encodeURIComponent(from)}&to=${encodeURIComponent(
@@ -238,6 +246,12 @@ const PhoneRecording = () => {
     } else {
       return (
         <div className="title">
+          <PhoneInput
+            placeholder="Enter phone number with country code"
+            //defaultCountry="US"
+            value={phoneNumber}
+            onChange={setPhoneNumber}
+          />
           <button onClick={startRecordingAudio}>Start Recording</button>
         </div>
       );
