@@ -198,7 +198,7 @@ export default async function handler(req, res) {
         : null,
       action: data.event_type,
     };
-    console.log('about to publish', publishPayload)
+    console.log('about to publish',data.payload.call_control_id, publishPayload)
     publishMessage(data.payload.call_control_id, publishPayload);
     // seems to work in uploading. just need to render the UI to display call recordings now...
     // but I can't find storage items. Edit: I CAN find it, but it takes a bit of browsing. No search bars...
