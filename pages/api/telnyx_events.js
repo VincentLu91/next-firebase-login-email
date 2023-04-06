@@ -191,6 +191,7 @@ export default async function handler(req, res) {
         }
       }
     }
+    console.log('about to publish', callRecordingMp3Url)
     publishMessage(data.payload.call_control_id, {
       url: callRecordingMp3Url,
       call_recording_id: callRecordingResponse.data
