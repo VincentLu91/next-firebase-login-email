@@ -52,6 +52,7 @@ const PubnubProvider = ({ children }) => {
           }
         },*/
       message: (messageEvent) => {
+        console.log('messageEvent', messageEvent);
         switch (messageEvent.message.action) {
           case 'call.transcription':
             pubnubDispatch({
