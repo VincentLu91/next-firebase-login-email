@@ -76,6 +76,7 @@ const PubnubProvider = ({ children }) => {
 
   const subscribe = useCallback(
     (channelName) => {
+      console.log('subscribe to ', channelName)
       // subscribe to a channel
       pubnubState.pubnub.subscribe({
         channels: [channelName],
@@ -86,6 +87,7 @@ const PubnubProvider = ({ children }) => {
 
   const unSubscribe = useCallback(
     (channelName) => {
+      console.log('unsubscribe')
       // unsubscribe to a channel
       pubnubState.pubnub.unsubscribe({
         channels: [channelName],
@@ -97,6 +99,7 @@ const PubnubProvider = ({ children }) => {
    const unSubscribeAll = useCallback(
      () => {
        // unsubscribe all channels
+       console.log('unsubscribe all')
        pubnubState.pubnub.unsubscribeAll()
      },
      [pubnubState]
