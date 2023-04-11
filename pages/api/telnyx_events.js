@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         delivered_to: 'http://b988-142-114-125-127.ngrok.io/api/telnyx_events'
       }
     }*/
-
+    console.log("date.now", Date.now())
     const customer_id = Buffer.from(
       data.payload.client_state,
       "base64"
@@ -68,6 +68,8 @@ export default async function handler(req, res) {
       )
       .select();
 
+      console.log("date.now 2", Date.now());
+
     if (callRecordingResponse.data) {
       let telnyxChunkResponse = await supabase
         .from("telnyx_transcript_chunks")
@@ -83,6 +85,7 @@ export default async function handler(req, res) {
           .select()
           .eq("call_recording_id", callRecordingResponse.data[0].id)
           .order("occurred_at", { ascending: true });
+          console.log("date.now 3", Date.now());
 
         const transcript = telnyxChunkResponse.data
           .map((item) => item.transcription_data.transcript)
@@ -91,6 +94,7 @@ export default async function handler(req, res) {
           transcript,
           action: data.event_type,
         });
+        console.log("date.now 4", Date.now());
       }
     }
   } else if (data.event_type === "call.answered") {
