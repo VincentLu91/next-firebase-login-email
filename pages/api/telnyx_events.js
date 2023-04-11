@@ -192,14 +192,14 @@ export default async function handler(req, res) {
       }
     }
     const publishPayload = {
-      url: callRecordingMp3Url,
+      //url: callRecordingMp3Url,
       call_recording_id: callRecordingResponse.data
         ? callRecordingResponse.data[0].id
         : null,
       action: data.event_type,
     };
     console.log('about to publish',data.payload.call_control_id, publishPayload)
-    await publishMessage(data.payload.call_control_id, { name: 'test' });
+    await publishMessage(data.payload.call_control_id, publishPayload);
     // seems to work in uploading. just need to render the UI to display call recordings now...
     // but I can't find storage items. Edit: I CAN find it, but it takes a bit of browsing. No search bars...
   }
