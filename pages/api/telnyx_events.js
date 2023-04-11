@@ -192,7 +192,7 @@ export default async function handler(req, res) {
       }
     }
     const publishPayload = {
-      //url: callRecordingMp3Url,
+      url: callRecordingMp3Url,
       call_recording_id: callRecordingResponse.data
         ? callRecordingResponse.data[0].id
         : null,
