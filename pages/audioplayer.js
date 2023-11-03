@@ -69,25 +69,15 @@ function AudioPlayer() {
     if (sound == null || transcript == null) {
       setSummary("Transcript is empty!");
       return;
-    }
-    try {
-      const resp = await axios.post(
-        `${summarize_config.api_address}${summarize_config.route_path}`,
-        {
-          transcript,
-        }
+    } else {
+      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
+      const rawSummary = await axios.post(
+        "/api/cohere_llm?prompt=" +
+          "generate a summary for the following transcript: " +
+          transcript
       );
-      const summary_text = resp.data["summary_text"];
-      console.log(summary_text);
-      //console.log(typeof summary_text);
-      setSummary(summary_text);
-    } catch (error) {
-      if (error.response) {
-        console.log(error.response.status);
-        console.log(error.response);
-      } else {
-        console.log(error);
-      }
+      console.log(rawSummary["data"]);
+      setSummary(rawSummary["data"].trim());
     }
   };
 
@@ -233,12 +223,10 @@ function AudioPlayer() {
         <div style={{ marginTop: 20, lineHeight: "25px" }}>
           <div>
             <button
-              onClick={
-                () =>
-                  console.log(
-                    "placeholder getSummary()"
-                  ) /*getSummary(sound.transcript)*/
-              }
+              onClick={() => {
+                console.log("placeholder getSummary()");
+                getSummary(sound.full_transcript);
+              }}
             >
               Summary
             </button>
