@@ -486,7 +486,7 @@ const privacypolicy = () => {
         If you have any questions about this Privacy Policy, You can contact us:
       </p>
       <ul>
-        <li>By email: info@recreate.ai</li>
+        <li>By email: placeholder</li>
       </ul>
     </div>
   );

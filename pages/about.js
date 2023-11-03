@@ -10,7 +10,7 @@ const About = () => {
         forget or misinterpret what was being said.
       </p>
       <p>
-        recreate.ai aims to let humans capture spoken words in real-time, while
+        EchoyAlly aims to let humans capture spoken words in real-time, while
         intelligently processes spoken words into information that humans can
         quickly understand and respond accordingly.
       </p>
