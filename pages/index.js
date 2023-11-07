@@ -43,8 +43,8 @@ export default function Home() {
 
         <h2>
           Sign Up For Free{" "}
-          <Link href="/signin">
-            <a className="register">Today</a>
+          <Link href="/signin" className="register">
+            Today
           </Link>
         </h2>
         <br />
@@ -105,8 +105,8 @@ export default function Home() {
         </h2>
         <h2>
           Try for free{" "}
-          <Link href="/signin">
-            <a className="register">Today</a>
+          <Link href="/signin" className="register">
+            Today
           </Link>
         </h2>
       </main>

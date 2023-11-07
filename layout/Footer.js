@@ -3,15 +3,15 @@ const Footer = () => {
   return (
     <div className="footerstyle">
       <Link href="/blog">
-        <a>Blog</a>
+        Blog
       </Link>
       <br />
       <Link href="/privacypolicy">
-        <a>Privacy Policy</a>
+        Privacy Policy
       </Link>
       <br />
       <Link href="/termsofuse/">
-        <a>Terms of Use</a>
+        Terms of Use
       </Link>
     </div>
   );

@@ -7,16 +7,16 @@ const Navbar = () => {
         <h1>EchoAlly</h1>
       </div>
       <Link href="/">
-        <a>Home</a>
+        Home
       </Link>
       <Link href="/about">
-        <a>About</a>
+        About
       </Link>
       <Link href="/pricing">
-        <a>Pricing</a>
+        Pricing
       </Link>
       <Link href="/signin/">
-        <a>Sign In</a>
+        Sign In
       </Link>
     </nav>
   );
