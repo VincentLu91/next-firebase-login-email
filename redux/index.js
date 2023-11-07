@@ -1,4 +1,8 @@
-import { createStore, combineReducers, applyMiddleware } from "redux";
+import {
+  configureStore,
+  combineReducers,
+  applyMiddleware,
+} from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist"; // imports from redux-persist
 import storage from "redux-persist/lib/storage"; // defaults to localStorage for web
 import recordingAudioReducer, {
@@ -10,7 +14,11 @@ import userReducer, {
 import languageReducer, {
   initialState as initialLRState,
 } from "./language/languageReducer";
-import { composeWithDevTools } from "@redux-devtools/extension";
+//import { composeWithDevTools } from "@redux-devtools/extension";
+import logger from "redux-logger";
+
+// uses redux.js/toolkit instead of redux as required by NextJS 13 onward:
+// https://hackernoon.com/how-to-manage-state-in-nextjs-13-using-redux-toolkit
 
 const allReducers = combineReducers({
   recordingReducer: recordingAudioReducer,
@@ -40,16 +48,21 @@ const rootReducer = (state, action) => {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer); // create a persisted reducer
 
-//const store = createStore(persistedReducer, applyMiddleware());
+//const store = configureStore(persistedReducer, applyMiddleware());
 
-const store = createStore(
+/*const store = createStore(
   persistedReducer,
   composeWithDevTools(
     applyMiddleware()
     // other store enhancers if any
   )
-);
+);*/
+const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }).concat(logger),
+});
 const persistor = persistStore(store); // used to create the persisted store, persistor will be used in the next step
 export default store;
 export { persistor };
-//export default createStore(allReducers);
+//export default configureStore(allReducers);
