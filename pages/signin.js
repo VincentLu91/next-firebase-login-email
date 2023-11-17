@@ -1,14 +1,8 @@
 import React, { useRef, useEffect } from "react";
-import { auth } from "../firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../redux/user/actions";
-import { onAuthStateChanged } from "firebase/auth";
 import signInStyles from "../styles/signinStyles";
 import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -102,7 +96,7 @@ const Signin = () => {
       <Auth
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
-        theme="dark"
+        //theme="dark"
         redirectTo="http://localhost:3001/password-reset"
       />
       {/*<>

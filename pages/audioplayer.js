@@ -76,8 +76,8 @@ function AudioPlayer() {
           "generate a summary for the following transcript: " +
           transcript
       );
-      console.log(rawSummary["data"]);
-      setSummary(rawSummary["data"].trim());
+      console.log(rawSummary.data.text);
+      setSummary(rawSummary.data.text.trim());
     }
   };
 

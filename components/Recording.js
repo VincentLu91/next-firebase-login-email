@@ -1,4 +1,5 @@
 import { useReactMediaRecorder } from "react-media-recorder";
+// keep it at 1.6.5: https://github.com/DeltaCircuit/react-media-recorder/issues/98
 import * as React from "react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";

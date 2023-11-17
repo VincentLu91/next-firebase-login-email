@@ -1,18 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import db, { auth } from "../firebase";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  addDoc,
-  onSnapshot,
-  deleteDoc,
-} from "firebase/firestore";
 import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
-import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import dashboardStyles from "../styles/dashboardStyles";

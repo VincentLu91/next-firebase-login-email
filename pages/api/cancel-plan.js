@@ -1,8 +1,8 @@
 // Set your secret key. Remember to switch to your live secret key in production.
 const stripe = require("stripe")(
-  "sk_test_51Jx1cdLBlaDAR7THINnFtmhlbxt3oaeehIMdTtpTitqJtX5eTtBenCXEF1bnHUN8xvpzUSAxgFhut1BfRu1bZljo00F6QMtxgc"
+  "sk_test_51Jx1cdLBlaDAR7THINnFtmhlbxt3oaeehIMdTtpTitqJtX5eTtBenCXEF1bnHUN8xvpzUSAxgFhut1BfRu1bZljo00F6QMtxgc",
+  { apiVersion: "2023-10-16" }
 );
-
 
 export default async function handler(req, res) {
   // https://stripe.com/docs/billing/subscriptions/cancel

@@ -1,6 +1,7 @@
 // Set your secret key. Remember to switch to your live secret key in production.
 const stripe = require("stripe")(
-  "sk_test_51Jx1cdLBlaDAR7THINnFtmhlbxt3oaeehIMdTtpTitqJtX5eTtBenCXEF1bnHUN8xvpzUSAxgFhut1BfRu1bZljo00F6QMtxgc"
+  "sk_test_51Jx1cdLBlaDAR7THINnFtmhlbxt3oaeehIMdTtpTitqJtX5eTtBenCXEF1bnHUN8xvpzUSAxgFhut1BfRu1bZljo00F6QMtxgc",
+  { apiVersion: "2023-10-16" }
 );
 
 export default async function handler(req, res) {
@@ -8,6 +9,7 @@ export default async function handler(req, res) {
   const { subscription_id, stripe_price_id } = req.body;
   try {
     // https://stripe.com/docs/billing/subscriptions/upgrade-downgrade
+    console.log("subscription_id is: ", subscription_id);
     const subscription = await stripe.subscriptions.retrieve(subscription_id);
     console.log("subscription in api is: ", subscription);
     const subscriptionRes = await stripe.subscriptions.update(subscription.id, {

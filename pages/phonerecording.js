@@ -4,12 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateRecordingList } from "../redux/recording/actions";
 import moment from "moment";
 import getBlobDuration from "get-blob-duration";
-import db, { storage, auth } from "../firebase";
-import { uploadBytes, ref } from "firebase/storage";
-import { collection, addDoc } from "firebase/firestore";
 import { setCurrentUser } from "../redux/user/actions";
 import { useRouter } from "next/router";
-import { onAuthStateChanged } from "firebase/auth";
 import signInStyles from "../styles/signinStyles";
 //import Telnyx from "telnyx";
 import dynamic from "next/dynamic";
@@ -149,7 +145,6 @@ const PhoneRecording = () => {
     }
   }, [callRecordingData, stopRecordingAudio]);
 
-  // old firebase code
   async function renameRecord() {
     // this I have to work through. get the call recording URL. Then update
     // supabase record with filename and duration. That function is my focus now.

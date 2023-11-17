@@ -4,12 +4,12 @@ import { Provider } from "react-redux";
 import store, { persistor } from "../redux/";
 import Layout from "../layout/Layout";
 import PubnubProvider from "../contexts/pubnub";
-import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 
 function MyApp({ Component, pageProps }) {
-  const [supabase] = useState(() => createBrowserSupabaseClient());
+  const [supabase] = useState(() => createPagesBrowserClient());
   return (
     <SessionContextProvider
       supabaseClient={supabase}
