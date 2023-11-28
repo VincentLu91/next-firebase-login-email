@@ -103,10 +103,7 @@ export default async function handler(req, res) {
       call_control_id: data.payload.call_control_id,
     });
     try {
-      await transcription_call.transcription_start({
-        language: "en",
-        interim_results: true,
-      });
+      await transcription_call.transcription_start({ language: "en" });
     } catch (e) {
       console.log(e);
     }
