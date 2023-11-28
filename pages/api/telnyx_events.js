@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         delivered_to: 'http://b988-142-114-125-127.ngrok.io/api/telnyx_events'
       }
     }*/
-    console.log("date.now", Date.now())
+    console.log("date.now", Date.now());
     const customer_id = Buffer.from(
       data.payload.client_state,
       "base64"
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
       )
       .select();
 
-      console.log("date.now 2", Date.now());
+    console.log("date.now 2", Date.now());
 
     if (callRecordingResponse.data) {
       let telnyxChunkResponse = await supabase
@@ -85,7 +85,7 @@ export default async function handler(req, res) {
           .select()
           .eq("call_recording_id", callRecordingResponse.data[0].id)
           .order("occurred_at", { ascending: true });
-          console.log("date.now 3", Date.now());
+        console.log("date.now 3", Date.now());
 
         const transcript = telnyxChunkResponse.data
           .map((item) => item.transcription_data.transcript)
@@ -103,7 +103,10 @@ export default async function handler(req, res) {
       call_control_id: data.payload.call_control_id,
     });
     try {
-      await transcription_call.transcription_start({ language: "en" });
+      await transcription_call.transcription_start({
+        language: "en",
+        interim_results: true,
+      });
     } catch (e) {
       console.log(e);
     }
@@ -202,7 +205,11 @@ export default async function handler(req, res) {
         : null,
       action: data.event_type,
     };
-    console.log('about to publish',data.payload.call_control_id, publishPayload)
+    console.log(
+      "about to publish",
+      data.payload.call_control_id,
+      publishPayload
+    );
     await publishMessage(data.payload.call_control_id, publishPayload);
     // seems to work in uploading. just need to render the UI to display call recordings now...
     // but I can't find storage items. Edit: I CAN find it, but it takes a bit of browsing. No search bars...
