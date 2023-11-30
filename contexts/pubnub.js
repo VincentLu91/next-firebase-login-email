@@ -1,33 +1,37 @@
 import PubNub from "pubnub";
-import { useContext, createContext, useCallback, useState, useReducer, useEffect } from "react";
+import {
+  useContext,
+  createContext,
+  useCallback,
+  useReducer,
+  useEffect,
+} from "react";
 
 const PubnubContext = createContext();
 
-const EMPTY_OBJECT = {}
+const EMPTY_OBJECT = { transcript: "", callRecordingData: undefined };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case "SET_PUBNUB": {
       return { ...state, pubnub: action.payload };
-    }
-    case "SET_TRANSCRIPT_CALLBACK": {
-      return { ...state, transcriptCallback: action.payload };
-    }
-    case "SET_CALL_RECORDING_SAVED_CALLBACK": {
-      return { ...state, callRecordingSavedCallback: action.payload };
-    }
+    }   
     case "SET_CALL_RECORDING_SAVED": {
-      state.callRecordingSavedCallback({ call_recording_id: action.payload.call_recording_id, url: action.payload.url })
-      return state
+     return {
+        ...state,
+        callRecordingData: action.payload ? {
+          call_recording_id: action.payload.call_recording_id,
+          url: action.payload.url,
+        } : undefined,
+      };
     }
     case "CALL_TRANSCRIPT": {
-      state.transcriptCallback(action.payload.transcript);
-      return state;
+      return { ...state, transcript: action.payload.transcript };
     }
     default:
       return state;
   }
-}
+};
 
 const usePubnub = () => {
   const context = useContext(PubnubContext);
@@ -37,12 +41,13 @@ const usePubnub = () => {
 };
 
 const PubnubProvider = ({ children }) => {
-  const [pubnubState, pubnubDispatch] = useReducer(reducer, EMPTY_OBJECT)
+  const [pubnubState, pubnubDispatch] = useReducer(reducer, EMPTY_OBJECT);
 
   useEffect(() => {
     const instance = new PubNub({
       publishKey: "pub-c-6b9eeb0b-bbaa-44ee-bab2-859a8f35724a",
       subscribeKey: "sub-c-99fbc867-98f7-469e-a595-6dab6e00a5ea",
+      logVerbosity: true,
       userId: "recreate-ai-user",
     });
     instance.addListener({
@@ -52,31 +57,34 @@ const PubnubProvider = ({ children }) => {
           }
         },*/
       message: (messageEvent) => {
-        console.log('messageEvent', messageEvent);
+        console.log("messageEvent", messageEvent);
         switch (messageEvent.message.action) {
-          case 'call.transcription':
+          case "call.transcription":
             pubnubDispatch({
-              type: 'CALL_TRANSCRIPT',
+              type: "CALL_TRANSCRIPT",
               payload: messageEvent.message,
             });
             break;
-          case 'call.recording.saved':            
-            pubnubDispatch({ type: 'SET_CALL_RECORDING_SAVED', payload: messageEvent.message });
+          case "call.recording.saved":
+            pubnubDispatch({
+              type: "SET_CALL_RECORDING_SAVED",
+              payload: messageEvent.message,
+            });
             break;
           default:
           // code block
-        }        
+        }
       },
       /*presence: (presenceEvent) => {
           // handle presence
         },*/
     });
-    pubnubDispatch({ type: "SET_PUBNUB", payload: instance })
+    pubnubDispatch({ type: "SET_PUBNUB", payload: instance });
   }, []);
 
   const subscribe = useCallback(
     (channelName) => {
-      console.log('subscribe to ', channelName)
+      console.log("subscribe to ", channelName);
       // subscribe to a channel
       pubnubState.pubnub.subscribe({
         channels: [channelName],
@@ -87,7 +95,7 @@ const PubnubProvider = ({ children }) => {
 
   const unSubscribe = useCallback(
     (channelName) => {
-      console.log('unsubscribe')
+      console.log("unsubscribe");
       // unsubscribe to a channel
       pubnubState.pubnub.unsubscribe({
         channels: [channelName],
@@ -96,17 +104,16 @@ const PubnubProvider = ({ children }) => {
     [pubnubState]
   );
 
-   const unSubscribeAll = useCallback(
-     () => {
-       // unsubscribe all channels
-       console.log('unsubscribe all')
-       pubnubState.pubnub.unsubscribeAll()
-     },
-     [pubnubState]
-   );
+  const unSubscribeAll = useCallback(() => {
+    // unsubscribe all channels
+    console.log("unsubscribe all");
+    pubnubState.pubnub.unsubscribeAll();
+  }, [pubnubState]);
 
   return (
-    <PubnubContext.Provider value={{ subscribe, unSubscribe, unSubscribeAll, pubnubDispatch }}>
+    <PubnubContext.Provider
+      value={{ subscribe, unSubscribe, unSubscribeAll, pubnubDispatch, transcript: pubnubState.transcript, callRecordingData: pubnubState.callRecordingData  }}
+    >
       {children}
     </PubnubContext.Provider>
   );

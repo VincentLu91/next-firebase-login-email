@@ -16,20 +16,23 @@ import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 
 const PhoneRecording = () => {
-  const [transcript, setTranscript] = React.useState("");
-  const [callRecordingData, setCallRecordingData] = React.useState(undefined);
-
   const supabase = useSupabaseClient();
   const user = useUser();
-  const { subscribe, unSubscribeAll, pubnubDispatch } = usePubnub();
+  const { subscribe, unSubscribeAll, pubnubDispatch, transcript, callRecordingData } = usePubnub();
 
-  React.useEffect(() => {
-    pubnubDispatch({ type: "SET_TRANSCRIPT_CALLBACK", payload: setTranscript });
-    pubnubDispatch({
-      type: "SET_CALL_RECORDING_SAVED_CALLBACK",
-      payload: setCallRecordingData,
-    });
-  }, [pubnubDispatch]);
+  const setTranscript = (data) => {
+     pubnubDispatch({
+       type: "CALL_TRANSCRIPT",
+       payload: { transcript: data },
+     });
+  }
+
+  const setCallRecordingData = (data) => {
+     pubnubDispatch({
+       type: "SET_CALL_RECORDING_SAVED",
+       payload: data,
+     });
+  }
 
   const router = useRouter();
 
