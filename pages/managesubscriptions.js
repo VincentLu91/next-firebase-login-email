@@ -70,6 +70,22 @@ const ManageSubscriptions = () => {
     checkAuth(user);
   }, [checkAuth, user]);
 
+  useEffect(() => {
+    // Connect to your server or WebSocket and handle incoming webhook events
+    const socket = new WebSocket(
+      "ws://fef8-142-114-125-127.ngrok.io/api/events/stripe"
+    );
+    socket.addEventListener("message", (event) => {
+      const eventData = JSON.parse(event.data);
+      console.log("Received webhook event in React:", eventData);
+      // Update your React state or trigger an action based on the event
+    });
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   const getProductsDisplay = useCallback(async () => {
     let products = await supabase
       .from("products")
@@ -152,20 +168,24 @@ const ManageSubscriptions = () => {
   //Stripe APIs
   const switchPlan = async (subscription_id, stripe_price_id) => {
     // https://stripe.com/docs/billing/subscriptions/upgrade-downgrade
-    await checkAuth(user);
-    setLoading(true);
-    await axios
-      .post("/api/switch-plan", { subscription_id, stripe_price_id })
-      .then((subscriptionRes) => {
+    //await checkAuth(user);
+    //setLoading(true);
+    const response = await axios.post("/api/switch-plan", {
+      subscription_id,
+      customer,
+      return_url: `${window.location.origin}/dashboard`,
+    });
+    window.location.href = response.data.url;
+    /*.then((subscriptionRes) => {
         //console.log("subscription is: ", subscriptionRes.data.plan);
         //console.log("stripe_price_id is: ", stripe_price_id);
         updateSubscription(subscriptionRes.data.plan, stripe_price_id);
-      });
+      });*/
     //setSubscription(null); // reverting back to commented code; not needed
-    await checkAuth(user);
-    setLoading(false);
+    //await checkAuth(user);
+    //setLoading(false);
     //window.location.reload(true); // workaround for screen refresh
-    await checkAuth(user); // no need to router.push('/dashboard') anymore.
+    //await checkAuth(user); // no need to router.push('/dashboard') anymore.
   };
 
   const deleteSubscription = async (stripe_subscription_id) => {

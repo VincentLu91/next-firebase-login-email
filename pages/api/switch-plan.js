@@ -5,7 +5,7 @@ const stripe = require("stripe")(
 );
 
 export default async function handler(req, res) {
-  console.log("subscription request body is: ", req.body);
+  /*console.log("subscription request body is: ", req.body);
   const { subscription_id, stripe_price_id } = req.body;
   try {
     // https://stripe.com/docs/billing/subscriptions/upgrade-downgrade
@@ -26,6 +26,22 @@ export default async function handler(req, res) {
     //console.log("subscription_id is: ", subscription_id);
     console.log("subscriptionRes is: ", subscriptionRes);
     res.json(subscriptionRes);
+  } catch (error) {
+    res.status(500).json({ error });*/
+  console.log("subscription request body is: ", req.body);
+  const { subscription_id, customer, return_url } = req.body;
+  try {
+    // https://stripe.com/docs/billing/subscriptions/upgrade-downgrade
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customer?.stripe_customer_id,
+      return_url: return_url, // how to bring this back to home page!?
+    });
+    //console.log("Deleted subscription is: ", subscription);
+    console.log("Session: ", session);
+    console.log("Session stripe portal URL: ", session.url);
+    /*let deletedSubscription = await stripe.subscriptions.del(subscription_id);
+    console.log("deletedSubscription is: ", deletedSubscription);*/
+    res.json(session);
   } catch (error) {
     res.status(500).json({ error });
   }
