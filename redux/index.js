@@ -14,7 +14,6 @@ import userReducer, {
 import languageReducer, {
   initialState as initialLRState,
 } from "./language/languageReducer";
-//import { composeWithDevTools } from "@redux-devtools/extension";
 import logger from "redux-logger";
 
 // uses redux.js/toolkit instead of redux as required by NextJS 13 onward:
@@ -48,15 +47,6 @@ const rootReducer = (state, action) => {
 
 const persistedReducer = persistReducer(persistConfig, rootReducer); // create a persisted reducer
 
-//const store = configureStore(persistedReducer, applyMiddleware());
-
-/*const store = createStore(
-  persistedReducer,
-  composeWithDevTools(
-    applyMiddleware()
-    // other store enhancers if any
-  )
-);*/
 const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
