@@ -231,6 +231,9 @@ function AudioPlayer() {
               Summary
             </button>
             <h2>Summary is: {summary}</h2>
+            <button onClick={() => router.push("/chatbot")}>
+              Go to ChatBot
+            </button>
           </div>
         </div>
       )}

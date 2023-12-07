@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chatscope/chat-ui-kit-react": "^1.10.1",
     "@redux-devtools/extension": "^3.2.6",
     "@reduxjs/toolkit": "^2.0.1",
     "@sanity/block-content-to-react": "^3.0.0",
