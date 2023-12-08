@@ -25,7 +25,7 @@
     "file2arraybuffer": "^1.2.2",
     "get-blob-duration": "^1.2.0",
     "moment": "^2.29.4",
-    "next": "^14.0.3",
+    "next": "^14.0.4",
     "next-sanity-image": "^6.1.1",
     "nodemailer": "^6.9.7",
     "npm-check-updates": "^16.14.11",
@@ -40,7 +40,7 @@
     "recordrtc": "^5.6.2",
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
-    "stripe": "^14.7.0",
+    "stripe": "^14.8.0",
     "styled-jsx": "^5.1.2",
     "telnyx": "^1.25.5",
     "twilio": "^4.19.3"
@@ -52,6 +52,6 @@
   },
   "devDependencies": {
     "eslint": "8.55.0",
-    "eslint-config-next": "^14.0.3"
+    "eslint-config-next": "^14.0.4"
   }
 }

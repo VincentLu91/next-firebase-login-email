@@ -73,7 +73,7 @@ const ManageSubscriptions = () => {
   useEffect(() => {
     // Connect to your server or WebSocket and handle incoming webhook events
     const socket = new WebSocket(
-      "ws://fef8-142-114-125-127.ngrok.io/api/events/stripe"
+      "ws://f20e-70-50-62-54.ngrok.io/api/events/stripe"
     );
     socket.addEventListener("message", (event) => {
       const eventData = JSON.parse(event.data);
