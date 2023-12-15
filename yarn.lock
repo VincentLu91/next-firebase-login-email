@@ -5152,10 +5152,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^14.8.0:
-  version "14.8.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-14.8.0.tgz"
-  integrity sha512-Qdecqk7lx095BE829NWxrG1+69NjPuHrpZqeR61i2KO00fpKkjMX9TYjwFU+WjQD6ZcNmCGOwNfnz5VnI5bjIg==
+stripe@^14.9.0:
+  version "14.9.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-14.9.0.tgz"
+  integrity sha512-t2XdpNbRH4x3MYEoxNWhwUPl9D80aUd5OHds0zhDiwRYPZ0H7MrUI/dj9wOSYlzycD3xdvjn0q7pWeFWljtMUQ==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
@@ -5335,10 +5335,10 @@ tweetnacl@^1.0.1:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.1.tgz"
   integrity sha512-kcoMoKTPYnoeS50tzoqjPY3Uv9axeuuFAZY9M/9zFnhoVvRfxz9K29IMPD7jGmt2c8SW7i3gT9WqDl2+nV7p4A==
 
-twilio@^4.19.3:
-  version "4.19.3"
-  resolved "https://registry.npmjs.org/twilio/-/twilio-4.19.3.tgz"
-  integrity sha512-3X5Czl9Vg4QFl+2pnfMQ+H8YfEDQ4WeuAmqjUpbK65x0DfmxTCHuPEFWUKVZCJZew6iltJB/1whhVvIKETe54A==
+twilio@^4.20.0:
+  version "4.20.0"
+  resolved "https://registry.npmjs.org/twilio/-/twilio-4.20.0.tgz"
+  integrity sha512-Dl49awVTgv9LOLrmXi7elKa2mb69rtkwJHlKNbIR9HjXN7q66gEEaiZsE6gdr+Wfk/zInOvPDVBCdQM+SYXqkA==
   dependencies:
     axios "^1.6.0"
     dayjs "^1.11.9"
