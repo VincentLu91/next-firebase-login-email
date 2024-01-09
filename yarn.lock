@@ -459,10 +459,10 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.10.0":
-  version "6.10.0"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.10.0.tgz"
-  integrity sha512-TavtxGB6NWjro2BTGXSkzXNMKFZbS2il1ItV3IdRvO0luLqS31eIz37+5X4CmCC8hGFe6fDoCjnH/iJ81vKM7g==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.11.0":
+  version "6.11.0"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.11.0.tgz"
+  integrity sha512-95UoUO4VL9QfwT3Mwx5ZxImXbSG232VyVuPdiJ+jeTIFdFuMKzh0Db19y1+CwL28Dc2n7mKSD/ALAP28PXbCAQ==
   dependencies:
     "@sanity/eventsource" "^5.0.0"
     "@vercel/stega" "0.1.0"
@@ -533,10 +533,10 @@
   resolved "https://registry.npmjs.org/@stitches/core/-/core-1.2.8.tgz"
   integrity sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==
 
-"@stripe/stripe-js@^2.2.2":
-  version "2.2.2"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-2.2.2.tgz"
-  integrity sha512-LvFZRZEBoMe6vXC6RoOAIbXWo/0JDdndq43ekL9M6affcM7PtF5KALmwt91BazW7q49sbSl0l7TunWhhSwEW4w==
+"@stripe/stripe-js@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-2.3.0.tgz"
+  integrity sha512-iTwzjw1ORUR+1pH21+C/M05w+Jh5hAuE4QUei7Gnku65N7QpEaHtyVszYMYDBs6iNyLrD1tfQTSrjD6NkOA/ww==
 
 "@supabase/auth-helpers-nextjs@^0.8.7":
   version "0.8.7"
@@ -4452,10 +4452,10 @@ react-media-recorder@1.6.5:
   resolved "https://registry.npmjs.org/react-media-recorder/-/react-media-recorder-1.6.5.tgz"
   integrity sha512-YcARNZ498jtmOJ+O7GkaokR0DbMNV+YSXB0msAHMZk9wharBuVSWYCXKiIL5JAnR5cs6ebXaOtkkGsM3uIq7Bw==
 
-react-phone-number-input@^3.3.8:
-  version "3.3.8"
-  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.3.8.tgz"
-  integrity sha512-9k9OslI3OfutpUbDgyvsiDuLXqZ5YqdPTT4fOynK0WsWFEdYp4inkgLchvXkqpCmnG1P8uTQLj6PBCkLJJvC7g==
+react-phone-number-input@^3.3.9:
+  version "3.3.9"
+  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.3.9.tgz"
+  integrity sha512-TKK8VoFWR9RfPi90j/3Rr6j/S9V8/eovqUgNNNSyD0+WtaeLTlJVWb8DD7P57eZqkLv303sL8JMiZoExwKICxw==
   dependencies:
     classnames "^2.3.1"
     country-flag-icons "^1.5.4"
