@@ -73,7 +73,8 @@ const ManageSubscriptions = () => {
   useEffect(() => {
     // Connect to your server or WebSocket and handle incoming webhook events
     const socket = new WebSocket(
-      "ws://f20e-70-50-62-54.ngrok.io/api/events/stripe"
+      //"ws://f20e-70-50-62-54.ngrok.io/api/events/stripe"
+      "ws://next-firebase-login-email.vercel.app/api/events/stripe"
     );
     socket.addEventListener("message", (event) => {
       const eventData = JSON.parse(event.data);
