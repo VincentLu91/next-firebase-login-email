@@ -459,14 +459,14 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.11.1":
-  version "6.11.1"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.11.1.tgz"
-  integrity sha512-em4jWdXl/yZQsXRslTqF+0kj5sFM9l9tVz7pE/vPLN0aYlX+jxovzX4PBXLC1/gdJVtpT4GQRHcTBcnNSOtPNA==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.11.2":
+  version "6.11.2"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.11.2.tgz"
+  integrity sha512-loJF1MxnRgFL/vq7EPg/zhttzAy8Ka71Ip0zge1ksmzUt3PeEN27ZCnkYj8O7Mt1x9qALbdj+owXWqcNEF/lIA==
   dependencies:
     "@sanity/eventsource" "^5.0.0"
     "@vercel/stega" "0.1.0"
-    get-it "^8.4.4"
+    get-it "^8.4.5"
     rxjs "^7.0.0"
 
 "@sanity/eventsource@^5.0.0":
@@ -2244,7 +2244,7 @@ flatted@^3.1.0:
   resolved "https://registry.npmjs.org/flatted/-/flatted-3.2.5.tgz"
   integrity sha512-WIWGi2L3DyTUvUrwRKgGi9TwxQMUEqPOPQBVi71R96jZXJdFskXEmf54BoZaS1kknGODoIGASGEzBUYdyMCBJg==
 
-follow-redirects@^1.15.2, follow-redirects@^1.15.4:
+follow-redirects@^1.15.4:
   version "1.15.4"
   resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.4.tgz"
   integrity sha512-Cr4D/5wlrb0z9dgERpUL3LrmPKVDsETIJhaCMeDfuFYcqa5bldGV6wBsAN6X/vxlXQtFBMrXdXxdL8CbDTGniw==
@@ -2397,14 +2397,14 @@ get-intrinsic@^1.0.2, get-intrinsic@^1.1.1, get-intrinsic@^1.1.3, get-intrinsic@
     has-symbols "^1.0.3"
     hasown "^2.0.0"
 
-get-it@^8.4.4:
-  version "8.4.4"
-  resolved "https://registry.npmjs.org/get-it/-/get-it-8.4.4.tgz"
-  integrity sha512-Pu3pnJfnYuLEhwJgMlFqk19ugvtazzTxh7rg8wATaBL4c5Fy4ahM5B+bGdluiNSNYYK89F5vSa+N3sTa/qqtlg==
+get-it@^8.4.5:
+  version "8.4.5"
+  resolved "https://registry.npmjs.org/get-it/-/get-it-8.4.5.tgz"
+  integrity sha512-hOoAwSfJXy86QJPEsZFDtBsFBagyTAlYwLJkKZJN5q7ppXRQjq0Wies4d14icDSpVs7QVm4Wtt0XQzjxXlUdgg==
   dependencies:
     debug "^4.3.4"
     decompress-response "^7.0.0"
-    follow-redirects "^1.15.2"
+    follow-redirects "^1.15.4"
     into-stream "^6.0.0"
     is-plain-object "^5.0.0"
     is-retry-allowed "^2.2.0"
@@ -3130,7 +3130,7 @@ isarray@^2.0.5:
 isarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/isarray/-/isarray-1.0.0.tgz"
-  integrity sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=
+  integrity sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==
 
 isexe@^2.0.0:
   version "2.0.0"
@@ -4450,9 +4450,9 @@ read-package-json@^6.0.0:
     npm-normalize-package-bin "^3.0.0"
 
 readable-stream@^2.0.0, readable-stream@~2.3.6:
-  version "2.3.7"
-  resolved "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.7.tgz"
-  integrity sha512-Ebho8K4jIbHAxnuxi7o42OrZgF/ZTNcsZj6nRKyUmkhLFq8CHItp/fy6hQZuZmP/n3yZ9VBUbp4zz/mX8hmYPw==
+  version "2.3.8"
+  resolved "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.8.tgz"
+  integrity sha512-8p0AUk4XODgIewSi0l8Epjs+EVnWiK7NoDIEGU0HhE7+ZyY8D1IMY7odu5lRrFXGg71L15KG8QrPmum45RTtdA==
   dependencies:
     core-util-is "~1.0.0"
     inherits "~2.0.3"
