@@ -70,23 +70,6 @@ const ManageSubscriptions = () => {
     checkAuth(user);
   }, [checkAuth, user]);
 
-  useEffect(() => {
-    // Connect to your server or WebSocket and handle incoming webhook events
-    const socket = new WebSocket(
-      //"ws://f20e-70-50-62-54.ngrok.io/api/events/stripe"
-      "ws://next-firebase-login-email.vercel.app/api/events/stripe"
-    );
-    socket.addEventListener("message", (event) => {
-      const eventData = JSON.parse(event.data);
-      console.log("Received webhook event in React:", eventData);
-      // Update your React state or trigger an action based on the event
-    });
-
-    return () => {
-      socket.close();
-    };
-  }, []);
-
   const getProductsDisplay = useCallback(async () => {
     let products = await supabase
       .from("products")
