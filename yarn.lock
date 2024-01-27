@@ -459,10 +459,10 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.11.3":
-  version "6.11.3"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.11.3.tgz"
-  integrity sha512-areQ7bTcwxbswQntlOk3A+QMQa+FL4aOQ2npjp+tZjUmu3DZkLzInbOAqSpwQpd1hMbJYXmLp1m7XCmbEajApg==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.12.1":
+  version "6.12.1"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.12.1.tgz"
+  integrity sha512-vVjiASYaYQB7VyA7lDG3uHt0OZOaGT8U8aoSDocYiEtK+RWbyp5h16zLZQCL9j3K9Tgr4sx1iMgQkfpTL8GquQ==
   dependencies:
     "@sanity/eventsource" "^5.0.0"
     "@vercel/stega" "0.1.0"
@@ -3795,10 +3795,10 @@ npm-bundled@^3.0.0:
   dependencies:
     npm-normalize-package-bin "^3.0.0"
 
-npm-check-updates@^16.14.13:
-  version "16.14.13"
-  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-16.14.13.tgz"
-  integrity sha512-vuRTJUoOElBDQ1Z5/UqqgNfExteSdrmwKNV6xuZtiyuKENFduYsy+IhDvCIC9fI1F+MD4zWtq9WCBwfOGfxy7Q==
+npm-check-updates@^16.14.14:
+  version "16.14.14"
+  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-16.14.14.tgz"
+  integrity sha512-Y3ajS/Ep40jM489rLBdz9jehn/BMil5s9fA4PSr2ZJxxSmtLWCSmRqsI2IEZ9Nb3MTMu8a3s7kBs0l+JbjdkTA==
   dependencies:
     chalk "^5.3.0"
     cli-table3 "^0.6.3"
