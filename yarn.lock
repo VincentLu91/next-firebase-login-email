@@ -1356,10 +1356,10 @@ client-only@0.0.1:
   resolved "https://registry.npmjs.org/client-only/-/client-only-0.0.1.tgz"
   integrity sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==
 
-cohere-ai@^7.7.4:
-  version "7.7.4"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.7.4.tgz"
-  integrity sha512-WSaHGG6y4QiubjM4rWt8Cl1+Ougo9tclnqTzLouFWPiA5CXnN4qlF4q1Rl4zo7ztJzdBSsCj5K7GtvVDko4TuQ==
+cohere-ai@^7.7.5:
+  version "7.7.5"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.7.5.tgz"
+  integrity sha512-uKh4TzHpY/8nwuYprLKSz0vSKclL4zb8il/YNxfFuWgk9/Nhuw4ugzRuT+CE2f4miQG5dPtPfwXCYUJB60mfwQ==
   dependencies:
     form-data "4.0.0"
     js-base64 "3.7.2"
@@ -3761,10 +3761,10 @@ node-gyp@^9.0.0:
     tar "^6.1.2"
     which "^2.0.2"
 
-nodemailer@^6.9.8:
-  version "6.9.8"
-  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.8.tgz"
-  integrity sha512-cfrYUk16e67Ks051i4CntM9kshRYei1/o/Gi8K1d+R34OIs21xdFnW7Pt7EucmVKA0LKtqUGNcjMZ7ehjl49mQ==
+nodemailer@^6.9.9:
+  version "6.9.9"
+  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.9.tgz"
+  integrity sha512-dexTll8zqQoVJEZPwQAKzxxtFn0qTnjdQTchoU6Re9BUUGBJiOy3YMn/0ShTW6J5M0dfQ1NeDeRTTl4oIWgQMA==
 
 nopt@^6.0.0:
   version "6.0.0"
