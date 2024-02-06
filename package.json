@@ -40,7 +40,7 @@
     "recordrtc": "^5.6.2",
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
-    "stripe": "^14.14.0",
+    "stripe": "^14.15.0",
     "styled-jsx": "^5.1.2",
     "telnyx": "^1.25.5",
     "twilio": "^4.21.0"
