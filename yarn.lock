@@ -459,10 +459,10 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.12.3":
-  version "6.12.3"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.12.3.tgz"
-  integrity sha512-oA9LkDZOpVN8nciGb6/h+1r4ElH0IUTC3bHyBdVsxB5namdWBJKZzuVjJiWQlsK8up7U1xsATB4hyimSgUCSjA==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.12.4":
+  version "6.12.4"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.12.4.tgz"
+  integrity sha512-eDBnKwKdFIiMeRZ5xPaKUOs+gsw6P4Bq+Bj7cZ9xuaLXMTsOSlB5h9TsPW5vAYRMbm4coVYUvhqm9TMwSi0F2Q==
   dependencies:
     "@sanity/eventsource" "^5.0.0"
     "@vercel/stega" "0.1.0"
@@ -5080,10 +5080,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^14.15.0:
-  version "14.15.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-14.15.0.tgz"
-  integrity sha512-KPxNcf0iFWA38pkzeJyJklK9qQJo/6FEBDcLsZxDCVHfn8yT+uP9p1JSYiOhIxCyh+6BD5XEVOMnnBJnVeEnfA==
+stripe@^14.16.0:
+  version "14.16.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-14.16.0.tgz"
+  integrity sha512-1gOr2LzafWV84cPIO5Md/QPh4XVPLKULVuRpBVOV3Plq3seiHmg/eeOktX+hDl8jpNZuORHYaUJGrNqrABLwdg==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
