@@ -426,10 +426,10 @@
     "@pnpm/network.ca-file" "^1.0.1"
     config-chain "^1.1.11"
 
-"@reduxjs/toolkit@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.2.0.tgz"
-  integrity sha512-ZvPYKfu4kDnAqPhJ1bsis8QFbiQRz3Q2HxW3tw9tVGusPzYKRG7ju1FA+34PGcwCoemjGGv+f/7fEygcRZIwmA==
+"@reduxjs/toolkit@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.2.1.tgz"
+  integrity sha512-8CREoqJovQW/5I4yvvijm/emUiCCmcs4Ev4XPWd4mizSO+dD3g5G6w34QK5AGeNrSH7qM8Fl66j4vuV7dpOdkw==
   dependencies:
     immer "^10.0.3"
     redux "^5.0.1"
@@ -459,10 +459,10 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.12.4":
-  version "6.12.4"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.12.4.tgz"
-  integrity sha512-eDBnKwKdFIiMeRZ5xPaKUOs+gsw6P4Bq+Bj7cZ9xuaLXMTsOSlB5h9TsPW5vAYRMbm4coVYUvhqm9TMwSi0F2Q==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.13.3":
+  version "6.13.3"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.13.3.tgz"
+  integrity sha512-oOkce0xovPe0cwiEQeNPlrZugG69GHB+Dn16IlcnlyOp2GEsTD+Hgk29Z/cOhLbxqxGv9URpd0iuR9cTyEM4AQ==
   dependencies:
     "@sanity/eventsource" "^5.0.0"
     "@vercel/stega" "0.1.0"
@@ -533,10 +533,10 @@
   resolved "https://registry.npmjs.org/@stitches/core/-/core-1.2.8.tgz"
   integrity sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==
 
-"@stripe/stripe-js@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.0.0.tgz"
-  integrity sha512-xcuFxWP4jl3dN40+UbOr/SW7SeNrb8ZE+h5vLmKiOo0HUcW9gvz4Ny9SsfWWD2NI6CZmxi+oQw7KkZX8NmSxAA==
+"@stripe/stripe-js@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.0.2.tgz"
+  integrity sha512-Ykr5mtTwbG+wleKQhtKOKyOfZ/0lRmwf49IBLi1vUxS/Mp9A0usiNFEkOh+kUGxEyD/lht+VgPTxPHbgUlqI+Q==
 
 "@supabase/auth-helpers-nextjs@^0.9.0":
   version "0.9.0"
@@ -619,10 +619,10 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.19.0", "@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.4":
-  version "2.39.4"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.39.4.tgz"
-  integrity sha512-sLORcbtZX1/YX1lRJZZ+GjkkxUR4w+gQ4bUgcNWsHcRi/78wyK/pjpEz2xig6jV3HmaSK2EYpuRlG5b7S2pwmA==
+"@supabase/supabase-js@^2.19.0", "@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.6":
+  version "2.39.6"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.39.6.tgz"
+  integrity sha512-HlflDzem0+l3KYYTqHV0UsqkDooV9my5UcBCV2zvvTrl77UtW97uKTZWn9lSWMuiy+ZvRLsiuG+WTiBuKMQl0Q==
   dependencies:
     "@supabase/functions-js" "2.1.5"
     "@supabase/gotrue-js" "2.62.2"
