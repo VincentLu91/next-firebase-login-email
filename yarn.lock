@@ -533,10 +533,10 @@
   resolved "https://registry.npmjs.org/@stitches/core/-/core-1.2.8.tgz"
   integrity sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==
 
-"@stripe/stripe-js@^3.0.3":
-  version "3.0.3"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.0.3.tgz"
-  integrity sha512-UrHQ0hvDCZzpJEaOLbTRme1jREFzCuBe6eeHzowLtsS65Ah9pM+8bivXAyQUGHaAE2nPLu4lDvuDHPStPlrZUQ==
+"@stripe/stripe-js@^3.0.4":
+  version "3.0.4"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.0.4.tgz"
+  integrity sha512-oz+s5MbU308C3iG36NjsBTa+0u00qLKuzixo/7HUAcmWPok7CDREOcGLUCho3wUEC+AWYu9156Us+eCO42HRAg==
 
 "@supabase/auth-helpers-nextjs@^0.9.0":
   version "0.9.0"
