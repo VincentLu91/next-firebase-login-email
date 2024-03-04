@@ -64,10 +64,10 @@
     "@babel/helper-validator-identifier" "^7.22.20"
     to-fast-properties "^2.0.0"
 
-"@chatscope/chat-ui-kit-react@^1.10.1":
-  version "1.10.1"
-  resolved "https://registry.npmjs.org/@chatscope/chat-ui-kit-react/-/chat-ui-kit-react-1.10.1.tgz"
-  integrity sha512-pJIxvM9zR2oPk601P/S3Du1lZZSQcv76+8/IUhhWo88oy1iqiw2yk71T3nzE0sr8kRfZ8FoSSxOjVx9j7amjow==
+"@chatscope/chat-ui-kit-react@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.npmjs.org/@chatscope/chat-ui-kit-react/-/chat-ui-kit-react-2.0.3.tgz"
+  integrity sha512-0IkjFskRec7SHrFivOQPiZMie5GLQL+ZnROiIbj4yptbC3aMEMFdHRAZrfqlid3uQx9kYhdtn34wMLh1vVNMLA==
   dependencies:
     "@chatscope/chat-ui-kit-styles" "^1.2.0"
     "@fortawesome/fontawesome-free" "^5.12.1"
