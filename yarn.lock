@@ -459,14 +459,14 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.15.3":
-  version "6.15.3"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.15.3.tgz"
-  integrity sha512-7P6OMUeXr87aDzWHlXhP4QXYm02f9jc8f5xr736Er3RybuhSg+ZnetoxBFWhzlV6QA1F0fiC/8yGJKVJmrO+sg==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.15.4":
+  version "6.15.4"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.15.4.tgz"
+  integrity sha512-3UUq26TYs8Umjzn6WrHfMFoE/leIme92Kkz/MDEQoB9LHWQQ06Dk0Lro9GepUfLqkaDu5nCuM9r5+ZZsXg/8Nw==
   dependencies:
     "@sanity/eventsource" "^5.0.0"
     "@vercel/stega" "0.1.0"
-    get-it "^8.4.10"
+    get-it "^8.4.11"
     rxjs "^7.0.0"
 
 "@sanity/eventsource@^5.0.0":
@@ -533,10 +533,10 @@
   resolved "https://registry.npmjs.org/@stitches/core/-/core-1.2.8.tgz"
   integrity sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==
 
-"@stripe/stripe-js@^3.0.7":
-  version "3.0.7"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.0.7.tgz"
-  integrity sha512-qmjTsxnst84iWDsGqPxk5Wlff/fG4nSFjy/r24t9WWFAlCuvwnuUAe4eGgbqZBng019AtgWvo8wuhM3Y5/olbw==
+"@stripe/stripe-js@^3.0.8":
+  version "3.0.8"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.0.8.tgz"
+  integrity sha512-nEDZjCSrGI5GICqr2DsV7gPnEjmt5Y61Uj/z/UuWu3WR/ZyyskbEW/3ziVZdnnvFcoNCfpV2wA2ar1C1W//+Vg==
 
 "@supabase/auth-helpers-nextjs@^0.9.0":
   version "0.9.0"
@@ -619,10 +619,10 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.19.0", "@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.7":
-  version "2.39.7"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.39.7.tgz"
-  integrity sha512-1vxsX10Uhc2b+Dv9pRjBjHfqmw2N2h1PyTg9LEfICR3x2xwE24By1MGCjDZuzDKH5OeHCsf4it6K8KRluAAEXA==
+"@supabase/supabase-js@^2.19.0", "@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8":
+  version "2.39.8"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.39.8.tgz"
+  integrity sha512-WpiawHjseIRcCQTZbMJtHUSOepz5+M9qE1jP9BDmg8X7ehALFwgEkiKyHAu59qm/pKP2ryyQXLtu2XZNRbUarw==
   dependencies:
     "@supabase/functions-js" "2.1.5"
     "@supabase/gotrue-js" "2.62.2"
@@ -1356,10 +1356,10 @@ client-only@0.0.1:
   resolved "https://registry.npmjs.org/client-only/-/client-only-0.0.1.tgz"
   integrity sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==
 
-cohere-ai@^7.7.7:
-  version "7.7.7"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.7.7.tgz"
-  integrity sha512-eLL/5lkAxFvqwV200bsBsS5ZnPHZZKur0WR3dXD5K47QT7C9r0OFv/ykJw/rCuoSsyyK3eoHm+znIi3W3QCwiQ==
+cohere-ai@^7.8.0:
+  version "7.8.0"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.8.0.tgz"
+  integrity sha512-iKNNCJDwnilaCNDFem9acVtsFCvY+6qq8V/LpP8PNwBYBWafWiQQYNrxeDhXMTHB5Qjpmzmkqboz755zRvxOMw==
   dependencies:
     form-data "4.0.0"
     js-base64 "3.7.2"
@@ -2397,10 +2397,10 @@ get-intrinsic@^1.0.2, get-intrinsic@^1.1.1, get-intrinsic@^1.1.3, get-intrinsic@
     has-symbols "^1.0.3"
     hasown "^2.0.0"
 
-get-it@^8.4.10:
-  version "8.4.10"
-  resolved "https://registry.npmjs.org/get-it/-/get-it-8.4.10.tgz"
-  integrity sha512-yFcSKM8qyGvycYPcnoQGYC3mxeUxXnlQnA+2DF5TyrEHWN2G5pirXylJX+/AyCQrpctEWu/163fS0g0tFnhYcw==
+get-it@^8.4.11:
+  version "8.4.11"
+  resolved "https://registry.npmjs.org/get-it/-/get-it-8.4.11.tgz"
+  integrity sha512-Df2JuuYVldgAxHTGYLysz1q+FFVYMRElcOMLaFalH1O3SvRpuGTRccB0kmVY0MIdumc4rzinXN694mMhytkbdw==
   dependencies:
     debug "^4.3.4"
     decompress-response "^7.0.0"
@@ -3761,10 +3761,10 @@ node-gyp@^9.0.0:
     tar "^6.1.2"
     which "^2.0.2"
 
-nodemailer@^6.9.11:
-  version "6.9.11"
-  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.11.tgz"
-  integrity sha512-UiAkgiERuG94kl/3bKfE8o10epvDnl0vokNEtZDPTq9BWzIl6EFT9336SbIT4oaTBD8NmmUTLsQyXHV82eXSWg==
+nodemailer@^6.9.12:
+  version "6.9.12"
+  resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.12.tgz"
+  integrity sha512-pnLo7g37Br3jXbF0bl5DekBJihm2q+3bB3l2o/B060sWmb5l+VqeScAQCBqaQ+5ezRZFzW5SciZNGdRDEbq89w==
 
 nopt@^6.0.0:
   version "6.0.0"
@@ -5077,10 +5077,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^14.19.0:
-  version "14.19.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-14.19.0.tgz"
-  integrity sha512-Je2USTpUib3hApIgoHXViLoYkDLp+AXdUJvJ6aMQ/AcvZK1PcC7N8nTceh+0gpdotX8izlWN4QyVdMcptubHBQ==
+stripe@^14.20.0:
+  version "14.20.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-14.20.0.tgz"
+  integrity sha512-+3EP8GSWnKVHNATChhDzwAKk3nqSJKQOf2Q+dMGdgEk2sQXWYoA8GXY0A1TjL0m6895FVNavgvno6+0+6lC+kw==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
