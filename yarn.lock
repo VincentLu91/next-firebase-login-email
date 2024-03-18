@@ -459,14 +459,14 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.15.4":
-  version "6.15.4"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.15.4.tgz"
-  integrity sha512-3UUq26TYs8Umjzn6WrHfMFoE/leIme92Kkz/MDEQoB9LHWQQ06Dk0Lro9GepUfLqkaDu5nCuM9r5+ZZsXg/8Nw==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.15.5":
+  version "6.15.5"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.15.5.tgz"
+  integrity sha512-IGJPfk0bHRASPxSWEq5jY4MxECLbMVPqT3Nz0dfyZp2Pw9sIeYp528I9BQXI4dlEVWE/fEHbyvluagHn/HFqWQ==
   dependencies:
     "@sanity/eventsource" "^5.0.0"
     "@vercel/stega" "0.1.0"
-    get-it "^8.4.11"
+    get-it "^8.4.13"
     rxjs "^7.0.0"
 
 "@sanity/eventsource@^5.0.0":
@@ -533,10 +533,10 @@
   resolved "https://registry.npmjs.org/@stitches/core/-/core-1.2.8.tgz"
   integrity sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==
 
-"@stripe/stripe-js@^3.0.8":
-  version "3.0.8"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.0.8.tgz"
-  integrity sha512-nEDZjCSrGI5GICqr2DsV7gPnEjmt5Y61Uj/z/UuWu3WR/ZyyskbEW/3ziVZdnnvFcoNCfpV2wA2ar1C1W//+Vg==
+"@stripe/stripe-js@^3.0.10":
+  version "3.0.10"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.0.10.tgz"
+  integrity sha512-CFRNha+aPXR8GrqJss2TbK1j4aSGZXQY8gx0hvaYiSp+dU7EK/Zs5uwFTSAgV+t8H4+jcZ/iBGajAvoMYOwy+A==
 
 "@supabase/auth-helpers-nextjs@^0.9.0":
   version "0.9.0"
@@ -1048,12 +1048,12 @@ axe-core@=4.7.0:
   resolved "https://registry.npmjs.org/axe-core/-/axe-core-4.7.0.tgz"
   integrity sha512-M0JtH+hlOL5pLQwHOLNYZaXuhqmvS8oExsqB1SBYgA4Dk7u/xx+YdGHXaK5pyUfed5mYXdlYiphWq3G8cRi5JQ==
 
-axios@^1.6.0, axios@^1.6.7:
-  version "1.6.7"
-  resolved "https://registry.npmjs.org/axios/-/axios-1.6.7.tgz"
-  integrity sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==
+axios@^1.6.0, axios@^1.6.8:
+  version "1.6.8"
+  resolved "https://registry.npmjs.org/axios/-/axios-1.6.8.tgz"
+  integrity sha512-v/ZHtJDU39mDpyBoFVkETcd/uNdxrWRrg3bKpOKzXFA6Bvqopts6ALSMU3y6ijYxbw2B+wPrIv46egTzJXCLGQ==
   dependencies:
-    follow-redirects "^1.15.4"
+    follow-redirects "^1.15.6"
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
@@ -2244,10 +2244,10 @@ flatted@^3.1.0:
   resolved "https://registry.npmjs.org/flatted/-/flatted-3.2.5.tgz"
   integrity sha512-WIWGi2L3DyTUvUrwRKgGi9TwxQMUEqPOPQBVi71R96jZXJdFskXEmf54BoZaS1kknGODoIGASGEzBUYdyMCBJg==
 
-follow-redirects@^1.15.4:
-  version "1.15.4"
-  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.4.tgz"
-  integrity sha512-Cr4D/5wlrb0z9dgERpUL3LrmPKVDsETIJhaCMeDfuFYcqa5bldGV6wBsAN6X/vxlXQtFBMrXdXxdL8CbDTGniw==
+follow-redirects@^1.15.6:
+  version "1.15.6"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.6.tgz"
+  integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
 
 for-each@^0.3.3:
   version "0.3.3"
@@ -2397,14 +2397,14 @@ get-intrinsic@^1.0.2, get-intrinsic@^1.1.1, get-intrinsic@^1.1.3, get-intrinsic@
     has-symbols "^1.0.3"
     hasown "^2.0.0"
 
-get-it@^8.4.11:
-  version "8.4.11"
-  resolved "https://registry.npmjs.org/get-it/-/get-it-8.4.11.tgz"
-  integrity sha512-Df2JuuYVldgAxHTGYLysz1q+FFVYMRElcOMLaFalH1O3SvRpuGTRccB0kmVY0MIdumc4rzinXN694mMhytkbdw==
+get-it@^8.4.13:
+  version "8.4.13"
+  resolved "https://registry.npmjs.org/get-it/-/get-it-8.4.13.tgz"
+  integrity sha512-uY9sMQmiG3RCXqzfpIwt7uI6FuL0XNHgO1U8DhWbpxWgOZ8cCNJOAwr+xkLZxpYRcQ6jFEwdr6oTG55l8u415g==
   dependencies:
     debug "^4.3.4"
     decompress-response "^7.0.0"
-    follow-redirects "^1.15.4"
+    follow-redirects "^1.15.6"
     into-stream "^6.0.0"
     is-plain-object "^5.0.0"
     is-retry-allowed "^2.2.0"
@@ -3795,10 +3795,10 @@ npm-bundled@^3.0.0:
   dependencies:
     npm-normalize-package-bin "^3.0.0"
 
-npm-check-updates@^16.14.15:
-  version "16.14.15"
-  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-16.14.15.tgz"
-  integrity sha512-WH0wJ9j6CP7Azl+LLCxWAYqroT2IX02kRIzgK/fg0rPpMbETgHITWBdOPtrv521xmA3JMgeNsQ62zvVtS/nCmQ==
+npm-check-updates@^16.14.17:
+  version "16.14.17"
+  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-16.14.17.tgz"
+  integrity sha512-ElnDdXKe60f8S6RhzFeaGuH2TFJmt2cU2HjLdowldabdm27nWFCxV2ebeP3xGbQkzp2+RPDQNdW9HqU1lcY8ag==
   dependencies:
     chalk "^5.3.0"
     cli-table3 "^0.6.3"
@@ -5077,10 +5077,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^14.20.0:
-  version "14.20.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-14.20.0.tgz"
-  integrity sha512-+3EP8GSWnKVHNATChhDzwAKk3nqSJKQOf2Q+dMGdgEk2sQXWYoA8GXY0A1TjL0m6895FVNavgvno6+0+6lC+kw==
+stripe@^14.21.0:
+  version "14.21.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-14.21.0.tgz"
+  integrity sha512-PFmpl35Myn6UDdVLTHcuppdbkPVvlQfkMHOmgGZh5QOdSUxVmvz090Z4obLg8ta1MNs1PNpzr9i7E39iAIv07A==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
@@ -5260,10 +5260,10 @@ tweetnacl@^1.0.3:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
-twilio@^4.23.0:
-  version "4.23.0"
-  resolved "https://registry.npmjs.org/twilio/-/twilio-4.23.0.tgz"
-  integrity sha512-LdNBQfOe0dY2oJH2sAsrxazpgfFQo5yXGxe96QA8UWB5uu+433PrUbkv8gQ5RmrRCqUTPQ0aOrIyAdBr1aB03Q==
+twilio@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/twilio/-/twilio-5.0.1.tgz"
+  integrity sha512-sglywth8kQKiiTeqzTW5FeoYWhvMYdu61XAIjzsByxDu61S8A0QS35cfDl0LCWoK8gEhyKSomPAxS5XSn75vaA==
   dependencies:
     axios "^1.6.0"
     dayjs "^1.11.9"
