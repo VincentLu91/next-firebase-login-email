@@ -5083,10 +5083,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^14.22.0:
-  version "14.22.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-14.22.0.tgz"
-  integrity sha512-Pj8SAdTNjMq42UnWzBTTy8KMQ8qbQoVemPHbw3x+rHvwq1Psg9UFPT58j54F5os/SCgUAOZSEMcUedvzIDuqvw==
+stripe@^14.23.0:
+  version "14.23.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-14.23.0.tgz"
+  integrity sha512-OPD7LqBmni6uDdqA05GGgMZyyRWxJOehONBNC9tYgY4Uh089EtXd6QLIgRGrqTDlQH3cA2BXo848nxwa/zsQzw==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
@@ -5162,10 +5162,10 @@ tar@^6.1.11, tar@^6.1.2:
     mkdirp "^1.0.3"
     yallist "^4.0.0"
 
-telnyx@^1.26.0:
-  version "1.26.0"
-  resolved "https://registry.npmjs.org/telnyx/-/telnyx-1.26.0.tgz"
-  integrity sha512-ENbHVKKC6RtgBP+xv1GX54xzM8MvQ6mgbyaGcQWv4/6Xx1VA3prsiu/DKslNmMN/x2zCZcL5AZocHUSCCTu1wA==
+telnyx@^1.26.1:
+  version "1.26.1"
+  resolved "https://registry.npmjs.org/telnyx/-/telnyx-1.26.1.tgz"
+  integrity sha512-a38cYuXyxIUADqV9A1HIrAiJ3a3rEM5lPZAp0/OyUwpu9lvhkzGwU+UhAaSBmitW21TkL34FryMJ0OB8pPSHVg==
   dependencies:
     lodash.isplainobject "^4.0.6"
     qs "^6.11.2"
