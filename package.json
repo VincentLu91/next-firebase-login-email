@@ -11,7 +11,7 @@
     "@chatscope/chat-ui-kit-react": "^2.0.3",
     "@reduxjs/toolkit": "^2.2.3",
     "@sanity/block-content-to-react": "^3.0.0",
-    "@sanity/client": "^6.15.9",
+    "@sanity/client": "^6.15.11",
     "@sanity/image-url": "^1.0.2",
     "@stripe/stripe-js": "^3.2.0",
     "@supabase/auth-helpers-nextjs": "^0.9.0",
@@ -19,7 +19,7 @@
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/supabase-js": "^2.42.0",
     "axios": "^1.6.8",
-    "cohere-ai": "^7.9.0",
+    "cohere-ai": "^7.9.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "file2arraybuffer": "^1.2.2",
@@ -34,16 +34,16 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-media-recorder": "1.6.5",
-    "react-phone-number-input": "^3.3.10",
+    "react-phone-number-input": "^3.3.12",
     "react-redux": "^9.1.0",
     "react-select": "^5.8.0",
     "recordrtc": "^5.6.2",
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
-    "stripe": "^14.23.0",
+    "stripe": "^14.24.0",
     "styled-jsx": "^5.1.2",
     "telnyx": "^1.26.1",
-    "twilio": "^5.0.2"
+    "twilio": "^5.0.3"
   },
   "overrides": {
     "redux-persist": {
