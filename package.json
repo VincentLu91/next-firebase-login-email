@@ -19,7 +19,7 @@
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/supabase-js": "^2.42.0",
     "axios": "^1.6.8",
-    "cohere-ai": "^7.9.2",
+    "cohere-ai": "^7.9.3",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "file2arraybuffer": "^1.2.2",
@@ -40,7 +40,7 @@
     "recordrtc": "^5.6.2",
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
-    "stripe": "^14.24.0",
+    "stripe": "^15.0.0",
     "styled-jsx": "^5.1.2",
     "telnyx": "^1.26.1",
     "twilio": "^5.0.3"
