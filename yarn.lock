@@ -294,22 +294,22 @@
     wrap-ansi "^8.1.0"
     wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
 
-"@next/env@14.2.0":
-  version "14.2.0"
-  resolved "https://registry.npmjs.org/@next/env/-/env-14.2.0.tgz"
-  integrity sha512-4+70ELtSbRtYUuyRpAJmKC8NHBW2x1HMje9KO2Xd7IkoyucmV9SjgO+qeWMC0JWkRQXgydv1O7yKOK8nu/rITQ==
+"@next/env@14.2.1":
+  version "14.2.1"
+  resolved "https://registry.npmjs.org/@next/env/-/env-14.2.1.tgz"
+  integrity sha512-qsHJle3GU3CmVx7pUoXcghX4sRN+vINkbLdH611T8ZlsP//grzqVW87BSUgOZeSAD4q7ZdZicdwNe/20U2janA==
 
-"@next/eslint-plugin-next@14.2.0":
-  version "14.2.0"
-  resolved "https://registry.npmjs.org/@next/eslint-plugin-next/-/eslint-plugin-next-14.2.0.tgz"
-  integrity sha512-QkM01VPhwcupezVevy9Uyl1rmpg2PimhMjkb+ySmnPgSKUUM/PGGRQxdFgMpHv/JzQoC8kRySgKeM441GiizcA==
+"@next/eslint-plugin-next@14.2.1":
+  version "14.2.1"
+  resolved "https://registry.npmjs.org/@next/eslint-plugin-next/-/eslint-plugin-next-14.2.1.tgz"
+  integrity sha512-Fp+mthEBjkn8r9qd6o4JgxKp0IDEzW0VYHD8ZC05xS5/lFNwHKuOdr2kVhWG7BQCO9L6eeepshM1Wbs2T+LgSg==
   dependencies:
     glob "10.3.10"
 
-"@next/swc-darwin-x64@14.2.0":
-  version "14.2.0"
-  resolved "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-14.2.0.tgz"
-  integrity sha512-HFSDu7lb1U3RDxXNeKH3NGRR5KyTPBSUTuIOr9jXoAso7i76gNYvnTjbuzGVWt2X5izpH908gmOYWtI7un+JrA==
+"@next/swc-darwin-x64@14.2.1":
+  version "14.2.1"
+  resolved "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-14.2.1.tgz"
+  integrity sha512-dAdWndgdQi7BK2WSXrx4lae7mYcOYjbHJUhvOUnJjMNYrmYhxbbvJ2xElZpxNxdfA6zkqagIB9He2tQk+l16ew==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -595,17 +595,17 @@
   dependencies:
     whatwg-url "^5.0.0"
 
-"@supabase/postgrest-js@1.15.1":
-  version "1.15.1"
-  resolved "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.15.1.tgz"
-  integrity sha512-H/4PABAAgMrEIo7oewUZiZMy422Pgc19OLVjU8Vwopcvfr3GD7h8Re4VXtiaPPZqc/2z/k3PnyguFnoKIB7fkA==
+"@supabase/postgrest-js@1.15.2":
+  version "1.15.2"
+  resolved "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.15.2.tgz"
+  integrity sha512-9/7pUmXExvGuEK1yZhVYXPZnLEkDTwxgMQHXLrN5BwPZZm4iUCL1YEyep/Z2lIZah8d8M433mVAUEGsihUj5KQ==
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/realtime-js@2.9.3":
-  version "2.9.3"
-  resolved "https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.9.3.tgz"
-  integrity sha512-lAp50s2n3FhGJFq+wTSXLNIDPw5Y0Wxrgt44eM5nLSA3jZNUUP3Oq2Ccd1CbZdVntPCWLZvJaU//pAd2NE+QnQ==
+"@supabase/realtime-js@2.9.4":
+  version "2.9.4"
+  resolved "https://registry.npmjs.org/@supabase/realtime-js/-/realtime-js-2.9.4.tgz"
+  integrity sha512-wdq+2hZpgw0r2ldRs87d3U08Y8BrsO1bZxPNqbImpYshAEkusDz4vufR8KaqujKxqewmXS6YnUhuRVdvSEIKCA==
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
     "@types/phoenix" "^1.5.4"
@@ -619,16 +619,16 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8", "@supabase/supabase-js@^2.42.1":
-  version "2.42.1"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.42.1.tgz"
-  integrity sha512-y05XIC6wChApz8BWE2TLUo6SBGp9ttbjhQ9DcQXI897vI3RRPIjm3wZqUoZiexUco+kgt3Em53+m55nB8Um6Sg==
+"@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8", "@supabase/supabase-js@^2.42.3":
+  version "2.42.3"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.42.3.tgz"
+  integrity sha512-/o52L/ngsGapcOUygWigvxzBo/bUVM4bubZMsUSZqZc+9sgjXZsgP/cwyggWUv3QOIqmbBrfSPgDLUh+Ofgi7Q==
   dependencies:
     "@supabase/auth-js" "2.63.0"
     "@supabase/functions-js" "2.2.2"
     "@supabase/node-fetch" "2.6.15"
-    "@supabase/postgrest-js" "1.15.1"
-    "@supabase/realtime-js" "2.9.3"
+    "@supabase/postgrest-js" "1.15.2"
+    "@supabase/realtime-js" "2.9.4"
     "@supabase/storage-js" "2.5.5"
 
 "@swc/counter@^0.1.3":
@@ -1962,12 +1962,12 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-next@^14.2.0:
-  version "14.2.0"
-  resolved "https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-14.2.0.tgz"
-  integrity sha512-N0eQkn/wz557mIpW4JQWGEv4wGU8zvJ7emLHMS15uC18jjaU4kx6leR4U9QYT/eNghUZT7N9lBlfd8E4N0cp1w==
+eslint-config-next@^14.2.1:
+  version "14.2.1"
+  resolved "https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-14.2.1.tgz"
+  integrity sha512-BgD0kPCWMlqoItRf3xe9fG0MqwObKfVch+f2ccwDpZiCJA8ghkz2wrASH+bI6nLZzGcOJOpMm1v1Q1euhfpt4Q==
   dependencies:
-    "@next/eslint-plugin-next" "14.2.0"
+    "@next/eslint-plugin-next" "14.2.1"
     "@rushstack/eslint-patch" "^1.3.3"
     "@typescript-eslint/parser" "^5.4.2 || ^6.0.0 || 7.0.0 - 7.2.0"
     eslint-import-resolver-node "^0.3.6"
@@ -3826,12 +3826,12 @@ next-sanity-image@^6.1.1:
   dependencies:
     "@sanity/image-url" "^1.0.2"
 
-"next@^13.0.0 || ^14.0.0", next@^14.2.0:
-  version "14.2.0"
-  resolved "https://registry.npmjs.org/next/-/next-14.2.0.tgz"
-  integrity sha512-2T41HqJdKPqheR27ll7MFZ3gtTYvGew7cUc0PwPSyK9Ao5vvwpf9bYfP4V5YBGLckHF2kEGvrLte5BqLSv0s8g==
+"next@^13.0.0 || ^14.0.0", next@^14.2.1:
+  version "14.2.1"
+  resolved "https://registry.npmjs.org/next/-/next-14.2.1.tgz"
+  integrity sha512-SF3TJnKdH43PMkCcErLPv+x/DY1YCklslk3ZmwaVoyUfDgHKexuKlf9sEfBQ69w+ue8jQ3msLb+hSj1T19hGag==
   dependencies:
-    "@next/env" "14.2.0"
+    "@next/env" "14.2.1"
     "@swc/helpers" "0.5.5"
     busboy "1.6.0"
     caniuse-lite "^1.0.30001579"
@@ -3839,15 +3839,15 @@ next-sanity-image@^6.1.1:
     postcss "8.4.31"
     styled-jsx "5.1.1"
   optionalDependencies:
-    "@next/swc-darwin-arm64" "14.2.0"
-    "@next/swc-darwin-x64" "14.2.0"
-    "@next/swc-linux-arm64-gnu" "14.2.0"
-    "@next/swc-linux-arm64-musl" "14.2.0"
-    "@next/swc-linux-x64-gnu" "14.2.0"
-    "@next/swc-linux-x64-musl" "14.2.0"
-    "@next/swc-win32-arm64-msvc" "14.2.0"
-    "@next/swc-win32-ia32-msvc" "14.2.0"
-    "@next/swc-win32-x64-msvc" "14.2.0"
+    "@next/swc-darwin-arm64" "14.2.1"
+    "@next/swc-darwin-x64" "14.2.1"
+    "@next/swc-linux-arm64-gnu" "14.2.1"
+    "@next/swc-linux-arm64-musl" "14.2.1"
+    "@next/swc-linux-x64-gnu" "14.2.1"
+    "@next/swc-linux-x64-musl" "14.2.1"
+    "@next/swc-win32-arm64-msvc" "14.2.1"
+    "@next/swc-win32-ia32-msvc" "14.2.1"
+    "@next/swc-win32-x64-msvc" "14.2.1"
 
 node-fetch@2.7.0:
   version "2.7.0"
@@ -5204,10 +5204,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^15.0.0:
-  version "15.0.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-15.0.0.tgz"
-  integrity sha512-QQ9JiLcKoGKT1/N0Ta5AsePGtdJejkKTWS9fnRWk9Z1Bcr6fiFkcdtlJwOg/hAQaDvXOB8cNc6J+UqXzH8ePCw==
+stripe@^15.1.0:
+  version "15.1.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-15.1.0.tgz"
+  integrity sha512-yMsP9VWsQKkmR14E7MhtFDYKCoYCnhG/tLtiMnNiSiVisDezU2OKJ2T9myufYKl922H85nvCgaczyBLovaJTVA==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
