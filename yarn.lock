@@ -2160,10 +2160,10 @@
   dependencies:
     whatwg-url "^5.0.0"
 
-"@supabase/postgrest-js@1.15.3":
-  version "1.15.3"
-  resolved "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.15.3.tgz"
-  integrity sha512-kvfFhuurvnn7+XoXvwb6j64BqqS/xguXfM5FY8xPK24Kza+Bl4NPxGSMu3NWZiWPBgW2C27X2yHz/T+VYlXkEA==
+"@supabase/postgrest-js@1.15.2":
+  version "1.15.2"
+  resolved "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.15.2.tgz"
+  integrity sha512-9/7pUmXExvGuEK1yZhVYXPZnLEkDTwxgMQHXLrN5BwPZZm4iUCL1YEyep/Z2lIZah8d8M433mVAUEGsihUj5KQ==
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
@@ -2184,15 +2184,15 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8", "@supabase/supabase-js@^2.43.3":
-  version "2.43.3"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.43.3.tgz"
-  integrity sha512-jrlx9sIty4lpG9ukhD9wimzHrFzeLTq/JKhqDqVLKo449NYlZbpcnmhqSjfZmve/0mIq1rbYmVvKQ90Hq4/cVg==
+"@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8", "@supabase/supabase-js@^2.43.4":
+  version "2.43.4"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.43.4.tgz"
+  integrity sha512-/pLPaxiIsn5Vaz3s32HC6O/VNwfeddnzS0bZRpOW0AKcPuXroD8pT9G8mpiBlZfpKsMmq6k7tlhW7Sr1PAQ1lw==
   dependencies:
     "@supabase/auth-js" "2.64.2"
     "@supabase/functions-js" "2.3.1"
     "@supabase/node-fetch" "2.6.15"
-    "@supabase/postgrest-js" "1.15.3"
+    "@supabase/postgrest-js" "1.15.2"
     "@supabase/realtime-js" "2.9.5"
     "@supabase/storage-js" "2.5.5"
 
@@ -8502,10 +8502,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^15.7.0:
-  version "15.7.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-15.7.0.tgz"
-  integrity sha512-hTJhh0Gc+l+hj2vuzaFCh0T46l7793W3wg4J9Oyy3Wu+Ofswd0OgTS4XNt7G9XHJAyHpTmNRNbWgGwn73P4j7g==
+stripe@^15.8.0:
+  version "15.8.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-15.8.0.tgz"
+  integrity sha512-7eEPMgehd1I16cXeP7Rcn/JKkPWIadB9vGIeE+vbCzQXaY5R95AoNmkZx0vmlu1H4QIDs7j1pYIKPRm9Dr4LKg==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
