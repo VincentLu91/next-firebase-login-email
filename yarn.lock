@@ -8363,10 +8363,10 @@ proxy-from-env@^1.1.0:
   resolved "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz"
   integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
 
-pubnub@^8.2.2:
-  version "8.2.2"
-  resolved "https://registry.npmjs.org/pubnub/-/pubnub-8.2.2.tgz"
-  integrity sha512-KQ97u3PyBbZB1Ow/1esNGbEImZkVKqYCsqgK7nE2OGNN1i6TgxRt52vkW7/uzAlb36XU2LU1sCPgT4WRrGRprg==
+pubnub@^8.2.3:
+  version "8.2.3"
+  resolved "https://registry.npmjs.org/pubnub/-/pubnub-8.2.3.tgz"
+  integrity sha512-VqAyildzNmkTJCSCFzAiMTeNFTO10On6Ah2AX59LkKCrNDPcqS4jw+xnyyakwmB/R9gLZuCieeTxHqsSWrZD2g==
   dependencies:
     agentkeepalive "^3.5.2"
     buffer "^6.0.3"
@@ -9512,10 +9512,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^15.9.0:
-  version "15.9.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-15.9.0.tgz"
-  integrity sha512-C7NAK17wGr6DOybxThO0n1zVcqSShWno7kx/UcJorQ/nWZ5KnfHQ38DUTb9NgizC8TCII3BPIhqq6Zc/1aUkrg==
+stripe@^15.10.0:
+  version "15.10.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-15.10.0.tgz"
+  integrity sha512-yM2967TDiNhmPE69R61Btx7URgRJOjAoLRvAa0dUyF5qfDMjDh4Qolr/FaZigxUzBH5/8SphkHpNS4Ie2L5RYg==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
@@ -9730,10 +9730,10 @@ tweetnacl@^1.0.3:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
-twilio@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.npmjs.org/twilio/-/twilio-5.1.0.tgz"
-  integrity sha512-8nIarHCbFwBsN7/KyDbQyRszMpmheUsx9hhaWOt0UfNzX/U8rG/W9dVbq/njjK6iCaR+5JIQipcbCF15EnqqBg==
+twilio@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.npmjs.org/twilio/-/twilio-5.1.1.tgz"
+  integrity sha512-YpOvpQM17UW72QxK5ukMN0RCY0DdEzI+hTTXxHHhlOtuvpP50JMY0NtkvUViWzZVPJSegJrZPjX43GqmhL/7aw==
   dependencies:
     axios "^1.6.8"
     dayjs "^1.11.9"
