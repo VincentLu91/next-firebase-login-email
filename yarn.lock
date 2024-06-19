@@ -2547,13 +2547,13 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.20.0":
-  version "6.20.0"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.20.0.tgz"
-  integrity sha512-p6ENOFBR1QQirKj6zVYPDeZNVHMVV+3UVo+RptZDQPuyYyfAOA/TwJzX3cE19O2G4CgWnLfkmOOg6RcFjzFMWQ==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.20.1":
+  version "6.20.1"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.20.1.tgz"
+  integrity sha512-iyqooCYAMWxHwlGYuePlZlaL2VsgX57cV610czxPLh2ooUnW4U/7zE3oIlSY1VFQ4WDfg4w5//xp6+5WdyEs9A==
   dependencies:
     "@sanity/eventsource" "^5.0.2"
-    get-it "^8.6.0"
+    get-it "^8.6.1"
     rxjs "^7.0.0"
 
 "@sanity/eventsource@^5.0.2":
@@ -3115,10 +3115,10 @@
   resolved "https://registry.npmjs.org/@stitches/core/-/core-1.2.8.tgz"
   integrity sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==
 
-"@stripe/stripe-js@^3.5.0":
-  version "3.5.0"
-  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-3.5.0.tgz"
-  integrity sha512-pKS3wZnJoL1iTyGBXAvCwduNNeghJHY6QSRSNNvpYnrrQrLZ6Owsazjyynu0e0ObRgks0i7Rv+pe2M7/MBTZpQ==
+"@stripe/stripe-js@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/@stripe/stripe-js/-/stripe-js-4.0.0.tgz"
+  integrity sha512-R5zewuzTVPGn4dXkavbgDk8vSILkT5hRlzga10p6JzngR17qKi1fgc27kl58TmaVvgBZGngTRNH2j9kYdvfPGA==
 
 "@supabase/auth-helpers-nextjs@^0.10.0":
   version "0.10.0"
@@ -4288,10 +4288,10 @@ clone@^1.0.2:
   resolved "https://registry.npmjs.org/clone/-/clone-1.0.4.tgz"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
 
-cohere-ai@^7.10.5:
-  version "7.10.5"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.10.5.tgz"
-  integrity sha512-mfMiWktE07z0BzhRl0pJSLsNEXMlPPfkxR75PCEc99tuK5auVD2ZLhr37GtByQbN2ToIq34HrfQvMCZFO5V5pA==
+cohere-ai@^7.10.6:
+  version "7.10.6"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.10.6.tgz"
+  integrity sha512-J9y5wenl6IMqQUjklseocgusXcym0wnmuSoEdWyaNEQSYrNsHqWrpjeOYbQZ3A8/5edpPkR5Qsdwcc4FOJ5DOA==
   dependencies:
     "@aws-sdk/client-sagemaker" "^3.583.0"
     "@aws-sdk/credential-providers" "^3.583.0"
@@ -4305,7 +4305,6 @@ cohere-ai@^7.10.5:
     qs "6.11.2"
     readable-stream "^4.5.2"
     url-join "4.0.1"
-    web-streams-polyfill "^4.0.0"
 
 color-convert@^1.9.0:
   version "1.9.3"
@@ -5702,10 +5701,10 @@ get-intrinsic@^1.1.1, get-intrinsic@^1.1.3, get-intrinsic@^1.2.1, get-intrinsic@
     has-symbols "^1.0.3"
     hasown "^2.0.0"
 
-get-it@^8.6.0:
-  version "8.6.0"
-  resolved "https://registry.npmjs.org/get-it/-/get-it-8.6.0.tgz"
-  integrity sha512-ZFNZc3eKkYRHI5a7p3SAc3s0eBJgLL+qqpF7wpoFbTdzbHKC/XHu+6ot9RZTe6aoYGmZqf3Mdl62XdgiWJ7/ZQ==
+get-it@^8.6.1:
+  version "8.6.1"
+  resolved "https://registry.npmjs.org/get-it/-/get-it-8.6.1.tgz"
+  integrity sha512-fCK6M+WkN1TuXzYac0RYk9OK4VdJKV1xG3fe9D3TU2is/G8ofz6/+hRBCiddO/eNPhnhMBpYIk2kNx1S4NRdsg==
   dependencies:
     decompress-response "^7.0.0"
     follow-redirects "^1.15.6"
@@ -9765,10 +9764,10 @@ tweetnacl@^1.0.3:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
-twilio@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.npmjs.org/twilio/-/twilio-5.1.1.tgz"
-  integrity sha512-YpOvpQM17UW72QxK5ukMN0RCY0DdEzI+hTTXxHHhlOtuvpP50JMY0NtkvUViWzZVPJSegJrZPjX43GqmhL/7aw==
+twilio@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.npmjs.org/twilio/-/twilio-5.2.0.tgz"
+  integrity sha512-v58OiasUj9ckZpdkLAJWZ6KJIjM7GM57onM93xxqq7YVJRgLG0jS0nZY3X+Lm6dF2f653BUkTn6R6kmky7pLYw==
   dependencies:
     axios "^1.6.8"
     dayjs "^1.11.9"
@@ -10065,11 +10064,6 @@ wcwidth@^1.0.1:
   integrity sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==
   dependencies:
     defaults "^1.0.3"
-
-web-streams-polyfill@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/web-streams-polyfill/-/web-streams-polyfill-4.0.0.tgz"
-  integrity sha512-0zJXHRAYEjM2tUfZ2DiSOHAa2aw1tisnnhU3ufD57R8iefL+DcdJyRBRyJpG+NUimDgbTI/lH+gAE1PAvV3Cgw==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
