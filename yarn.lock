@@ -3177,10 +3177,10 @@
   dependencies:
     whatwg-url "^5.0.0"
 
-"@supabase/postgrest-js@1.15.6":
-  version "1.15.6"
-  resolved "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.15.6.tgz"
-  integrity sha512-zg3URVhoHOijdqMyn3LIFHh+Pqj5BmRqWAaoSExzIHc4m0kGBMPMjDcleamGhbelAAiKbjpQ04mBgooDliGl5A==
+"@supabase/postgrest-js@1.15.7":
+  version "1.15.7"
+  resolved "https://registry.npmjs.org/@supabase/postgrest-js/-/postgrest-js-1.15.7.tgz"
+  integrity sha512-TJztay5lcnnKuXjIO/X/aaajOsP8qNeW0k3MqIFoOtRolj5MEAIy8rixNakRk3o23eVCdsuP3iMLYPvOOruH6Q==
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
@@ -3201,15 +3201,15 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8", "@supabase/supabase-js@^2.44.0":
-  version "2.44.0"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.44.0.tgz"
-  integrity sha512-SzMvAgSVuPzx7itiYiascXAVBqTcZ9zX3ONIdhZEWKUEgWaJftfPyVvz+PMYznK77miSMuy1f4geAvPElyiS2g==
+"@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8", "@supabase/supabase-js@^2.44.1":
+  version "2.44.1"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.44.1.tgz"
+  integrity sha512-4vCOkefRoeacmMELIWlYPwsfd9y/stH4fCZ4GZZjiOCHeViIrZ8artdj61MwkjQKFuF1uZ87gCKjtMDKLJsDlA==
   dependencies:
     "@supabase/auth-js" "2.64.2"
     "@supabase/functions-js" "2.4.1"
     "@supabase/node-fetch" "2.6.15"
-    "@supabase/postgrest-js" "1.15.6"
+    "@supabase/postgrest-js" "1.15.7"
     "@supabase/realtime-js" "2.10.1"
     "@supabase/storage-js" "2.6.0"
 
@@ -9635,10 +9635,10 @@ tar@^6.1.11, tar@^6.1.2:
     mkdirp "^1.0.3"
     yallist "^4.0.0"
 
-telnyx@^1.26.1:
-  version "1.26.1"
-  resolved "https://registry.npmjs.org/telnyx/-/telnyx-1.26.1.tgz"
-  integrity sha512-a38cYuXyxIUADqV9A1HIrAiJ3a3rEM5lPZAp0/OyUwpu9lvhkzGwU+UhAaSBmitW21TkL34FryMJ0OB8pPSHVg==
+telnyx@^1.26.2:
+  version "1.26.2"
+  resolved "https://registry.npmjs.org/telnyx/-/telnyx-1.26.2.tgz"
+  integrity sha512-c/IU4dmtxEhflD+A3cYlbetEfy6832JCr2pZ4+6A2gEAVhfFeWbWt/IAV7KJxAyAdOJJ46IMFFmaHVufMHMyEw==
   dependencies:
     lodash.isplainobject "^4.0.6"
     qs "^6.11.2"
