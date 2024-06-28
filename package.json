@@ -17,7 +17,7 @@
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/auth-helpers-react": "^0.5.0",
     "@supabase/auth-ui-react": "^0.4.7",
-    "@supabase/supabase-js": "^2.44.1",
+    "@supabase/supabase-js": "^2.44.2",
     "axios": "^1.7.2",
     "cohere-ai": "^7.10.6",
     "cors": "^2.8.5",
@@ -40,10 +40,10 @@
     "recordrtc": "^5.6.2",
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
-    "stripe": "^16.0.0",
+    "stripe": "^16.1.0",
     "styled-jsx": "^5.1.6",
     "telnyx": "^1.26.2",
-    "twilio": "^5.2.0"
+    "twilio": "^5.2.1"
   },
   "overrides": {
     "redux-persist": {
