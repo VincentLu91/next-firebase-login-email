@@ -9,23 +9,33 @@ const Navbar = () => {
   return (
     <nav>
       <div className="logo">
-        <h1>EchoAlly</h1>
+        <Link href="/">
+          <h1>EchoAlly</h1>
+        </Link>
       </div>
-      <Link href="/dashboard">Home</Link>
-      <Link href="/about">About</Link>
-      <Link href="/pricing">Pricing</Link>
+      <Link href="/dashboard">Dashboard</Link>
       {user ? (
-        <a
-          href="#"
-          onClick={() => {
-            //signOut(auth);
-            supabase.auth.signOut(); // had to call this twice for some reason
-            //dispatch(setSound(null));
-            dispatch({ type: "SIGNED_OUT" });
-          }}
-        >
-          Sign Out
-        </a>
+        <Link href="/managesubscriptions">Account</Link>
+      ) : (
+        <Link href="/pricing">Pricing</Link>
+      )}
+      {user ? (
+        <>
+          <Link href="/audioplayer">AudioPlayer</Link>
+          <Link href="/internalrecording">Recording</Link>
+          <Link href="/phonerecording">Phone Recording</Link>
+          <a
+            href="#"
+            onClick={() => {
+              //signOut(auth);
+              supabase.auth.signOut(); // had to call this twice for some reason
+              //dispatch(setSound(null));
+              dispatch({ type: "SIGNED_OUT" });
+            }}
+          >
+            Sign Out
+          </a>
+        </>
       ) : (
         <Link href="/signin/">Sign In</Link>
       )}

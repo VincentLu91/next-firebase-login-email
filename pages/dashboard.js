@@ -1,16 +1,22 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useRouter } from "next/router";
+import * as React from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setSound } from "../redux/recording/actions";
-import dashboardStyles from "../styles/dashboardStyles";
+import { useRouter } from "next/router";
+//import { printTranscription } from "../../../redux/language/actions";
+import libraryStyles from "../styles/libraryStyles";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
 const Dashboard = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const user = useUser();
   const supabase = useSupabaseClient();
-  const [emailAddress, setEmailAddress] = useState(null);
+  const user = useUser();
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+
+  const [cloudRecordingList, setCloudRecordingList] = React.useState([]);
+  const [search, setNewSearch] = React.useState("");
+  const [customer, setCustomer] = useState(null);
 
   const checkAuth = useCallback(
     async (user) => {
@@ -20,30 +26,38 @@ const Dashboard = () => {
           .from("customers")
           .select("*")
           .eq("email_address", user.email);
-        console.log("customerInfo is: ", customerInfo.data[0]);
-        if (!customerInfo.data[0]) {
-          // say if the user created their account for the first time, then create a customer row for them.
-          customerInfo = await supabase
-            .from("customers")
-            .insert([{ email_address: user.email }])
-            .select();
-          if (customerInfo.error) {
-            console.log("Cannot create customer, see error: ");
-            console.log(customerInfo.error);
-          }
-          if (customerInfo.data) {
-            console.log("Customer Success!");
-            console.log(customerInfo.data);
-          }
-        } else {
-          //console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
-          setEmailAddress(customerInfo.data[0].email_address);
-          let subscriptionResponse = await supabase
-            .from("subscriptions")
-            .select()
-            .eq("customer_id", customerInfo.data[0].id);
-          console.log("subscriptionResponse is: ", subscriptionResponse);
-        }
+        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
+        setCustomer(customerInfo.data[0]);
+        let subscriptionResponse = await supabase
+          .from("subscriptions")
+          .select()
+          .eq("customer_id", customerInfo.data[0].id);
+        // we don't have to check subscriptions because if the user cancels plan, they could still listen
+        // to existing audio/transcripts.
+        /*console.log(
+          "subscriptionResponse is: ",
+          subscriptionResponse.data[0].stripe_product_name
+        );
+        setSubscriptionInfo(subscriptionResponse.data[0].stripe_product_name);*/
+        let micRecordingInfo = await supabase
+          .from("mic_recordings")
+          .select(
+            "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at"
+          )
+          .eq("customer_id", customerInfo.data[0].id);
+        //console.log("micRecordingInfo is: ", micRecordingInfo.data);
+        let callRecordingInfo = await supabase
+          .from("call_recordings")
+          .select(
+            "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at"
+          )
+          .eq("customer_id", customerInfo.data[0].id);
+        //console.log("callRecordingInfo is: ", callRecordingInfo.data);
+        let combinedRecordingInfo = micRecordingInfo.data.concat(
+          callRecordingInfo.data
+        );
+        console.log("combinedRecordingInfo is: ", combinedRecordingInfo);
+        setCloudRecordingList(combinedRecordingInfo);
       } else {
         // User is signed out
         console.log(
@@ -55,51 +69,114 @@ const Dashboard = () => {
     [router, supabase]
   );
 
+  // this is to check for the user status and subscriptions before loading all recording objects
   useEffect(() => {
-    //console.log("Current user is: ", currentUser);
     checkAuth(user);
   }, [checkAuth, user]);
 
-  return (
-    <div className="center">
-      <h1 className="title">Welcome home {emailAddress}</h1>
-      <p>
-        <button
-          className="logout"
-          onClick={() => {
-            //signOut(auth);
-            supabase.auth.signOut(); // had to call this twice for some reason
-            //dispatch(setSound(null));
-            dispatch({ type: "SIGNED_OUT" });
-          }}
-        >
-          Sign out
-        </button>
-        {/*<button onClick={() => router.push("/blog1")}>Go to Blog1</button>*/}
-        <br />
-        {/*<button onClick={() => router.push("/plan1")}>Go to Plan1</button>*/}
-        {/*<button onClick={() => router.push("/plan2")}>Go to Plan2</button>*/}
-        <br />
-        {/*<button onClick={() => router.push("/plan3")}>Go to Plan3</button>*/}
-        {/*<button onClick={() => router.push("/plan4")}>Go to Plan4</button>*/}
-        <br />
-        <button onClick={() => router.push("/audioplayer")}>AudioPlayer</button>
-        <button onClick={() => router.push("/managesubscriptions")}>
-          Manage Subscriptions
-        </button>
-        <br />
-        <button onClick={() => router.push("/internalrecording")}>
-          Recording
-        </button>
-        <button onClick={() => router.push("/library")}>Library</button>
-        <button onClick={() => router.push("/phonerecording")}>
-          Phone Recording
-        </button>
-      </p>
+  useEffect(() => {
+    console.log("Cloud Recording List is: ", cloudRecordingList);
+  }, [cloudRecordingList]);
 
-      <style jsx>{dashboardStyles}</style>
-      {/*console.log("Supabase user is: ", user)*/}
-      {console.log("supabase obj is: ", supabase.auth)}
+  // function to delete a recording:
+  async function deleteRecording(original_file_name, customer) {
+    console.log("deleting recording: ", original_file_name);
+    let micDeleteInfo = await supabase
+      .from("mic_recordings")
+      .select("*", { count: "exact", head: true })
+      .eq("customer_id", customer.id)
+      .eq("original_file_name", original_file_name);
+    let callDeleteInfo = await supabase
+      .from("call_recordings")
+      .select("*", { count: "exact", head: true })
+      .eq("customer_id", customer.id)
+      .eq("original_file_name", original_file_name);
+    if (micDeleteInfo.count > 0) {
+      console.log("mic delete.....");
+      await supabase
+        .from("mic_recordings")
+        .delete()
+        .eq("customer_id", customer.id)
+        .eq("original_file_name", original_file_name);
+    } else if (callDeleteInfo.count > 0) {
+      console.log("call delete.....");
+      let callChunkDeleteInfo = await supabase
+        .from("call_recordings")
+        .select("*")
+        .eq("original_file_name", original_file_name);
+      console.log(
+        "callChunkDeleteInfo ID is: ",
+        callChunkDeleteInfo.data[0].id
+      );
+      // delete from chunks table first since it depends on `call_recording` table
+      await supabase
+        .from("telnyx_transcript_chunks")
+        .delete()
+        .eq("call_recording_id", callChunkDeleteInfo.data[0].id);
+
+      await supabase
+        .from("call_recordings")
+        .delete()
+        .eq("customer_id", customer.id)
+        .eq("original_file_name", original_file_name);
+    }
+    const storageDeleteResponse = await supabase.storage
+      .from("recreate-ai-storage-bucket")
+      .remove([original_file_name]);
+    console.log("storageDeleteResponse is: ", storageDeleteResponse);
+    router.push("/dashboard");
+  }
+
+  // will call later
+  async function viewContent(item) {
+    //dispatch(printTranscription(transcription));
+    //console.log("Transcription from Library is: ", transcription);
+    dispatch(setSound(item));
+    router.push("/audioplayer");
+  }
+
+  const handleSearchChange = (e) => {
+    setNewSearch(e.target.value);
+  };
+
+  const filtered = !search
+    ? cloudRecordingList
+    : cloudRecordingList.filter(
+        (item) =>
+          item.file_name?.toLowerCase().includes(search.toLowerCase()) ||
+          item.full_transcript?.toLowerCase().includes(search.toLowerCase())
+      );
+
+  return (
+    <div className="title">
+      <button onClick={() => router.push("/dashboard")}>
+        Back to Dashboard
+      </button>
+      <h2>List of recordings and transcriptions</h2>
+      <input type="text" value={search} onChange={handleSearchChange} />
+      <ul className="no-bullet">
+        {filtered.map(function (item) {
+          //console.log("item", item);
+          return (
+            <li key={item.created_at}>
+              <div>{item.file_name}</div>
+              <button onClick={() => viewContent(item)}>
+                View Recording And Transcription
+              </button>
+              <button
+                onClick={() =>
+                  deleteRecording(item.original_file_name, customer)
+                }
+              >
+                Delete
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+      <h3>The total number of recordings is: {cloudRecordingList.length}</h3>
+      <h3>The filtered number of recordings is: {filtered.length}</h3>
+      <style jsx>{libraryStyles}</style>
     </div>
   );
 };
