@@ -75,13 +75,13 @@ const Dashboard = () => {
         >
           Sign out
         </button>
-        <button onClick={() => router.push("/blog1")}>Go to Blog1</button>
+        {/*<button onClick={() => router.push("/blog1")}>Go to Blog1</button>*/}
         <br />
-        <button onClick={() => router.push("/plan1")}>Go to Plan1</button>
-        <button onClick={() => router.push("/plan2")}>Go to Plan2</button>
+        {/*<button onClick={() => router.push("/plan1")}>Go to Plan1</button>*/}
+        {/*<button onClick={() => router.push("/plan2")}>Go to Plan2</button>*/}
         <br />
-        <button onClick={() => router.push("/plan3")}>Go to Plan3</button>
-        <button onClick={() => router.push("/plan4")}>Go to Plan4</button>
+        {/*<button onClick={() => router.push("/plan3")}>Go to Plan3</button>*/}
+        {/*<button onClick={() => router.push("/plan4")}>Go to Plan4</button>*/}
         <br />
         <button onClick={() => router.push("/audioplayer")}>AudioPlayer</button>
         <button onClick={() => router.push("/managesubscriptions")}>
