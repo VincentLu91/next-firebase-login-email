@@ -157,6 +157,25 @@ const Dashboard = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage);
 
+  const dateString = (timestamp) => {
+    const date = new Date(timestamp);
+
+    // Get month name (full name)
+    const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+      date
+    );
+
+    // Get day of the month
+    const day = date.getDate();
+
+    // Get full year
+    const year = date.getFullYear();
+
+    // Construct the formatted date string
+    const formattedDate = `${month} ${day} ${year}`;
+    return formattedDate;
+  };
+
   return (
     <div className="title">
       <h2>List of recordings and transcriptions</h2>
@@ -165,19 +184,23 @@ const Dashboard = () => {
         {currentItems.map(function (item) {
           //console.log("item", item);
           return (
-            <li key={item.created_at}>
-              <div>{item.file_name}</div>
-              <button onClick={() => viewContent(item)}>
-                View Recording And Transcription
-              </button>
-              <button
-                onClick={() =>
-                  deleteRecording(item.original_file_name, customer)
-                }
-              >
-                Delete
-              </button>
-            </li>
+            <>
+              <li key={item.created_at}>
+                <div>{item.file_name}</div>
+                <div>{dateString(item.created_at)}</div>
+                <button onClick={() => viewContent(item)}>
+                  View Recording And Transcription
+                </button>
+                <button
+                  onClick={() =>
+                    deleteRecording(item.original_file_name, customer)
+                  }
+                >
+                  Delete
+                </button>
+              </li>
+              <br />
+            </>
           );
         })}
       </ul>
