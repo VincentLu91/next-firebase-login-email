@@ -45,6 +45,13 @@ button.subscribed {
   background: #2c3e50;
 }
 
+button:disabled {
+  background-color: #ccc; /* Light gray background */
+  color: #666; /* Darker gray text */
+  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+  opacity: 0.6; /* Reduce opacity */
+}
+
 body {
   background: #f2f2f2;
   color: #333;

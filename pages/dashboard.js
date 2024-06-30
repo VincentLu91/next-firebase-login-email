@@ -18,6 +18,9 @@ const Dashboard = () => {
   const [search, setNewSearch] = React.useState("");
   const [customer, setCustomer] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const checkAuth = useCallback(
     async (user) => {
       if (user) {
@@ -147,15 +150,19 @@ const Dashboard = () => {
           item.full_transcript?.toLowerCase().includes(search.toLowerCase())
       );
 
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+
+  // Calculate the items to display on the current page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentItems = filtered.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <div className="title">
-      <button onClick={() => router.push("/dashboard")}>
-        Back to Dashboard
-      </button>
       <h2>List of recordings and transcriptions</h2>
       <input type="text" value={search} onChange={handleSearchChange} />
       <ul className="no-bullet">
-        {filtered.map(function (item) {
+        {currentItems.map(function (item) {
           //console.log("item", item);
           return (
             <li key={item.created_at}>
@@ -174,6 +181,21 @@ const Dashboard = () => {
           );
         })}
       </ul>
+      <button
+        onClick={() => setCurrentPage(currentPage - 1)}
+        disabled={currentPage === 1}
+      >
+        Previous
+      </button>
+      <span>
+        {currentPage} of {totalPages}
+      </span>
+      <button
+        onClick={() => setCurrentPage(currentPage + 1)}
+        disabled={currentPage === totalPages}
+      >
+        Next
+      </button>
       <h3>The total number of recordings is: {cloudRecordingList.length}</h3>
       <h3>The filtered number of recordings is: {filtered.length}</h3>
       <style jsx>{libraryStyles}</style>
