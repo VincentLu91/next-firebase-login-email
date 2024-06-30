@@ -180,30 +180,43 @@ const Dashboard = () => {
     <div className="title">
       <h2>List of recordings and transcriptions</h2>
       <input type="text" value={search} onChange={handleSearchChange} />
-      <ul className="no-bullet">
-        {currentItems.map(function (item) {
-          //console.log("item", item);
-          return (
-            <>
-              <li key={item.created_at}>
-                <div>{item.file_name}</div>
-                <div>{dateString(item.created_at)}</div>
-                <button onClick={() => viewContent(item)}>
-                  View Recording And Transcription
-                </button>
-                <button
-                  onClick={() =>
-                    deleteRecording(item.original_file_name, customer)
-                  }
-                >
-                  Delete
-                </button>
-              </li>
-              <br />
-            </>
-          );
-        })}
-      </ul>
+      {cloudRecordingList.length === 0 ? (
+        <>
+          <p>No recordings available.</p>
+          <p>
+            To record with microphone, click on <strong>Recording</strong> at
+            the top and start recording.
+          </p>
+          <p>
+            To record a phone call, click on <strong>Phone Recording</strong>.
+          </p>
+        </>
+      ) : (
+        <ul className="no-bullet">
+          {currentItems.map(function (item) {
+            //console.log("item", item);
+            return (
+              <>
+                <li key={item.created_at}>
+                  <div>{item.file_name}</div>
+                  <div>{dateString(item.created_at)}</div>
+                  <button onClick={() => viewContent(item)}>
+                    View Recording And Transcription
+                  </button>
+                  <button
+                    onClick={() =>
+                      deleteRecording(item.original_file_name, customer)
+                    }
+                  >
+                    Delete
+                  </button>
+                </li>
+                <br />
+              </>
+            );
+          })}
+        </ul>
+      )}
       <button
         onClick={() => setCurrentPage(currentPage - 1)}
         disabled={currentPage === 1}
