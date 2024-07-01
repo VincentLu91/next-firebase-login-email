@@ -12,6 +12,8 @@ export const initialState = {
   recording: undefined,
   isRecording: false,
   recordURI: null,
+  docID: null,
+  tableName: null,
 };
 
 // reducer
@@ -84,6 +86,16 @@ const recordingAudioReducer = (state = initialState, action) => {
       return {
         ...state,
         recordingDuration: action.payload,
+      };
+    case RecordingAudioTypes.SET_DOC_ID:
+      return {
+        ...state,
+        docID: action.payload,
+      };
+    case RecordingAudioTypes.SET_TABLE_NAME:
+      return {
+        ...state,
+        tableName: action.payload,
       };
 
     default:

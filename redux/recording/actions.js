@@ -69,3 +69,13 @@ export const setRecordingDuration = (recordingDuration) => ({
   type: RecordingAudioTypes.SET_RECORDING_DURATION,
   payload: recordingDuration,
 });
+
+export const setDocID = (docID) => ({
+  type: RecordingAudioTypes.SET_DOC_ID,
+  payload: docID,
+});
+
+export const setTableName = (tableName) => ({
+  type: RecordingAudioTypes.SET_TABLE_NAME,
+  payload: tableName,
+});

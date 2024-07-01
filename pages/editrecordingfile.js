@@ -10,11 +10,11 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { setSound, setDocID, setTableName } from "../redux/recording/actions";
+import { setSound } from "../redux/recording/actions";
 
 import audioPlayerStyles from "../styles/audioPlayerStyles";
 
-function AudioPlayer() {
+function EditRecordingFile() {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useUser();
@@ -31,6 +31,10 @@ function AudioPlayer() {
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
+  const [editName, setEditName] = useState(sound.file_name);
+  const [editTranscript, setEditTranscript] = useState(sound.full_transcript);
+  const docID = useSelector((state) => state.recordingReducer.docID);
+  const tableName = useSelector((state) => state.recordingReducer.tableName);
 
   const checkAuth = useCallback(
     async (user) => {
@@ -172,37 +176,31 @@ function AudioPlayer() {
     console.log("Language selected: ", e.value);
   };
 
-  async function goEditFile(sound) {
-    //dispatch(printTranscription(transcription));
-    //console.log("Transcription from Library is: ", transcription);
-    dispatch(setSound(sound));
-    let micRenameInfo = await supabase
-      .from("mic_recordings")
-      .select("*")
-      .eq("file_name", sound.file_name)
-      .eq("original_file_name", sound.original_file_name);
-    let callRenameInfo = await supabase
-      .from("call_recordings")
-      .select("*")
-      .eq("file_name", sound.file_name)
-      .eq("original_file_name", sound.original_file_name);
-    if (micRenameInfo) {
-      // do something
-      console.log("micRenameInfo is: ", micRenameInfo);
-      dispatch(setDocID(micRenameInfo.data[0].id));
-      dispatch(setTableName("mic_recordings"));
-      router.push("/editrecordingfile");
-      return;
-    } else if (callRenameInfo) {
-      // do something
-      console.log("callRenameInfo is: ", callRenameInfo);
-      dispatch(setDocID(callRenameInfo.data[0].id));
-      dispatch(setTableName("call_recordings"));
-      router.push("/editrecordingfile");
-      return;
-    }
-    //router.push("/editrecordingfile");
-  }
+  const handleEditName = (e) => {
+    setEditName(e.target.value);
+    console.log("editName: ", e.target.value);
+  };
+
+  const handleEditTranscript = (e) => {
+    setEditTranscript(e.target.value);
+    console.log("editName: ", e.target.value);
+  };
+
+  const onSubmitRenameName = async (editName) => {
+    const fileNameRef = await supabase
+      .from(tableName)
+      .update({ file_name: editName })
+      .eq("id", docID)
+      .select();
+  };
+
+  const onSubmitRenameTranscript = async (editTranscript) => {
+    const fileNameRef = await supabase
+      .from(tableName)
+      .update({ full_transcript: editTranscript })
+      .eq("id", docID)
+      .select();
+  };
 
   return (
     <div>
@@ -233,11 +231,31 @@ function AudioPlayer() {
       </div>
       {isAudioSelected ? (
         <>
-          <h1 className="h1-center-bold">{sound.file_name}</h1>
-          <h1 className="h1-center-bold">Transcript:</h1>
-          <h1 className="h1-center-bold">{sound.full_transcript}</h1>
-          <button onClick={() => goEditFile(sound)}>
-            Edit Filename and transcript
+          <textarea
+            type="text"
+            id="editName"
+            name="editName"
+            onChange={handleEditName}
+            value={editName}
+            cols="80"
+            rows="15"
+            placeholder="Edit the filename..."
+            className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+          />
+          <button onClick={() => onSubmitRenameName(editName)}>Rename</button>
+          <textarea
+            type="text"
+            id="editTranscript"
+            name="editTranscript"
+            onChange={handleEditTranscript}
+            value={editTranscript}
+            cols="80"
+            rows="15"
+            placeholder="Edit the transcript"
+            className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
+          />
+          <button onClick={() => onSubmitRenameTranscript(editTranscript)}>
+            Edit Transcript
           </button>
         </>
       ) : (
@@ -299,4 +317,4 @@ function AudioPlayer() {
   );
 }
 
-export default AudioPlayer;
+export default EditRecordingFile;
