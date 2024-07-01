@@ -195,7 +195,7 @@ function EditRecordingFile() {
   };
 
   const onSubmitRenameTranscript = async (editTranscript) => {
-    const fileNameRef = await supabase
+    const transcriptRef = await supabase
       .from(tableName)
       .update({ full_transcript: editTranscript })
       .eq("id", docID)
