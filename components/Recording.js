@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import signInStyles from "../styles/signinStyles";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import fileToArrayBuffer from "file2arraybuffer";
+import axios from "axios";
 
 const Recording = () => {
   const router = useRouter();
@@ -25,6 +26,10 @@ const Recording = () => {
   const [liveTranscript, setLiveTranscript] = React.useState("");
   const [transcript, setTranscript] = React.useState("");
   const [isTranscribing, setIsTranscribing] = React.useState(false);
+  const [time, setTime] = React.useState(0);
+  // state to check stopwatch running or not
+  const [isRunning, setIsRunning] = React.useState(false);
+  const intervalIdRef = React.useRef(null);
   const dispatch = useDispatch();
   const recordingList = useSelector(
     (state) => state.recordingReducer.recordingList
@@ -37,6 +42,52 @@ const Recording = () => {
   console.log("Internal Recording isRecording: ", isRecording);
 
   let recorder;
+
+  const runStopWatch = async () => {
+    try {
+      let customerInfo = await supabase
+        .from("customers")
+        .select("*")
+        .eq("email_address", user.email);
+      let customer_id = customerInfo.data[0].id;
+      //console.log("customer_id: ", customer_id);
+      const response = await axios.post(`/api/mic-seconds?user=${customer_id}`);
+      const decrementSeconds = response.data;
+      console.log("decrementSeconds: ", decrementSeconds); // Use this data as needed
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (isRunning) {
+      runStopWatch();
+      // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
+      intervalIdRef.current = setInterval(() => setTime(time + 1), 1000);
+    } else if (intervalIdRef.current) {
+      clearInterval(intervalIdRef.current);
+    }
+    return () => clearInterval(intervalIdRef.current);
+  }, [isRunning, time, user.id]);
+
+  // Hours calculation
+  const hours = Math.floor(time / 3600);
+
+  // Minutes calculation
+  const minutes = Math.floor((time % 3600) / 60);
+
+  // Seconds calculation
+  const seconds = time % 60;
+
+  // Method to start and stop timer
+  const startAndStop = () => {
+    setIsRunning(!isRunning);
+  };
+
+  // Method to reset timer back to 0
+  const reset = () => {
+    setTime(0);
+  };
 
   const uploadAudio = async (audioData) => {
     let uriParts = mediaBlobUrl.split(".").toString().replace("//", "");
@@ -105,6 +156,7 @@ const Recording = () => {
 
   const startRecordingAudio = async () => {
     startRecording();
+    startAndStop(); // this is to set isRunning to True and run the stopwatch
     // call transcription function later
     setIsTranscribing(true);
     const response = await fetch("/api/token");
@@ -199,6 +251,7 @@ const Recording = () => {
 
   async function stopRecordingAudio() {
     stopRecording();
+    startAndStop(); // this is to set isRunning to False and stop the stopwatch
     setIsTranscribing(false);
     setTranscript(liveTranscript);
   }
@@ -248,6 +301,7 @@ const Recording = () => {
       //duration: durationSeconds,
       full_transcript: transcript,
     };
+    reset();
     uploadAudio(audioData);
 
     // Reset the field
@@ -268,6 +322,13 @@ const Recording = () => {
             {<p>{status}</p>}
             <button onClick={stopRecordingAudio}>Stop Recording</button>
             {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
+            <div className="stopwatch-container">
+              <p className="stopwatch-time">
+                {hours}:{minutes.toString().padStart(2, "0")}:
+                {seconds.toString().padStart(2, "0")}
+                {/*milliseconds.toString().padStart(2, "0")*/}
+              </p>
+            </div>
             <h1>Transcript below</h1>
             <p>{liveTranscript}</p>
           </div>
