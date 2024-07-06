@@ -63,7 +63,11 @@ export default async function handler(req, res) {
     const callRecordingResponse = await supabase
       .from("call_recordings")
       .upsert(
-        { telnyx_call_control_id: call_control_id, customer_id },
+        {
+          telnyx_call_control_id: call_control_id,
+          customer_id,
+          react_native_event: "blah",
+        },
         { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
       )
       .select();
@@ -77,6 +81,7 @@ export default async function handler(req, res) {
           occurred_at,
           call_recording_id: callRecordingResponse.data[0].id,
           transcription_data,
+          react_native_event: "blah",
         });
 
       if (!telnyxChunkResponse.error) {
