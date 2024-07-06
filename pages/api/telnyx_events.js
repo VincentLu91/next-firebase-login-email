@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         {
           telnyx_call_control_id: call_control_id,
           customer_id,
-          react_native_event: "blah",
+          react_native_event: data.event,
         },
         { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
       )
@@ -81,7 +81,6 @@ export default async function handler(req, res) {
           occurred_at,
           call_recording_id: callRecordingResponse.data[0].id,
           transcription_data,
-          react_native_event: "blah",
         });
 
       if (!telnyxChunkResponse.error) {
@@ -107,6 +106,11 @@ export default async function handler(req, res) {
     const transcription_call = telnyx.Call({
       call_control_id: data.payload.call_control_id,
     });
+    const callAnswerResponse = await supabase
+      .from("call_recordings")
+      .update({ react_native_event: data.event_type })
+      .eq("telnyx_call_control_id", data.payload.call_control_id)
+      .select();
     try {
       await transcription_call.transcription_start({ language: "en" });
     } catch (e) {
@@ -127,7 +131,10 @@ export default async function handler(req, res) {
     // next, store the recording_id in the table. Use upsert or update
     const callRecordingResponse = await supabase
       .from("call_recordings")
-      .update({ recording_id: data.payload.recording_id })
+      .update({
+        recording_id: data.payload.recording_id,
+        react_native_event: data.event_type,
+      })
       .eq("telnyx_call_control_id", data.payload.call_control_id)
       .select();
     if (callRecordingResponse.error) {
