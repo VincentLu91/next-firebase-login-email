@@ -18,21 +18,27 @@ import { isValidPhoneNumber } from "react-phone-number-input";
 const PhoneRecording = () => {
   const supabase = useSupabaseClient();
   const user = useUser();
-  const { subscribe, unSubscribeAll, pubnubDispatch, transcript, callRecordingData } = usePubnub();
+  const {
+    subscribe,
+    unSubscribeAll,
+    pubnubDispatch,
+    transcript,
+    callRecordingData,
+  } = usePubnub();
 
   const setTranscript = (data) => {
-     pubnubDispatch({
-       type: "CALL_TRANSCRIPT",
-       payload: { transcript: data },
-     });
-  }
+    pubnubDispatch({
+      type: "CALL_TRANSCRIPT",
+      payload: { transcript: data },
+    });
+  };
 
   const setCallRecordingData = (data) => {
-     pubnubDispatch({
-       type: "SET_CALL_RECORDING_SAVED",
-       payload: data,
-     });
-  }
+    pubnubDispatch({
+      type: "SET_CALL_RECORDING_SAVED",
+      payload: data,
+    });
+  };
 
   const router = useRouter();
 
@@ -47,6 +53,9 @@ const PhoneRecording = () => {
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const [customer, setCustomer] = useState(null);
   const [phoneNumber, setPhoneNumber] = React.useState(null);
+  const [time, setTime] = React.useState(0);
+  // state to check stopwatch running or not
+  const intervalIdRef = React.useRef(null);
 
   const dispatch = useDispatch();
   const recordingList = useSelector(
@@ -107,6 +116,96 @@ const PhoneRecording = () => {
     //getSubscriptionsInfo();
   }, [checkAuth, user]);
 
+  const getEventType = useCallback(
+    async (callId) => {
+      try {
+        let getEventResponse;
+        console.log(callId);
+        if (callId) {
+          getEventResponse = await supabase
+            .from("call_recordings")
+            .select("react_native_event")
+            .eq("telnyx_call_control_id", callId);
+        }
+
+        if (!getEventResponse) {
+          setCallStatus(null);
+          setTimeout(() => getEventType(callId), 1000);
+          console.log("nothing in getEventResponse1", getEventResponse);
+        } else {
+          if (!getEventResponse.data[0]) {
+            setCallStatus(null);
+            console.log("nothing in getEventResponse2", getEventResponse);
+            setTimeout(() => getEventType(callId), 1000);
+          } else {
+            console.log("getEventResponse is: ", getEventResponse.data[0]);
+            setCallStatus(getEventResponse.data[0].react_native_event);
+            // if (!isTranscribing) {
+            //   setCallStatus(null);
+            //   return;
+            // }
+            return;
+          }
+        }
+        console.log(
+          "getEventResponse: ",
+          getEventResponse.data[0].react_native_event
+        );
+      } catch (error) {
+        console.error("Error in getEventType:", error);
+      }
+    },
+    [supabase]
+  );
+
+  const runStopWatch = useCallback(async () => {
+    try {
+      let customerInfo = await supabase
+        .from("customers")
+        .select("*")
+        .eq("email_address", user.email);
+      let customer_id = customerInfo.data[0].id;
+      const response = await axios.post(
+        `/api/call-seconds?user=${customer_id}`
+      );
+      const decrementSeconds = response.data;
+      console.log("decrementSeconds: ", decrementSeconds); // Use this data as needed
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [user, supabase]);
+
+  useEffect(() => {
+    //console.log("callStatus: ", callStatus);
+    if (callStatus == "call.answered") {
+      runStopWatch();
+      // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
+      intervalIdRef.current = setInterval(() => setTime(time + 1), 1000);
+    } else if (intervalIdRef.current) {
+      clearInterval(intervalIdRef.current);
+    }
+    return () => clearInterval(intervalIdRef.current);
+  }, [callStatus, runStopWatch, time]);
+
+  // Hours calculation
+  const hours = Math.floor(time / 3600);
+
+  // Minutes calculation
+  const minutes = Math.floor((time % 3600) / 60);
+
+  // Seconds calculation
+  const seconds = time % 60;
+
+  // Method to start and stop timer (not needed in this case)
+  const startAndStop = () => {
+    setIsRunning(!isRunning);
+  };
+
+  // Method to reset timer back to 0
+  const reset = () => {
+    setTime(0);
+  };
+
   const startRecordingAudio = async () => {
     console.log("phoneNumber is: ", phoneNumber);
     if (!phoneNumber || !isValidPhoneNumber(phoneNumber)) {
@@ -124,6 +223,7 @@ const PhoneRecording = () => {
     console.log("call_control_id is: ", res_dial.data);
     //console.log("callStatus is: ", res_dial.status);
     setCallControlID(res_dial.data);
+    getEventType(res_dial.data);
     subscribe(res_dial.data);
     //setIsDialed(true);
     //setCallStatus(res_dial.status);
@@ -196,6 +296,7 @@ const PhoneRecording = () => {
       //duration: durationSeconds,
       transcript: transcript,
     });
+    reset();
     //newRecordingList.reverse()   //sorting
     //props.setRecordinglistProp(newRecordingList);
     dispatch(updateRecordingList(newRecordingList));
@@ -237,6 +338,13 @@ const PhoneRecording = () => {
       return (
         <div className="title">
           {/*<button onClick={stopRecordingAudio}>Stop Recording</button>*/}
+          <div className="stopwatch-container">
+            <p className="stopwatch-time">
+              {hours}:{minutes.toString().padStart(2, "0")}:
+              {seconds.toString().padStart(2, "0")}
+              {/*milliseconds.toString().padStart(2, "0")*/}
+            </p>
+          </div>
           <h1>Transcript below</h1>
           <p>{transcript}</p>
         </div>
