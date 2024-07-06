@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         {
           telnyx_call_control_id: call_control_id,
           customer_id,
-          react_native_event: "call.answered", // it's the first thing it gets created so forcing it
+          react_native_event: "call.answered",
         },
         { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
       )
@@ -106,17 +106,6 @@ export default async function handler(req, res) {
     const transcription_call = telnyx.Call({
       call_control_id: data.payload.call_control_id,
     });
-    const callRecordingResponse = await supabase
-      .from("call_recordings")
-      .upsert(
-        {
-          telnyx_call_control_id: call_control_id,
-          customer_id,
-          react_native_event: data.event_type,
-        },
-        { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
-      )
-      .select();
     try {
       await transcription_call.transcription_start({ language: "en" });
     } catch (e) {
@@ -137,10 +126,7 @@ export default async function handler(req, res) {
     // next, store the recording_id in the table. Use upsert or update
     const callRecordingResponse = await supabase
       .from("call_recordings")
-      .update({
-        recording_id: data.payload.recording_id,
-        react_native_event: data.event_type,
-      })
+      .update({ recording_id: data.payload.recording_id })
       .eq("telnyx_call_control_id", data.payload.call_control_id)
       .select();
     if (callRecordingResponse.error) {
