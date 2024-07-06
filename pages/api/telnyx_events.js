@@ -132,6 +132,18 @@ export default async function handler(req, res) {
     } catch (e) {
       console.log(e);
     }
+  } else if (data.event_type === "call.hangup") {
+    const callRecordingResponse = await supabase
+      .from("call_recordings")
+      .upsert(
+        {
+          telnyx_call_control_id: call_control_id,
+          customer_id,
+          react_native_event: data.event_type, // just to store status when it's call.hangup
+        },
+        { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
+      )
+      .select();
   } else if (data.event_type === "call.recording.saved") {
     // this occurs when the user hangs up the phone, not the actual saving of the recording record
     const callSavedResponse = await supabase
