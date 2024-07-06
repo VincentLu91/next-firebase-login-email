@@ -81,7 +81,6 @@ export default async function handler(req, res) {
           occurred_at,
           call_recording_id: callRecordingResponse.data[0].id,
           transcription_data,
-          react_native_event: "blah",
         });
 
       if (!telnyxChunkResponse.error) {
