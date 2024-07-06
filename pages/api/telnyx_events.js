@@ -118,7 +118,7 @@ export default async function handler(req, res) {
         {
           telnyx_call_control_id: call_control_id,
           customer_id,
-          react_native_event: "call.answered....1",
+          react_native_event: data.event_type,
         },
         { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
       )
