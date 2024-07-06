@@ -66,7 +66,7 @@ export default async function handler(req, res) {
         {
           telnyx_call_control_id: call_control_id,
           customer_id,
-          react_native_event: "call.answered",
+          //react_native_event: "call.answered",
         },
         { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
       )
@@ -102,6 +102,27 @@ export default async function handler(req, res) {
       }
     }
   } else if (data.event_type === "call.answered") {
+    const customer_id = Buffer.from(
+      data.payload.client_state,
+      "base64"
+    ).toString();
+    const {
+      occurred_at,
+      id,
+      payload: { call_control_id, transcription_data },
+    } = data;
+
+    const callRecordingResponse = await supabase
+      .from("call_recordings")
+      .upsert(
+        {
+          telnyx_call_control_id: call_control_id,
+          customer_id,
+          react_native_event: "call.answered....1",
+        },
+        { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
+      )
+      .select();
     // call transcription function
     const transcription_call = telnyx.Call({
       call_control_id: data.payload.call_control_id,
