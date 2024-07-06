@@ -105,10 +105,16 @@ export default async function handler(req, res) {
     const transcription_call = telnyx.Call({
       call_control_id: data.payload.call_control_id,
     });
-    const callAnswerResponse = await supabase
+    const callRecordingResponse = await supabase
       .from("call_recordings")
-      .update({ react_native_event: data.event_type })
-      .eq("telnyx_call_control_id", data.payload.call_control_id)
+      .upsert(
+        {
+          telnyx_call_control_id: call_control_id,
+          customer_id,
+          react_native_event: data.event_type,
+        },
+        { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
+      )
       .select();
     try {
       await transcription_call.transcription_start({ language: "en" });
