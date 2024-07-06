@@ -133,6 +133,12 @@ export default async function handler(req, res) {
       console.log(e);
     }
   } else if (data.event_type === "call.recording.saved") {
+    // this occurs when the user hangs up the phone, not the actual saving of the recording record
+    const callSavedResponse = await supabase
+      .from("call_recordings")
+      .update({ react_native_event: data.event_type })
+      .eq("telnyx_call_control_id", data.payload.call_control_id)
+      .select();
     let callRecordingMp3Url;
     let callRecordingMp3FileName;
     let callRecordingMp3Duration;
