@@ -260,7 +260,7 @@ const Recording = () => {
 
   useEffect(() => {
     if (isTranscribing) {
-      if (numMicTokens < 0) {
+      if (numMicTokens == 0) {
         stopRecordingAudio();
       } else {
         runStopWatch();
