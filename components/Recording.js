@@ -49,7 +49,7 @@ const Recording = () => {
       .from("customers")
       .select("*")
       .eq("email_address", user.email);
-    console.log("tokenResponse: ", tokenResponse.data[0].mic_tokens);
+    //console.log("tokenResponse: ", tokenResponse.data[0].mic_tokens);
     setNumMicTokens(tokenResponse.data[0].mic_tokens);
   }, [user, setNumMicTokens]);
 
@@ -332,8 +332,15 @@ const Recording = () => {
 
   function renderView() {
     if (status === "recording" || status === "idle") {
-      // while recording or not recording yet
+      if (numMicTokens == 0) {
+        return (
+          <div className="title">
+            <h2>You have no seconds left!</h2>
+          </div>
+        );
+      }
       if (isTranscribing) {
+        // while recording or not recording yet
         return (
           <div className="title">
             {<p>{status}</p>}
