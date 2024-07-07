@@ -13,11 +13,12 @@ import signInStyles from "../styles/signinStyles";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import fileToArrayBuffer from "file2arraybuffer";
 import axios from "axios";
+import { supabase } from "../utils/initSupabase";
 
 const Recording = () => {
   const router = useRouter();
   const user = useUser();
-  const supabase = useSupabaseClient();
+  //const supabase = useSupabaseClient();
 
   const { status, startRecording, stopRecording, mediaBlobUrl } =
     useReactMediaRecorder({ audio: true }); // could also put video and screen props as true!
@@ -27,6 +28,7 @@ const Recording = () => {
   const [transcript, setTranscript] = React.useState("");
   const [isTranscribing, setIsTranscribing] = React.useState(false);
   const [time, setTime] = React.useState(0);
+  const [numMicTokens, setNumMicTokens] = React.useState(0);
   // state to check stopwatch running or not
   const intervalIdRef = React.useRef(null);
   const dispatch = useDispatch();
@@ -42,6 +44,25 @@ const Recording = () => {
 
   let recorder;
 
+  const getNumMicTokens = useCallback(async () => {
+    let tokenResponse = await supabase
+      .from("customers")
+      .select("*")
+      .eq("email_address", user.email);
+    console.log("tokenResponse: ", tokenResponse.data[0].mic_tokens);
+    setNumMicTokens(tokenResponse.data[0].mic_tokens);
+  }, [user, setNumMicTokens]);
+
+  useEffect(() => {
+    getNumMicTokens(); // Run on mount
+
+    const intervalId = setInterval(() => {
+      getNumMicTokens();
+    }, 1000); // Run every 60 seconds
+
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, [getNumMicTokens]);
+
   const runStopWatch = useCallback(async () => {
     try {
       let customerInfo = await supabase
@@ -56,18 +77,7 @@ const Recording = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [user, supabase]);
-
-  useEffect(() => {
-    if (isTranscribing) {
-      runStopWatch();
-      // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
-      intervalIdRef.current = setInterval(() => setTime(time + 1), 1000);
-    } else if (intervalIdRef.current) {
-      clearInterval(intervalIdRef.current);
-    }
-    return () => clearInterval(intervalIdRef.current);
-  }, [isTranscribing, time, runStopWatch]);
+  }, [user]);
 
   // Hours calculation
   const hours = Math.floor(time / 3600);
@@ -242,11 +252,26 @@ const Recording = () => {
     };
   };
 
-  async function stopRecordingAudio() {
+  const stopRecordingAudio = useCallback(async () => {
     stopRecording();
     setIsTranscribing(false);
     setTranscript(liveTranscript);
-  }
+  }, [liveTranscript, stopRecording]);
+
+  useEffect(() => {
+    if (isTranscribing) {
+      if (numMicTokens < 0) {
+        stopRecordingAudio();
+      } else {
+        runStopWatch();
+        // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
+        intervalIdRef.current = setInterval(() => setTime(time + 1), 1000);
+      }
+    } else if (intervalIdRef.current) {
+      clearInterval(intervalIdRef.current);
+    }
+    return () => clearInterval(intervalIdRef.current);
+  }, [isTranscribing, time, runStopWatch, numMicTokens, stopRecordingAudio]);
 
   async function renameRecord() {
     if (!filename && filename.length < 1) {
@@ -316,9 +341,10 @@ const Recording = () => {
             {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
             <div className="stopwatch-container">
               <p className="stopwatch-time">
-                {hours}:{minutes.toString().padStart(2, "0")}:
-                {seconds.toString().padStart(2, "0")}
+                {/*hours}:{minutes.toString().padStart(2, "0")*/}
+                {/*seconds.toString().padStart(2, "0")*/}
                 {/*milliseconds.toString().padStart(2, "0")*/}
+                Number of seconds available to use: {numMicTokens}
               </p>
             </div>
             <h1>Transcript below</h1>
