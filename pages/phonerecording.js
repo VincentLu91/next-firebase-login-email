@@ -234,10 +234,11 @@ const PhoneRecording = () => {
   //Trigger call (or telnyx action) -> send event data to webhook -> webhook is ngrok -> tunnel data to port -> next app is listening on port
 
   const stopRecordingAudio = useCallback(async () => {
+    getEventType(callControlID); // this is so that it gets the status once user hangs up
     setIsTranscribing(false);
     //setTranscript("");
     unSubscribeAll();
-  }, [unSubscribeAll]);
+  }, [unSubscribeAll, callControlID, getEventType]);
 
   useEffect(() => {
     if (callRecordingData !== undefined) {
