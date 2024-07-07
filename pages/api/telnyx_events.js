@@ -140,6 +140,8 @@ export default async function handler(req, res) {
           telnyx_call_control_id: call_control_id,
           customer_id,
           react_native_event: data.event_type, // just to store status when it's call.hangup
+          start_time: data.payload.start_time,
+          end_time: data.payload.end_time,
         },
         { onConflict: "telnyx_call_control_id", ignoreDuplicates: false }
       )
