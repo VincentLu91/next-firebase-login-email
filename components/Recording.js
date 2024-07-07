@@ -28,7 +28,6 @@ const Recording = () => {
   const [isTranscribing, setIsTranscribing] = React.useState(false);
   const [time, setTime] = React.useState(0);
   // state to check stopwatch running or not
-  const [isRunning, setIsRunning] = React.useState(false);
   const intervalIdRef = React.useRef(null);
   const dispatch = useDispatch();
   const recordingList = useSelector(
@@ -78,11 +77,6 @@ const Recording = () => {
 
   // Seconds calculation
   const seconds = time % 60;
-
-  // Method to start and stop timer
-  const startAndStop = () => {
-    setIsRunning(!isRunning);
-  };
 
   // Method to reset timer back to 0
   const reset = () => {
@@ -156,7 +150,6 @@ const Recording = () => {
 
   const startRecordingAudio = async () => {
     startRecording();
-    startAndStop(); // this is to set isRunning to True and run the stopwatch
     // call transcription function later
     setIsTranscribing(true);
     const response = await fetch("/api/token");
@@ -251,7 +244,6 @@ const Recording = () => {
 
   async function stopRecordingAudio() {
     stopRecording();
-    startAndStop(); // this is to set isRunning to False and stop the stopwatch
     setIsTranscribing(false);
     setTranscript(liveTranscript);
   }
