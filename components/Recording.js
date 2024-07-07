@@ -1,7 +1,7 @@
 import { useReactMediaRecorder } from "react-media-recorder";
 // keep it at 1.6.5: https://github.com/DeltaCircuit/react-media-recorder/issues/98
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateRecordingList, setRecordURI } from "../redux/recording/actions";
 import moment from "moment";
@@ -43,7 +43,7 @@ const Recording = () => {
 
   let recorder;
 
-  const runStopWatch = async () => {
+  const runStopWatch = useCallback(async () => {
     try {
       let customerInfo = await supabase
         .from("customers")
@@ -57,10 +57,10 @@ const Recording = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [user, supabase]);
 
   useEffect(() => {
-    if (isRunning) {
+    if (isTranscribing) {
       runStopWatch();
       // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
       intervalIdRef.current = setInterval(() => setTime(time + 1), 1000);
@@ -68,7 +68,7 @@ const Recording = () => {
       clearInterval(intervalIdRef.current);
     }
     return () => clearInterval(intervalIdRef.current);
-  }, [isRunning, time, user.id]);
+  }, [isTranscribing, time, runStopWatch]);
 
   // Hours calculation
   const hours = Math.floor(time / 3600);
