@@ -14,9 +14,10 @@ import { usePubnub } from "../contexts/pubnub";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
+import { supabase } from "../utils/initSupabase";
 
 const PhoneRecording = () => {
-  const supabase = useSupabaseClient();
+  //const supabase = useSupabaseClient();
   const user = useUser();
   const {
     subscribe,
@@ -54,6 +55,7 @@ const PhoneRecording = () => {
   const [customer, setCustomer] = useState(null);
   const [phoneNumber, setPhoneNumber] = React.useState(null);
   const [time, setTime] = React.useState(0);
+  const [numCallTokens, setNumCallTokens] = React.useState(0);
   // state to check stopwatch running or not
   const intervalIdRef = React.useRef(null);
 
@@ -107,7 +109,7 @@ const PhoneRecording = () => {
         router.push("/signin");
       }
     },
-    [router, supabase]
+    [router]
   );
 
   useEffect(() => {
@@ -116,47 +118,62 @@ const PhoneRecording = () => {
     //getSubscriptionsInfo();
   }, [checkAuth, user]);
 
-  const getEventType = useCallback(
-    async (callId) => {
-      try {
-        let getEventResponse;
-        console.log(callId);
-        if (callId) {
-          getEventResponse = await supabase
-            .from("call_recordings")
-            .select("react_native_event")
-            .eq("telnyx_call_control_id", callId);
-        }
-
-        if (!getEventResponse) {
-          setCallStatus(null);
-          setTimeout(() => getEventType(callId), 1000);
-          console.log("nothing in getEventResponse1", getEventResponse);
-        } else {
-          if (!getEventResponse.data[0]) {
-            setCallStatus(null);
-            console.log("nothing in getEventResponse2", getEventResponse);
-            setTimeout(() => getEventType(callId), 1000);
-          } else {
-            console.log("getEventResponse is: ", getEventResponse.data[0]);
-            setCallStatus(getEventResponse.data[0].react_native_event);
-            // if (!isTranscribing) {
-            //   setCallStatus(null);
-            //   return;
-            // }
-            return;
-          }
-        }
-        console.log(
-          "getEventResponse: ",
-          getEventResponse.data[0].react_native_event
-        );
-      } catch (error) {
-        console.error("Error in getEventType:", error);
+  const getEventType = useCallback(async (callId) => {
+    try {
+      let getEventResponse;
+      console.log(callId);
+      if (callId) {
+        getEventResponse = await supabase
+          .from("call_recordings")
+          .select("react_native_event")
+          .eq("telnyx_call_control_id", callId);
       }
-    },
-    [supabase]
-  );
+
+      if (!getEventResponse) {
+        setCallStatus(null);
+        setTimeout(() => getEventType(callId), 1000);
+        console.log("nothing in getEventResponse1", getEventResponse);
+      } else {
+        if (!getEventResponse.data[0]) {
+          setCallStatus(null);
+          console.log("nothing in getEventResponse2", getEventResponse);
+          setTimeout(() => getEventType(callId), 1000);
+        } else {
+          console.log("getEventResponse is: ", getEventResponse.data[0]);
+          setCallStatus(getEventResponse.data[0].react_native_event);
+          // if (!isTranscribing) {
+          //   setCallStatus(null);
+          //   return;
+          // }
+          return;
+        }
+      }
+      console.log(
+        "getEventResponse: ",
+        getEventResponse.data[0].react_native_event
+      );
+    } catch (error) {
+      console.error("Error in getEventType:", error);
+    }
+  }, []);
+
+  const getNumCallTokens = useCallback(async () => {
+    let tokenResponse = await supabase
+      .from("customers")
+      .select("*")
+      .eq("email_address", user.email);
+    setNumCallTokens(tokenResponse.data[0].call_tokens);
+  }, [user, setNumCallTokens]);
+
+  useEffect(() => {
+    getNumCallTokens(); // Run on mount
+
+    const intervalId = setInterval(() => {
+      getNumCallTokens();
+    }, 1000); // Run every 60 seconds
+
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
+  }, [getNumCallTokens]);
 
   const runStopWatch = useCallback(async () => {
     try {
@@ -173,19 +190,7 @@ const PhoneRecording = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [user, supabase]);
-
-  useEffect(() => {
-    //console.log("callStatus: ", callStatus);
-    if (callStatus == "call.answered") {
-      runStopWatch();
-      // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
-      intervalIdRef.current = setInterval(() => setTime(time + 1), 1000);
-    } else if (intervalIdRef.current) {
-      clearInterval(intervalIdRef.current);
-    }
-    return () => clearInterval(intervalIdRef.current);
-  }, [callStatus, runStopWatch, time]);
+  }, [user]);
 
   // Hours calculation
   const hours = Math.floor(time / 3600);
@@ -239,6 +244,43 @@ const PhoneRecording = () => {
     //setTranscript("");
     unSubscribeAll();
   }, [unSubscribeAll, callControlID, getEventType]);
+
+  useEffect(() => {
+    const handleCallStatusChange = async () => {
+      if (callStatus === "call.answered") {
+        console.log("numCallTokens: ", numCallTokens);
+        if (numCallTokens === 0) {
+          try {
+            const res_hangup = await axios.get(
+              "/api/hangup?callControlID=" + callControlID
+            );
+            console.log("Hangup response:", res_hangup);
+            stopRecordingAudio();
+          } catch (error) {
+            console.error("Error hanging up call:", error);
+          }
+        } else {
+          runStopWatch();
+          intervalIdRef.current = setInterval(
+            () => setTime((prevTime) => prevTime + 1),
+            1000
+          );
+        }
+      } else if (intervalIdRef.current) {
+        clearInterval(intervalIdRef.current);
+      }
+    };
+
+    handleCallStatusChange();
+
+    return () => clearInterval(intervalIdRef.current);
+  }, [
+    callStatus,
+    runStopWatch,
+    numCallTokens,
+    stopRecordingAudio,
+    callControlID,
+  ]);
 
   useEffect(() => {
     if (callRecordingData !== undefined) {
@@ -351,17 +393,25 @@ const PhoneRecording = () => {
         </div>
       );
     } else {
-      return (
-        <div className="title">
-          <PhoneInput
-            placeholder="Enter phone number with country code"
-            //defaultCountry="US"
-            value={phoneNumber}
-            onChange={setPhoneNumber}
-          />
-          <button onClick={startRecordingAudio}>Start Recording</button>
-        </div>
-      );
+      if (numCallTokens == 0) {
+        return (
+          <div className="title">
+            <h2>You have no seconds left!</h2>
+          </div>
+        );
+      } else {
+        return (
+          <div className="title">
+            <PhoneInput
+              placeholder="Enter phone number with country code"
+              //defaultCountry="US"
+              value={phoneNumber}
+              onChange={setPhoneNumber}
+            />
+            <button onClick={startRecordingAudio}>Start Recording</button>
+          </div>
+        );
+      }
     }
   }
 
