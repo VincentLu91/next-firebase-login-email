@@ -31,6 +31,11 @@ export const setCurrentSoundRecording = (currentSoundRecording) => ({
   payload: currentSoundRecording,
 });
 
+export const setCallControlID = (callControlID) => ({
+  type: RecordingAudioTypes.SET_CALL_CONTROL_ID,
+  payload: callControlID,
+});
+
 export const setCurrentPlayingStatus = (currentPlayingStatus) => ({
   type: RecordingAudioTypes.SET_CURRENT_PLAYING_STATUS,
   payload: currentPlayingStatus,

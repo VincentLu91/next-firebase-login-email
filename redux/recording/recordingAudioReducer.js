@@ -8,6 +8,7 @@ export const initialState = {
   hasSoundStopped: true,
   currentSoundPlaying: null,
   currentSoundRecording: null,
+  callControlID: null,
   currentPlayingStatus: null,
   recording: undefined,
   isRecording: false,
@@ -52,6 +53,13 @@ const recordingAudioReducer = (state = initialState, action) => {
         ...state,
         currentSoundRecording: action.payload,
       };
+
+    case RecordingAudioTypes.SET_CALL_CONTROL_ID:
+      return {
+        ...state,
+        callControlID: action.payload,
+      };
+
     case RecordingAudioTypes.SET_CURRENT_PLAYING_STATUS:
       return {
         ...state,
