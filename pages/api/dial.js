@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         client_state: Buffer.from(req.query.customer_id).toString("base64"),
         record: "record-from-answer", // this parameter enables call recording to kick off when the user answers the phone
         // no need to manually make the record_start function call
-        //time_limit_secs: 20, // test out the auto-hang up once time limit is reached
+        time_limit_secs: 35, // test out the auto-hang up once time limit is reached
       })
       .then(async (response) => {
         // call Recording
