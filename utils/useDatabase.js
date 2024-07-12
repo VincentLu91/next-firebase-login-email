@@ -131,10 +131,10 @@ const deductNumCallsToken = async (customerId, tokensToDeduct) => {
     .single();
   if (noCustomerError) return false;
 
-  if (call_tokens - tokensToDeduct >= 0) {
+  if (num_calls - tokensToDeduct >= 0) {
     let customerTokenUpdate = {
       id: uuid,
-      call_tokens: call_tokens - tokensToDeduct,
+      num_calls: num_calls - tokensToDeduct,
     };
 
     await supabase.from("customers").upsert(customerTokenUpdate).select();
