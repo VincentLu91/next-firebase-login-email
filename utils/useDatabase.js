@@ -119,4 +119,35 @@ const deductUserCallToken = async (customerId, tokensToDeduct) => {
   }
 };
 
-export { getTokens, getTieredTokens, deductUserMicToken, deductUserCallToken };
+const deductNumCallsToken = async (customerId, tokensToDeduct) => {
+  // Get customer's UUID from mapping table.
+  const {
+    data: { id: uuid, num_calls },
+    error: noCustomerError,
+  } = await supabase
+    .from("customers")
+    .select("id,num_calls")
+    .eq("id", customerId)
+    .single();
+  if (noCustomerError) return false;
+
+  if (call_tokens - tokensToDeduct >= 0) {
+    let customerTokenUpdate = {
+      id: uuid,
+      call_tokens: call_tokens - tokensToDeduct,
+    };
+
+    await supabase.from("customers").upsert(customerTokenUpdate).select();
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export {
+  getTokens,
+  getTieredTokens,
+  deductUserMicToken,
+  deductUserCallToken,
+  deductNumCallsToken,
+};
