@@ -185,17 +185,21 @@ const PhoneRecording = () => {
     [customer]
   );
 
-  const getNumCalls = useCallback(async () => {
-    let tokenResponse = await supabase
-      .from("customers")
-      .select("*")
-      .eq("email_address", user.email);
-    setNumCalls(tokenResponse.data[0].num_calls);
-  }, [user, setNumCalls]);
+  const getNumCalls = useCallback(
+    async (user) => {
+      let tokenResponse = await supabase
+        .from("customers")
+        .select("*")
+        .eq("email_address", user.email);
+      // when signed out, TypeError: Cannot read properties of null (reading 'email')
+      setNumCalls(tokenResponse.data[0].num_calls);
+    },
+    [setNumCalls]
+  );
 
   useEffect(() => {
-    getNumCalls();
-  }, [getNumCalls]);
+    getNumCalls(user);
+  }, [getNumCalls, user]);
 
   // Hours calculation
   const hours = Math.floor(time / 3600);
