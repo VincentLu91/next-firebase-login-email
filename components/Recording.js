@@ -364,6 +364,7 @@ const Recording = () => {
             {<p>{status}</p>}
             <button onClick={startRecordingAudio}>Start Recording</button>
             {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
+            <p>Number of seconds available to use: {numMicTokens}</p>
             <h1>Transcript below</h1>
           </div>
         );

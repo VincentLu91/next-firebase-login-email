@@ -373,11 +373,6 @@ const PhoneRecording = () => {
           {/*<button onClick={stopRecordingAudio}>Stop Recording</button>*/}
           <div className="stopwatch-container">
             <h2>Number of calls available: {numCalls}</h2>
-            <p className="stopwatch-time">
-              {hours}:{minutes.toString().padStart(2, "0")}:
-              {seconds.toString().padStart(2, "0")}
-              {/*milliseconds.toString().padStart(2, "0")*/}
-            </p>
           </div>
           <h1>Transcript below</h1>
           <p>{transcript}</p>
