@@ -48,9 +48,9 @@ const Recording = () => {
     let tokenResponse = await supabase
       .from("customers")
       .select("*")
-      .eq("email_address", user.email);
+      .eq("email_address", user?.email);
     //console.log("tokenResponse: ", tokenResponse.data[0].mic_tokens);
-    setNumMicTokens(tokenResponse.data[0].mic_tokens);
+    setNumMicTokens(tokenResponse?.data[0]?.mic_tokens);
   }, [user, setNumMicTokens]);
 
   useEffect(() => {

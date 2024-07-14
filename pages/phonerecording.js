@@ -59,6 +59,8 @@ const PhoneRecording = () => {
   const [time, setTime] = React.useState(0);
   // state to check stopwatch running or not
   const intervalIdRef = React.useRef(null);
+  const getEventResponseRef = React.useRef(null);
+
   const [numCalls, setNumCalls] = React.useState(0);
   const eventProcessedRef = React.useRef(false); // Ref to track if event is processed
 
@@ -127,30 +129,42 @@ const PhoneRecording = () => {
 
   const getEventType = useCallback(
     async (callId) => {
+      if (!callId) return;
       try {
-        let getEventResponse;
+        //let getEventResponse;
         console.log(callId);
         if (callId) {
-          getEventResponse = await supabase
+          getEventResponseRef.current = await supabase
             .from("call_recordings")
             .select("react_native_event")
             .eq("telnyx_call_control_id", callId);
         }
 
-        if (!getEventResponse) {
+        if (!getEventResponseRef.current) {
           setCallStatus(null);
           setTimeout(() => getEventType(callId), 1000);
-          console.log("nothing in getEventResponse1", getEventResponse);
+          console.log(
+            "nothing in getEventResponse1",
+            getEventResponseRef.current
+          );
         } else {
-          if (!getEventResponse.data[0]) {
+          if (!getEventResponseRef.current.data[0]) {
             setCallStatus(null);
-            console.log("nothing in getEventResponse2", getEventResponse);
+            console.log(
+              "nothing in getEventResponse2",
+              getEventResponseRef.current
+            );
             setTimeout(() => getEventType(callId), 1000);
           } else {
-            console.log("getEventResponse is: ", getEventResponse.data[0]);
-            setCallStatus(getEventResponse.data[0].react_native_event);
+            console.log(
+              "getEventResponse is: ",
+              getEventResponseRef.current.data[0]
+            );
+            setCallStatus(
+              getEventResponseRef.current.data[0].react_native_event
+            );
             if (
-              getEventResponse.data[0].react_native_event ==
+              getEventResponseRef.current.data[0].react_native_event ==
                 "call.recording.saved" &&
               !eventProcessedRef.current
             ) {
@@ -158,6 +172,7 @@ const PhoneRecording = () => {
               let numCallsResponse = await axios.post(
                 `/api/calls-token?user=${customer.id}`
               );
+              getEventResponseRef.current = null;
               console.log("numCallsResponse: ", numCallsResponse.data);
               console.log("customer: ", customer);
               let customerInfo = await supabase
@@ -176,7 +191,7 @@ const PhoneRecording = () => {
         }
         console.log(
           "getEventResponse: ",
-          getEventResponse.data[0].react_native_event
+          getEventResponseRef.current.data[0].react_native_event
         );
       } catch (error) {
         console.error("Error in getEventType:", error);
@@ -190,9 +205,9 @@ const PhoneRecording = () => {
       let tokenResponse = await supabase
         .from("customers")
         .select("*")
-        .eq("email_address", user.email);
+        .eq("email_address", user?.email);
       // when signed out, TypeError: Cannot read properties of null (reading 'email')
-      setNumCalls(tokenResponse.data[0].num_calls);
+      setNumCalls(tokenResponse?.data[0]?.num_calls);
     },
     [setNumCalls]
   );
@@ -336,7 +351,8 @@ const PhoneRecording = () => {
     //if (status === "recording") { // to be replaced with data.event_type from pages/api/telnyx_events.js upon publish
     // while recording or not recording yet
 
-    if (callRecordingData) {
+    if (callRecordingData && callStatus == "call.recording.saved") {
+      // try the app again...
       return (
         <div className="title">
           <h2>Number of calls available: {numCalls}</h2>
