@@ -8239,10 +8239,10 @@ proxy-from-env@^1.1.0:
   resolved "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz"
   integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
 
-pubnub@^8.2.5:
-  version "8.2.5"
-  resolved "https://registry.npmjs.org/pubnub/-/pubnub-8.2.5.tgz"
-  integrity sha512-04iQplsUA5lVqYDkWKfNBU+oVqTJDygfRHTaDec1xWEuZ9RS0qnobZN/uAtG76jgkaVakfSFnej9/aq9B8Lv0A==
+pubnub@^8.2.6:
+  version "8.2.6"
+  resolved "https://registry.npmjs.org/pubnub/-/pubnub-8.2.6.tgz"
+  integrity sha512-pXjzSm13QATQpNFsr68Z7f5jdBNeKsdo3MNsKMYLwlytNu9tELWD2Dg26gynYIiupvR0ytoHFLeB9WPMAvLmkw==
   dependencies:
     agentkeepalive "^3.5.2"
     buffer "^6.0.3"
@@ -8436,10 +8436,10 @@ react-native@*:
     ws "^6.2.2"
     yargs "^17.6.2"
 
-react-phone-number-input@^3.4.3:
-  version "3.4.3"
-  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.4.3.tgz"
-  integrity sha512-n0dD9V1T8EWeRoGwVMcNK6bwOdEbIk0U3EQ87K0WTADgyJZUJd9NIQMmpcl9mtWSL+LwPaEMzre0yGkhwZYTzg==
+react-phone-number-input@^3.4.4:
+  version "3.4.4"
+  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.4.4.tgz"
+  integrity sha512-zeyZeS1Iazhj3vTHj6qOyTTguBf/WFLAe9OtA8s0Itycy7AOoQI0vFlpxKDaEcyvYup7Wt79lKu+nl/nJwyLdw==
   dependencies:
     classnames "^2.5.1"
     country-flag-icons "^1.5.11"
@@ -9372,10 +9372,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-2.0.1.tgz"
   integrity sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==
 
-stripe@^16.2.0:
-  version "16.2.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-16.2.0.tgz"
-  integrity sha512-kNHb5x6mlQJ8V92Afn+F+uyHG3U0+Mc1pOYxDkbEh/kI3oF63URnUt6dwTQthELYWBy04arerm2XjwgtzEPDEA==
+stripe@^16.4.0:
+  version "16.4.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-16.4.0.tgz"
+  integrity sha512-rFIcDJaF+z28BsR4GXoy0YhAjE24D0AymJRsrAS0YbQAIJi0gOO/4mctbhNzrySS+bLVJOQLefdblDQMMNm58Q==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
