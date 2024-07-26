@@ -30,7 +30,7 @@
     "nodemailer": "^6.9.14",
     "npm-check-updates": "^16.14.20",
     "pubnub": "^8.2.6",
-    "raw-body": "^2.5.2",
+    "raw-body": "^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-media-recorder": "1.6.5",
@@ -40,7 +40,7 @@
     "recordrtc": "^5.6.2",
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
-    "stripe": "^16.4.0",
+    "stripe": "^16.5.0",
     "styled-jsx": "^5.1.6",
     "telnyx": "^1.26.2",
     "twilio": "^5.2.2"
