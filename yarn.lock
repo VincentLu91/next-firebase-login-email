@@ -2502,10 +2502,10 @@
     invariant "^2.2.4"
     nullthrows "^1.1.1"
 
-"@reduxjs/toolkit@^2.2.6":
-  version "2.2.6"
-  resolved "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.2.6.tgz"
-  integrity sha512-kH0r495c5z1t0g796eDQAkYbEQ3a1OLYN9o8jQQVZyKyw367pfRGS+qZLkHYvFHiUUdafpoSlQ2QYObIApjPWA==
+"@reduxjs/toolkit@^2.2.7":
+  version "2.2.7"
+  resolved "https://registry.npmjs.org/@reduxjs/toolkit/-/toolkit-2.2.7.tgz"
+  integrity sha512-faI3cZbSdFb8yv9dhDTmGwclW0vk0z5o1cia+kf7gCbaCwHI5e+7tP57mJUv22pNcNbeA62GSrPpfrUfdXcQ6g==
   dependencies:
     immer "^10.0.3"
     redux "^5.0.1"
@@ -3201,10 +3201,10 @@
   dependencies:
     "@supabase/node-fetch" "^2.6.14"
 
-"@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8", "@supabase/supabase-js@^2.44.4":
-  version "2.44.4"
-  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.44.4.tgz"
-  integrity sha512-vqtUp8umqcgj+RPUc7LiEcQmgsEWFDPJdJizRJF/5tf2zSlVB+3YbUwyQE/hLagYA8TLvGXe7oAqtYyFde6llw==
+"@supabase/supabase-js@^2.21.0", "@supabase/supabase-js@^2.39.8", "@supabase/supabase-js@^2.45.0":
+  version "2.45.0"
+  resolved "https://registry.npmjs.org/@supabase/supabase-js/-/supabase-js-2.45.0.tgz"
+  integrity sha512-j66Mfs8RhzCQCKxKogAFQYH9oNhRmgIdKk6pexguI2Oc7hi+nL9UNJug5aL1tKnBdaBM3h65riPLQSdL6sWa3Q==
   dependencies:
     "@supabase/auth-js" "2.64.4"
     "@supabase/functions-js" "2.4.1"
