@@ -18,7 +18,10 @@ export const config = {
 export default async function handler(req, res) {
   // This is your Stripe CLI webhook secret for testing your endpoint locally.
   // the code below mainly is copied/pasted from the code snippet generated when I created the webhook.
-  const endpointSecret = "whsec_84sztzV0jVbkcCZcSZmWGLYW1TjO15pH";
+  //dev
+  const endpointSecret = "whsec_tHLfkNK7JBoewOfQHY8DiaXvbAGiNTBl";
+  // production
+  //const endpointSecret = "whsec_84sztzV0jVbkcCZcSZmWGLYW1TjO15pH";
 
   const sig = req.headers["stripe-signature"];
 
@@ -49,6 +52,7 @@ export default async function handler(req, res) {
       // query supabase for customer
       // and delete customer subscription
       break;
+    case "customer.subscription.created":
     case "customer.subscription.updated":
       console.log("event.type is: ", event.type);
       console.log("event.data.object is: ", event.data.object);
@@ -73,6 +77,18 @@ export default async function handler(req, res) {
         .select("*")
         .eq("stripe_product_id", priceResponse.data[0].stripe_product_id);
       console.log("productResponse when switching plans is: ", productResponse);
+      // renewing tokens
+      let customerTokenUpdate = {
+        id: customer_id,
+        mic_tokens: priceResponse.data[0].mic_tokens,
+        call_tokens: priceResponse.data[0].call_tokens,
+        num_calls: priceResponse.data[0].num_calls,
+      };
+      await supabase
+        .from("customers")
+        .upsert(customerTokenUpdate)
+        .select()
+        .eq("stripe_customer_id", event.data.object.customer);
       let subscriptionUpdateResponse = await supabase
         .from("subscriptions")
         .update([
