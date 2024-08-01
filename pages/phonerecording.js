@@ -348,57 +348,65 @@ const PhoneRecording = () => {
   }
 
   function renderView() {
-    //if (status === "recording") { // to be replaced with data.event_type from pages/api/telnyx_events.js upon publish
-    // while recording or not recording yet
+    if (isSubscribed) {
+      //if (status === "recording") { // to be replaced with data.event_type from pages/api/telnyx_events.js upon publish
+      // while recording or not recording yet
 
-    if (callRecordingData && callStatus == "call.recording.saved") {
-      // try the app again...
-      return (
-        <div className="title">
-          <h2>Number of calls available: {numCalls}</h2>
-          <input
-            value={filename}
-            name="filename"
-            onChange={(e) => setFilename(e.target.value)}
-          />
-          <button onClick={renameRecord}>Rename</button>
-          <div>URL: {callRecordingData.url}</div>
-        </div>
-      );
-    }
-
-    if (isTranscribing) {
-      return (
-        <div className="title">
-          {/*<button onClick={stopRecordingAudio}>Stop Recording</button>*/}
-          <div className="stopwatch-container">
-            <h2>Number of calls available: {numCalls}</h2>
-          </div>
-          <h1>Transcript below</h1>
-          <p>{transcript}</p>
-        </div>
-      );
-    } else {
-      if (numCalls == 0) {
-        return (
-          <div className="title">
-            <h2>You have no calls available!</h2>
-          </div>
-        );
-      } else {
+      if (callRecordingData && callStatus == "call.recording.saved") {
+        // try the app again...
         return (
           <div className="title">
             <h2>Number of calls available: {numCalls}</h2>
-            <PhoneInput
-              placeholder="Enter phone number with country code"
-              //defaultCountry="US"
-              value={phoneNumber}
-              onChange={setPhoneNumber}
+            <input
+              value={filename}
+              name="filename"
+              onChange={(e) => setFilename(e.target.value)}
             />
-            <button onClick={startRecordingAudio}>Start Recording</button>
+            <button onClick={renameRecord}>Rename</button>
+            <div>URL: {callRecordingData.url}</div>
           </div>
         );
       }
+
+      if (isTranscribing) {
+        return (
+          <div className="title">
+            {/*<button onClick={stopRecordingAudio}>Stop Recording</button>*/}
+            <div className="stopwatch-container">
+              <h2>Number of calls available: {numCalls}</h2>
+            </div>
+            <h1>Transcript below</h1>
+            <p>{transcript}</p>
+          </div>
+        );
+      } else {
+        if (numCalls == 0) {
+          return (
+            <div className="title">
+              <h2>You have no calls available!</h2>
+            </div>
+          );
+        } else {
+          return (
+            <div className="title">
+              <h2>Number of calls available: {numCalls}</h2>
+              <PhoneInput
+                placeholder="Enter phone number with country code"
+                //defaultCountry="US"
+                value={phoneNumber}
+                onChange={setPhoneNumber}
+              />
+              <button onClick={startRecordingAudio}>Start Recording</button>
+            </div>
+          );
+        }
+      }
+    } else {
+      return (
+        <>
+          <h1> You are not subscribed!!</h1>
+        </>
+      );
     }
   }
 
@@ -418,9 +426,6 @@ const PhoneRecording = () => {
       >
         unsubscribe all
       </button>*/}
-      <button onClick={() => router.push("/dashboard")}>
-        Back to Dashboard
-      </button>
       {renderView()}
       <style jsx>{signInStyles}</style>
     </div>
