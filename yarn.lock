@@ -3576,10 +3576,10 @@ axe-core@=4.7.0:
   resolved "https://registry.npmjs.org/axe-core/-/axe-core-4.7.0.tgz"
   integrity sha512-M0JtH+hlOL5pLQwHOLNYZaXuhqmvS8oExsqB1SBYgA4Dk7u/xx+YdGHXaK5pyUfed5mYXdlYiphWq3G8cRi5JQ==
 
-axios@^1.6.8, axios@^1.7.2:
-  version "1.7.2"
-  resolved "https://registry.npmjs.org/axios/-/axios-1.7.2.tgz"
-  integrity sha512-2A8QhOMrbomlDuiLeK9XibIBzuHeRcqqNOHp0Cyp5EoJ1IFDh+XZH3A6BkXtv0K4gFGCI0Y4BM7B1wOEi0Rmgw==
+axios@^1.6.8, axios@^1.7.3:
+  version "1.7.3"
+  resolved "https://registry.npmjs.org/axios/-/axios-1.7.3.tgz"
+  integrity sha512-Ar7ND9pU99eJ9GpoGQKhKf58GpUOgnzuaB7ueNQ5BMi0p+LZ5oaEnfF999fAArcTIBwXTCHAmGcHOZJaWPq9Nw==
   dependencies:
     follow-redirects "^1.15.6"
     form-data "^4.0.0"
@@ -3937,10 +3937,10 @@ clone@^1.0.2:
   resolved "https://registry.npmjs.org/clone/-/clone-1.0.4.tgz"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
 
-cohere-ai@^7.11.1:
-  version "7.11.1"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.11.1.tgz"
-  integrity sha512-Ua3BJmbQC+lQ9j6yHF/e+6Jsy47WUWczjYqwg9dKY5uBZSbSifmu79FgEcZiPo9VmfGMGWc2+U2gmxeguuO04w==
+cohere-ai@^7.11.2:
+  version "7.11.2"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.11.2.tgz"
+  integrity sha512-IImDbZLg+kApTH9KswRAEGd0dRuZiChnsqC8gf6RepuklLuSxEkqto4uwSQQSUTj50Ns4uN7yaxzVyS6OmLpIg==
   dependencies:
     "@aws-sdk/client-sagemaker" "^3.583.0"
     "@aws-sdk/credential-providers" "^3.583.0"
@@ -7131,10 +7131,10 @@ proxy-from-env@^1.1.0:
   resolved "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz"
   integrity sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==
 
-pubnub@^8.2.6:
-  version "8.2.6"
-  resolved "https://registry.npmjs.org/pubnub/-/pubnub-8.2.6.tgz"
-  integrity sha512-pXjzSm13QATQpNFsr68Z7f5jdBNeKsdo3MNsKMYLwlytNu9tELWD2Dg26gynYIiupvR0ytoHFLeB9WPMAvLmkw==
+pubnub@^8.2.7:
+  version "8.2.7"
+  resolved "https://registry.npmjs.org/pubnub/-/pubnub-8.2.7.tgz"
+  integrity sha512-VsGHTMgNcf+PJiRDoZZzGKKxBZqroUsWaX/DQlCoKx698YZXQSatT+KNweOG20acCK2mb9vF9pnWpH9ud6MxTw==
   dependencies:
     agentkeepalive "^3.5.2"
     buffer "^6.0.3"
@@ -8071,10 +8071,10 @@ strip-json-comments@^3.1.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-3.1.1.tgz"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
-stripe@^16.5.0:
-  version "16.5.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-16.5.0.tgz"
-  integrity sha512-5qY2Va8pmnqS/dcKsQKJnk9kkYCtS6hqjN7kktZEmdxVohZHvbT9pOWK8UUKRInTXYkCNl6x505tO5416KLPsQ==
+stripe@^16.6.0:
+  version "16.6.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-16.6.0.tgz"
+  integrity sha512-6hWEt6n7InVyP4p2MfMpyl1GwKRJA2w4VAwxJUbXA9xhT7ToWOdrTXqTz2EnyJkw4PMM03twi3eOWQAXN/+uEg==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
