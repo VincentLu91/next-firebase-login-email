@@ -3937,10 +3937,10 @@ clone@^1.0.2:
   resolved "https://registry.npmjs.org/clone/-/clone-1.0.4.tgz"
   integrity sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==
 
-cohere-ai@^7.12.0:
-  version "7.12.0"
-  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.12.0.tgz"
-  integrity sha512-DlKtiJwct/v2rzF78XV7RKhm1EXTq780LJhzvu5TLeOnJ9MrSm1JXeFh2cUkye8LmJMUkW47nSyCRL47SxhSLw==
+cohere-ai@^7.12.1:
+  version "7.12.1"
+  resolved "https://registry.npmjs.org/cohere-ai/-/cohere-ai-7.12.1.tgz"
+  integrity sha512-EgyhPSPR+d8ZP9JDe4obc/MHWbDVPlyqjnbGlY+rpL752JJ+9Fb2LCphRQt9AZhiwQhZUnUj2/xM+2cFK8fyAQ==
   dependencies:
     "@aws-sdk/client-sagemaker" "^3.583.0"
     "@aws-sdk/credential-providers" "^3.583.0"
