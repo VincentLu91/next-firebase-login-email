@@ -6,11 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateRecordingList, setRecordURI } from "../redux/recording/actions";
 import moment from "moment";
 import getBlobDuration from "get-blob-duration";
-import { setCurrentUser } from "../redux/user/actions";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc"; // only run on the browser
 import { useRouter } from "next/router";
 import signInStyles from "../styles/signinStyles";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser } from "@supabase/auth-helpers-react";
 import fileToArrayBuffer from "file2arraybuffer";
 import axios from "axios";
 import { supabase } from "../utils/initSupabase";
@@ -18,7 +17,6 @@ import { supabase } from "../utils/initSupabase";
 const Recording = () => {
   const router = useRouter();
   const user = useUser();
-  //const supabase = useSupabaseClient();
   const [timeDifference, setTimeDifference] = React.useState(0);
 
   const storeDifferenceInSupabase = async (difference) => {
@@ -106,29 +104,7 @@ const Recording = () => {
 
   useEffect(() => {
     getNumMicTokens(); // Run on mount
-
-    /*const intervalId = setInterval(() => {
-      getNumMicTokens();
-    }, 1000); // Run every 60 seconds
-
-    return () => clearInterval(intervalId); // Cleanup interval on unmount*/
   }, [getNumMicTokens]);
-
-  const runStopWatch = useCallback(async () => {
-    try {
-      let customerInfo = await supabase
-        .from("customers")
-        .select("*")
-        .eq("email_address", user.email);
-      let customer_id = customerInfo.data[0].id;
-      //console.log("customer_id: ", customer_id);
-      const response = await axios.post(`/api/mic-seconds?user=${customer_id}`);
-      const decrementSeconds = response.data;
-      console.log("decrementSeconds: ", decrementSeconds); // Use this data as needed
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }, [user]);
 
   // Hours calculation
   const hours = Math.floor(time / 3600);
@@ -313,15 +289,7 @@ const Recording = () => {
     if (isTranscribing) {
       if (numMicTokens == 0) {
         stopRecordingAudio();
-      } /*else {
-        runStopWatch();
-        // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
-        intervalIdRef.current = setInterval(() => setTime(time + 1), 1000);
-      }*/
-      /*} else if (intervalIdRef.current) {
-      clearInterval(intervalIdRef.current);
-    }
-    return () => clearInterval(intervalIdRef.current);*/
+      }
     }
   }, [isTranscribing, numMicTokens, stopRecordingAudio]);
 
