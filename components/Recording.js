@@ -19,9 +19,57 @@ const Recording = () => {
   const router = useRouter();
   const user = useUser();
   //const supabase = useSupabaseClient();
+  const [timeDifference, setTimeDifference] = React.useState(0);
+
+  const storeDifferenceInSupabase = async (difference) => {
+    try {
+      // Fetch customer information based on the user's email
+      let { data: customerInfo, error: fetchError } = await supabase
+        .from("customers")
+        .select("id") // Only select the 'id' field
+        .eq("email_address", user.email)
+        .single(); // Use .single() if you expect only one result (ensures you get a single object instead of an array)
+
+      // Handle any errors during the fetch
+      if (fetchError) {
+        throw new Error(`Error fetching customer info: ${fetchError.message}`);
+      }
+
+      // If customer info was found, update the mic_tokens field
+      const { error: updateError } = await supabase
+        .from("customers")
+        .update({ mic_tokens: difference })
+        .eq("id", customerInfo.id);
+
+      if (updateError) {
+        throw new Error(`Error updating mic_tokens: ${updateError.message}`);
+      }
+
+      console.log("Successfully stored difference in Supabase.");
+    } catch (error) {
+      console.error("Error storing difference in Supabase:", error.message);
+    }
+  };
 
   const { status, startRecording, stopRecording, mediaBlobUrl } =
-    useReactMediaRecorder({ audio: true }); // could also put video and screen props as true!
+    useReactMediaRecorder({
+      audio: true,
+      onStart: () => {
+        setElapsedTime(0); // Reset the timer
+        timerRef.current = setInterval(() => {
+          setElapsedTime((prevTime) => {
+            const newElapsedTime = prevTime + 1;
+            const difference = numMicTokens - newElapsedTime;
+            setTimeDifference(difference);
+            storeDifferenceInSupabase(difference);
+            return newElapsedTime;
+          });
+        }, 1000); // Update the time every second
+      },
+      onStop: () => {
+        clearInterval(timerRef.current);
+      },
+    }); // could also put video and screen props as true!
 
   const [filename, setFilename] = React.useState("");
   const [liveTranscript, setLiveTranscript] = React.useState("");
@@ -29,6 +77,8 @@ const Recording = () => {
   const [isTranscribing, setIsTranscribing] = React.useState(false);
   const [time, setTime] = React.useState(0);
   const [numMicTokens, setNumMicTokens] = React.useState(0);
+  const [elapsedTime, setElapsedTime] = React.useState(0);
+  const timerRef = React.useRef(null);
   // state to check stopwatch running or not
   const intervalIdRef = React.useRef(null);
   const dispatch = useDispatch();
@@ -51,16 +101,17 @@ const Recording = () => {
       .eq("email_address", user?.email);
     //console.log("tokenResponse: ", tokenResponse.data[0].mic_tokens);
     setNumMicTokens(tokenResponse?.data[0]?.mic_tokens);
+    setTimeDifference(tokenResponse?.data[0]?.mic_tokens);
   }, [user, setNumMicTokens]);
 
   useEffect(() => {
     getNumMicTokens(); // Run on mount
 
-    const intervalId = setInterval(() => {
+    /*const intervalId = setInterval(() => {
       getNumMicTokens();
     }, 1000); // Run every 60 seconds
 
-    return () => clearInterval(intervalId); // Cleanup interval on unmount
+    return () => clearInterval(intervalId); // Cleanup interval on unmount*/
   }, [getNumMicTokens]);
 
   const runStopWatch = useCallback(async () => {
@@ -262,16 +313,17 @@ const Recording = () => {
     if (isTranscribing) {
       if (numMicTokens == 0) {
         stopRecordingAudio();
-      } else {
+      } /*else {
         runStopWatch();
         // setting time from 0 to 1 every 10 milisecond using javascript setInterval method
         intervalIdRef.current = setInterval(() => setTime(time + 1), 1000);
-      }
-    } else if (intervalIdRef.current) {
+      }*/
+      /*} else if (intervalIdRef.current) {
       clearInterval(intervalIdRef.current);
     }
-    return () => clearInterval(intervalIdRef.current);
-  }, [isTranscribing, time, runStopWatch, numMicTokens, stopRecordingAudio]);
+    return () => clearInterval(intervalIdRef.current);*/
+    }
+  }, [isTranscribing, numMicTokens, stopRecordingAudio]);
 
   async function renameRecord() {
     if (!filename && filename.length < 1) {
@@ -352,6 +404,7 @@ const Recording = () => {
                 {/*seconds.toString().padStart(2, "0")*/}
                 {/*milliseconds.toString().padStart(2, "0")*/}
                 Number of seconds available to use: {numMicTokens}
+                <p>Recording Time: {timeDifference} seconds</p>
               </p>
             </div>
             <h1>Transcript below</h1>
