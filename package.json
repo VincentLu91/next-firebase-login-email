@@ -21,7 +21,7 @@
     "axios": "^1.7.7",
     "cohere-ai": "^7.13.0",
     "cors": "^2.8.5",
-    "express": "^4.19.2",
+    "express": "^4.20.0",
     "file2arraybuffer": "^1.2.2",
     "get-blob-duration": "^1.2.0",
     "moment": "^2.30.1",
