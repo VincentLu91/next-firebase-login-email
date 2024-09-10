@@ -233,9 +233,9 @@ function AudioPlayer() {
       </div>
       {isAudioSelected ? (
         <>
-          <h1 className="h1-center-bold">{sound.file_name}</h1>
+          <h1 className="h1-center-bold">{sound?.file_name}</h1>
           <h1 className="h1-center-bold">Transcript:</h1>
-          <h1 className="h1-center-bold">{sound.full_transcript}</h1>
+          <h1 className="h1-center-bold">{sound?.full_transcript}</h1>
           <button onClick={() => goEditFile(sound)}>
             Edit Filename and transcript
           </button>
