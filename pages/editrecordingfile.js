@@ -31,8 +31,8 @@ function EditRecordingFile() {
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
-  const [editName, setEditName] = useState(sound.file_name);
-  const [editTranscript, setEditTranscript] = useState(sound.full_transcript);
+  const [editName, setEditName] = useState(sound?.file_name);
+  const [editTranscript, setEditTranscript] = useState(sound?.full_transcript);
   const docID = useSelector((state) => state.recordingReducer.docID);
   const tableName = useSelector((state) => state.recordingReducer.tableName);
 
@@ -192,6 +192,7 @@ function EditRecordingFile() {
       .update({ file_name: editName })
       .eq("id", docID)
       .select();
+    alert("You just edited filename");
   };
 
   const onSubmitRenameTranscript = async (editTranscript) => {
@@ -200,6 +201,7 @@ function EditRecordingFile() {
       .update({ full_transcript: editTranscript })
       .eq("id", docID)
       .select();
+    alert("You just edited transcript");
   };
 
   return (
