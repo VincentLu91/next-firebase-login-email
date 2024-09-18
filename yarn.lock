@@ -2003,22 +2003,22 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@next/env@14.2.11":
-  version "14.2.11"
-  resolved "https://registry.npmjs.org/@next/env/-/env-14.2.11.tgz"
-  integrity sha512-HYsQRSIXwiNqvzzYThrBwq6RhXo3E0n8j8nQnAs8i4fCEo2Zf/3eS0IiRA8XnRg9Ha0YnpkyJZIZg1qEwemrHw==
+"@next/env@14.2.12":
+  version "14.2.12"
+  resolved "https://registry.npmjs.org/@next/env/-/env-14.2.12.tgz"
+  integrity sha512-3fP29GIetdwVIfIRyLKM7KrvJaqepv+6pVodEbx0P5CaMLYBtx+7eEg8JYO5L9sveJO87z9eCReceZLi0hxO1Q==
 
-"@next/eslint-plugin-next@14.2.11":
-  version "14.2.11"
-  resolved "https://registry.npmjs.org/@next/eslint-plugin-next/-/eslint-plugin-next-14.2.11.tgz"
-  integrity sha512-7mw+xW7Y03Ph4NTCcAzYe+vu4BNjEHZUfZayyF3Y1D9RX6c5NIe25m1grHEAkyUuaqjRxOYhnCNeglOkIqLkBA==
+"@next/eslint-plugin-next@14.2.12":
+  version "14.2.12"
+  resolved "https://registry.npmjs.org/@next/eslint-plugin-next/-/eslint-plugin-next-14.2.12.tgz"
+  integrity sha512-cPrKbXtK8NTThOOFNxRGGTw+5s02Ek8z8ri/hZqeKs6uP8LOTGqFyBy6hpCXt7TvLzzriWiiwRyD4h0XYmPEEg==
   dependencies:
     glob "10.3.10"
 
-"@next/swc-darwin-x64@14.2.11":
-  version "14.2.11"
-  resolved "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-14.2.11.tgz"
-  integrity sha512-lnB0zYCld4yE0IX3ANrVMmtAbziBb7MYekcmR6iE9bujmgERl6+FK+b0MBq0pl304lYe7zO4yxJus9H/Af8jbg==
+"@next/swc-darwin-x64@14.2.12":
+  version "14.2.12"
+  resolved "https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-14.2.12.tgz"
+  integrity sha512-JbEaGbWq18BuNBO+lCtKfxl563Uw9oy2TodnN2ioX00u7V1uzrsSUcg3Ep9ce+P0Z9es+JmsvL2/rLphz+Frcw==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"
@@ -3216,7 +3216,7 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@typescript-eslint/eslint-plugin@^5.4.2 || ^6.0.0 || 7.0.0 - 7.2.0":
+"@typescript-eslint/eslint-plugin@^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0":
   version "7.2.0"
   resolved "https://registry.npmjs.org/@typescript-eslint/eslint-plugin/-/eslint-plugin-7.2.0.tgz"
   integrity sha512-mdekAHOqS9UjlmyF/LSs6AIEvfceV749GFxoBAjwAv0nkevfKHWQFDMcBZWUiIC5ft6ePWivXoS36aKQ0Cy3sw==
@@ -3233,7 +3233,7 @@
     semver "^7.5.4"
     ts-api-utils "^1.0.1"
 
-"@typescript-eslint/parser@^5.4.2 || ^6.0.0 || 7.0.0 - 7.2.0", "@typescript-eslint/parser@^7.0.0":
+"@typescript-eslint/parser@^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0", "@typescript-eslint/parser@^7.0.0":
   version "7.2.0"
   resolved "https://registry.npmjs.org/@typescript-eslint/parser/-/parser-7.2.0.tgz"
   integrity sha512-5FKsVcHTk6TafQKQbuIVkXq58Fnbkd2wDL4LB7AURN7RUOu1utVP+G8+6u3ZhEroW3DF6hyo3ZEXxgKgp4KeCg==
@@ -4664,15 +4664,15 @@ escodegen@^2.1.0:
   optionalDependencies:
     source-map "~0.6.1"
 
-eslint-config-next@^14.2.11:
-  version "14.2.11"
-  resolved "https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-14.2.11.tgz"
-  integrity sha512-gGIoBoHCJuLn6vaV1Ke8UurVvgb7JjQv6oRlWmI6RAAxz7KwJOYxxm2blctavA0a3eofbE9TdgKvvTb2G55OHQ==
+eslint-config-next@^14.2.12:
+  version "14.2.12"
+  resolved "https://registry.npmjs.org/eslint-config-next/-/eslint-config-next-14.2.12.tgz"
+  integrity sha512-fzUIlF6Ng1cUFFd013wn9H3YhKe3vV/cZBC0Ec9S64q/wGoTq0HlASA7WgiOwDAISSbzkLprInLiIMu6U8bqEw==
   dependencies:
-    "@next/eslint-plugin-next" "14.2.11"
+    "@next/eslint-plugin-next" "14.2.12"
     "@rushstack/eslint-patch" "^1.3.3"
-    "@typescript-eslint/eslint-plugin" "^5.4.2 || ^6.0.0 || 7.0.0 - 7.2.0"
-    "@typescript-eslint/parser" "^5.4.2 || ^6.0.0 || 7.0.0 - 7.2.0"
+    "@typescript-eslint/eslint-plugin" "^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0"
+    "@typescript-eslint/parser" "^5.4.2 || ^6.0.0 || ^7.0.0 || ^8.0.0"
     eslint-import-resolver-node "^0.3.6"
     eslint-import-resolver-typescript "^3.5.2"
     eslint-plugin-import "^2.28.1"
@@ -6822,12 +6822,12 @@ next-sanity-image@^6.1.1:
   dependencies:
     "@sanity/image-url" "^1.0.2"
 
-"next@^13.0.0 || ^14.0.0", next@^14.2.11:
-  version "14.2.11"
-  resolved "https://registry.npmjs.org/next/-/next-14.2.11.tgz"
-  integrity sha512-8MDFqHBhdmR2wdfaWc8+lW3A/hppFe1ggQ9vgIu/g2/2QEMYJrPoQP6b+VNk56gIug/bStysAmrpUKtj3XN8Bw==
+"next@^13.0.0 || ^14.0.0", next@^14.2.12:
+  version "14.2.12"
+  resolved "https://registry.npmjs.org/next/-/next-14.2.12.tgz"
+  integrity sha512-cDOtUSIeoOvt1skKNihdExWMTybx3exnvbFbb9ecZDIxlvIbREQzt9A5Km3Zn3PfU+IFjyYGsHS+lN9VInAGKA==
   dependencies:
-    "@next/env" "14.2.11"
+    "@next/env" "14.2.12"
     "@swc/helpers" "0.5.5"
     busboy "1.6.0"
     caniuse-lite "^1.0.30001579"
@@ -6835,15 +6835,15 @@ next-sanity-image@^6.1.1:
     postcss "8.4.31"
     styled-jsx "5.1.1"
   optionalDependencies:
-    "@next/swc-darwin-arm64" "14.2.11"
-    "@next/swc-darwin-x64" "14.2.11"
-    "@next/swc-linux-arm64-gnu" "14.2.11"
-    "@next/swc-linux-arm64-musl" "14.2.11"
-    "@next/swc-linux-x64-gnu" "14.2.11"
-    "@next/swc-linux-x64-musl" "14.2.11"
-    "@next/swc-win32-arm64-msvc" "14.2.11"
-    "@next/swc-win32-ia32-msvc" "14.2.11"
-    "@next/swc-win32-x64-msvc" "14.2.11"
+    "@next/swc-darwin-arm64" "14.2.12"
+    "@next/swc-darwin-x64" "14.2.12"
+    "@next/swc-linux-arm64-gnu" "14.2.12"
+    "@next/swc-linux-arm64-musl" "14.2.12"
+    "@next/swc-linux-x64-gnu" "14.2.12"
+    "@next/swc-linux-x64-musl" "14.2.12"
+    "@next/swc-win32-arm64-msvc" "14.2.12"
+    "@next/swc-win32-ia32-msvc" "14.2.12"
+    "@next/swc-win32-x64-msvc" "14.2.12"
 
 nocache@^3.0.1:
   version "3.0.4"
@@ -6899,10 +6899,10 @@ normalize-path@^3.0.0:
   resolved "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-npm-check-updates@^17.1.1:
-  version "17.1.1"
-  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-17.1.1.tgz"
-  integrity sha512-2aqIzGAEWB7xPf0hKHTkNmUM5jHbn2S5r2/z/7dA5Ij2h/sVYAg9R/uVkaUC3VORPAfBm7pKkCWo6E9clEVQ9A==
+npm-check-updates@^17.1.2:
+  version "17.1.2"
+  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-17.1.2.tgz"
+  integrity sha512-k3osAbCNXIXqC7QAuF2uRHsKtTUS50KhOW1VAojRHlLdZRh/5EYfduvnVPGDWsbQXFakbSrSbWDdV8qIvDSUtA==
 
 npm-run-path@^4.0.1:
   version "4.0.1"
@@ -7516,10 +7516,10 @@ react-native@*:
     ws "^6.2.2"
     yargs "^17.6.2"
 
-react-phone-number-input@^3.4.6:
-  version "3.4.6"
-  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.4.6.tgz"
-  integrity sha512-OivU8++WnB7yzMFEvPTf8zc06fYyoCuA3jtcW1p9pLWzi6BH7FRjwVHz0OyFDhw2ED8o/9NP4pilcdOwgEzTXQ==
+react-phone-number-input@^3.4.7:
+  version "3.4.7"
+  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.4.7.tgz"
+  integrity sha512-IscLYIE6sbKiNOzNkOYsoVZcJYXOcOndd9aUYZ+mrJI6qeUozNJ/ingk6aG6L6l7GuEM0n5q0aYXJHsvonhZWQ==
   dependencies:
     classnames "^2.5.1"
     country-flag-icons "^1.5.11"
@@ -8502,10 +8502,10 @@ tweetnacl@^1.0.3:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
-twilio@^5.3.0:
-  version "5.3.0"
-  resolved "https://registry.npmjs.org/twilio/-/twilio-5.3.0.tgz"
-  integrity sha512-bwveAxChPPFR2umttraRjUJdq/WY0OJCCgetzuKqLoGYqYSyYGsiFYYFAB5EOL/XnzCQNwAvq5622u+jqMTLOA==
+twilio@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.npmjs.org/twilio/-/twilio-5.3.1.tgz"
+  integrity sha512-angX6IpoUcoehtArCJsUqbBklw2df/FgtzjTyx9fRQU/RPZsULMEGYcs4iNqLj486Iz8cxs6iP69990F9KxCMg==
   dependencies:
     axios "^1.7.4"
     dayjs "^1.11.9"
