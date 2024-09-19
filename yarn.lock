@@ -7516,10 +7516,10 @@ react-native@*:
     ws "^6.2.2"
     yargs "^17.6.2"
 
-react-phone-number-input@^3.4.7:
-  version "3.4.7"
-  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.4.7.tgz"
-  integrity sha512-IscLYIE6sbKiNOzNkOYsoVZcJYXOcOndd9aUYZ+mrJI6qeUozNJ/ingk6aG6L6l7GuEM0n5q0aYXJHsvonhZWQ==
+react-phone-number-input@^3.4.8:
+  version "3.4.8"
+  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.4.8.tgz"
+  integrity sha512-CoJ0OrG42NtAoAl78xCbw4nuhNc4llCxfcS8zB8wSzY1IJ5ib0nSHkOeKqIfm1rzZhTnwjxgecA8wEtzlargUg==
   dependencies:
     classnames "^2.5.1"
     country-flag-icons "^1.5.11"
@@ -7540,10 +7540,10 @@ react-refresh@^0.14.0:
   resolved "https://registry.npmjs.org/react-refresh/-/react-refresh-0.14.2.tgz"
   integrity sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==
 
-react-select@^5.8.0:
-  version "5.8.0"
-  resolved "https://registry.npmjs.org/react-select/-/react-select-5.8.0.tgz"
-  integrity sha512-TfjLDo58XrhP6VG5M/Mi56Us0Yt8X7xD6cDybC7yoRMUNm7BGO7qk8J0TLQOua/prb8vUOtsfnXZwfm30HGsAA==
+react-select@^5.8.1:
+  version "5.8.1"
+  resolved "https://registry.npmjs.org/react-select/-/react-select-5.8.1.tgz"
+  integrity sha512-RT1CJmuc+ejqm5MPgzyZujqDskdvB9a9ZqrdnVLsvAHjJ3Tj0hELnLeVPQlmYdVKCdCpxanepl6z7R5KhXhWzg==
   dependencies:
     "@babel/runtime" "^7.12.0"
     "@emotion/cache" "^11.4.0"
@@ -8309,10 +8309,10 @@ strip-json-comments@^3.1.1:
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-3.1.1.tgz"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
 
-stripe@^16.11.0:
-  version "16.11.0"
-  resolved "https://registry.npmjs.org/stripe/-/stripe-16.11.0.tgz"
-  integrity sha512-Rl4S2UAU/uWr3diETk3wkpXSe7LBPJ4BdXRzto5XVGGUhvLi8Q0MShwI5yhPH6Cdv2kmLu/Yl14QMlHgeRp7Qw==
+stripe@^16.12.0:
+  version "16.12.0"
+  resolved "https://registry.npmjs.org/stripe/-/stripe-16.12.0.tgz"
+  integrity sha512-H7eFVLDxeTNNSn4JTRfL2//LzCbDrMSZ+2q1c7CanVWgK2qIW5TwS+0V7N9KcKZZNpYh/uCqK0PyZh/2UsaAtQ==
   dependencies:
     "@types/node" ">=8.1.0"
     qs "^6.11.0"
