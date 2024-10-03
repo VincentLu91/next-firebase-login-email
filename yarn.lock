@@ -2410,10 +2410,10 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.22.0":
-  version "6.22.0"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.22.0.tgz"
-  integrity sha512-GlPwg8iG74WkzRb5Im2dpFg0xq5vgvsDfQA5NQCUWmmnELdo3iMa5hicLyuW+TBK+x1SmVe7InuAjIGKq5XcYg==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.22.1":
+  version "6.22.1"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.22.1.tgz"
+  integrity sha512-2F/byHTbA91iS2YuJA/LmuJbmh4prqMYqhMSQ2PGFBPU2z/trBOByuuYrHAQfjmETu95n1N24t5A8XjqzjQZTQ==
   dependencies:
     "@sanity/eventsource" "^5.0.2"
     get-it "^8.6.5"
@@ -8518,10 +8518,10 @@ tweetnacl@^1.0.3:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
-twilio@^5.3.2:
-  version "5.3.2"
-  resolved "https://registry.npmjs.org/twilio/-/twilio-5.3.2.tgz"
-  integrity sha512-d9qdZBB4ozlBcZz4vqvMq461OfUrhZPLwdGBHlwiPzLPL82gmVwQFkhD7/KGxy9B1j18LfJkL1whI3KmKtWM6w==
+twilio@^5.3.3:
+  version "5.3.3"
+  resolved "https://registry.npmjs.org/twilio/-/twilio-5.3.3.tgz"
+  integrity sha512-sI2A304/nMLnv6Vu1U6CREOvuLslUvo6ULhNNEa+mVZz29zMlzv20XQAExIVWxyXTBU4iIjOQY6giY58p1eb8Q==
   dependencies:
     axios "^1.7.4"
     dayjs "^1.11.9"
