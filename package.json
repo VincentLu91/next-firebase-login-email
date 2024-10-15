@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@chatscope/chat-ui-kit-react": "^2.0.3",
-    "@reduxjs/toolkit": "^2.2.8",
+    "@reduxjs/toolkit": "^2.3.0",
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/client": "^6.22.1",
     "@sanity/image-url": "^1.0.2",
