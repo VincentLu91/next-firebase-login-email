@@ -2410,10 +2410,10 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.22.1":
-  version "6.22.1"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.22.1.tgz"
-  integrity sha512-2F/byHTbA91iS2YuJA/LmuJbmh4prqMYqhMSQ2PGFBPU2z/trBOByuuYrHAQfjmETu95n1N24t5A8XjqzjQZTQ==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.22.2":
+  version "6.22.2"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.22.2.tgz"
+  integrity sha512-GrLmwREcw4Us6kBaqoXyLVVl7xAELf/4Qzvv0nGxIIqCkDWQof6nL55ar6m1W9hF+eHKyRTkktWSkZ/+RklCuw==
   dependencies:
     "@sanity/eventsource" "^5.0.2"
     get-it "^8.6.5"
@@ -6267,10 +6267,10 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
-libphonenumber-js@^1.11.8:
-  version "1.11.8"
-  resolved "https://registry.npmjs.org/libphonenumber-js/-/libphonenumber-js-1.11.8.tgz"
-  integrity sha512-0fv/YKpJBAgXKy0kaS3fnqoUVN8901vUYAKIGD/MWZaDfhJt1nZjPL3ZzdZBt/G8G8Hw2J1xOIrXWdNHFHPAvg==
+libphonenumber-js@^1.11.12:
+  version "1.11.12"
+  resolved "https://registry.npmjs.org/libphonenumber-js/-/libphonenumber-js-1.11.12.tgz"
+  integrity sha512-QkJn9/D7zZ1ucvT++TQSvZuSA2xAWeUytU+DiEQwbPKLyrDpvbul2AFs1CGbRAPpSCCk47aRAb5DX5mmcayp4g==
 
 lighthouse-logger@^1.0.0:
   version "1.4.2"
@@ -6915,10 +6915,10 @@ normalize-path@^3.0.0:
   resolved "https://registry.npmjs.org/normalize-path/-/normalize-path-3.0.0.tgz"
   integrity sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==
 
-npm-check-updates@^17.1.3:
-  version "17.1.3"
-  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-17.1.3.tgz"
-  integrity sha512-4uDLBWPuDHT5KLieIJ20FoAB8yqJejmupI42wPyfObgQOBbPAikQSwT73afDwREvhuxYrRDqlRvxTMSfvO+L8A==
+npm-check-updates@^17.1.4:
+  version "17.1.4"
+  resolved "https://registry.npmjs.org/npm-check-updates/-/npm-check-updates-17.1.4.tgz"
+  integrity sha512-crOUeN2GngqlkRCFQ/zi1zsneWd9IGZgIfAWYGAuhYiPnfbBTmJBL7Yq1wI0e1dsW8CfWc+h348WmfCREqeOBA==
 
 npm-run-path@^4.0.1:
   version "4.0.1"
@@ -7532,15 +7532,15 @@ react-native@*:
     ws "^6.2.2"
     yargs "^17.6.2"
 
-react-phone-number-input@^3.4.8:
-  version "3.4.8"
-  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.4.8.tgz"
-  integrity sha512-CoJ0OrG42NtAoAl78xCbw4nuhNc4llCxfcS8zB8wSzY1IJ5ib0nSHkOeKqIfm1rzZhTnwjxgecA8wEtzlargUg==
+react-phone-number-input@^3.4.9:
+  version "3.4.9"
+  resolved "https://registry.npmjs.org/react-phone-number-input/-/react-phone-number-input-3.4.9.tgz"
+  integrity sha512-RG40GTjfJwBR5whpEkQMvMMKcbqQSlXiKfiTp2mYoULkTYwxFn04iAVplRizWi3yLPL0fQiL4U+YU+9MIQGZog==
   dependencies:
     classnames "^2.5.1"
     country-flag-icons "^1.5.11"
     input-format "^0.3.10"
-    libphonenumber-js "^1.11.8"
+    libphonenumber-js "^1.11.12"
     prop-types "^15.8.1"
 
 "react-redux@^7.2.1 || ^8.1.3 || ^9.0.0", react-redux@^9.1.2:
@@ -8518,10 +8518,10 @@ tweetnacl@^1.0.3:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
-twilio@^5.3.3:
-  version "5.3.3"
-  resolved "https://registry.npmjs.org/twilio/-/twilio-5.3.3.tgz"
-  integrity sha512-sI2A304/nMLnv6Vu1U6CREOvuLslUvo6ULhNNEa+mVZz29zMlzv20XQAExIVWxyXTBU4iIjOQY6giY58p1eb8Q==
+twilio@^5.3.4:
+  version "5.3.4"
+  resolved "https://registry.npmjs.org/twilio/-/twilio-5.3.4.tgz"
+  integrity sha512-Uu5AXZiPjpwGqn1NLTjxn1lidA+J17bkJSK2KAsg98bSFu0tkzVIQELzolxZVDu5BRcFeeFm9Zs5+5YzGoMhEg==
   dependencies:
     axios "^1.7.4"
     dayjs "^1.11.9"
