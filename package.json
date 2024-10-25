@@ -43,7 +43,7 @@
     "stripe": "^17.2.1",
     "styled-jsx": "^5.1.6",
     "telnyx": "^1.27.0",
-    "twilio": "^5.3.4"
+    "twilio": "^5.3.5"
   },
   "overrides": {
     "redux-persist": {
