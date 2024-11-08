@@ -2415,10 +2415,10 @@
     "@sanity/block-content-to-hyperscript" "^3.0.0"
     prop-types "^15.6.2"
 
-"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.22.3":
-  version "6.22.3"
-  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.22.3.tgz"
-  integrity sha512-CJDUXPdw4q6VtdUmKbkH8D4iRqYIfIPNQ4U2Y1jzjez7NORnflX1vfgfMLSkNMc9xoK0xji4qhQgvcQHUNh4Lw==
+"@sanity/client@^5.0.0 || ^6.0.0", "@sanity/client@^6.22.4":
+  version "6.22.4"
+  resolved "https://registry.npmjs.org/@sanity/client/-/client-6.22.4.tgz"
+  integrity sha512-l807VLFs/CVrbWoqQ6C9SNqpvSvNkNnJ5RgxUSfCB2t8elkJ7fr3ahi1bbGrIMrfr/uL044WfWIQ4E3DoqpiuQ==
   dependencies:
     "@sanity/eventsource" "^5.0.2"
     get-it "^8.6.5"
