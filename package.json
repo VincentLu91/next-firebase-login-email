@@ -36,7 +36,7 @@
     "react-media-recorder": "1.7.1",
     "react-phone-number-input": "^3.4.9",
     "react-redux": "^9.1.2",
-    "react-select": "^5.8.2",
+    "react-select": "^5.8.3",
     "recordrtc": "^5.6.2",
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
