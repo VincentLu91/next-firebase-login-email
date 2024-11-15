@@ -8465,10 +8465,10 @@ tweetnacl@^1.0.3:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-1.0.3.tgz"
   integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
-twilio@^5.3.5:
-  version "5.3.5"
-  resolved "https://registry.npmjs.org/twilio/-/twilio-5.3.5.tgz"
-  integrity sha512-f/sA1Yd6TyIzfcq0u4QDGU+93afwswsJB+rf3T08tvBAMobBDVR3DfGREwJr5jp8xUic0qWa7GbJidk16NA4bg==
+twilio@^5.3.6:
+  version "5.3.6"
+  resolved "https://registry.npmjs.org/twilio/-/twilio-5.3.6.tgz"
+  integrity sha512-izHce9sWpiIYyFeZ5pJb5KQeHQ6NDyGuCQ+BOTbBS64ZWq+0InWXvWjZsXbFwGFrhn5MQq0ulouLtYOXiEYY8g==
   dependencies:
     axios "^1.7.4"
     dayjs "^1.11.9"
