@@ -19,6 +19,7 @@ function ChatBot() {
   const user = useUser();
   const supabase = useSupabaseClient();
   const [customer, setCustomer] = useState(null);
+  const [soundUrl, setSoundUrl] = useState(null);
   const sound = useSelector((state) => state.recordingReducer.sound);
 
   const [typing, setTyping] = useState(false);
@@ -32,7 +33,7 @@ function ChatBot() {
   const checkAuth = useCallback(
     async (user) => {
       if (user) {
-        console.log("Supabase user is: ", user);
+        console.log("Supabase user is: ", user.id);
         let customerInfo = await supabase
           .from("customers")
           .select("*")
@@ -67,6 +68,7 @@ function ChatBot() {
           .getPublicUrl(sound.original_file_name);
         console.log("uri is: ", uri.data.publicUrl);
         console.log(uri.data.publicUrl);
+        setSoundUrl(uri.data.publicUrl);
       } else {
         router.push("/library");
       }
@@ -107,6 +109,54 @@ function ChatBot() {
     return docs;
   };
 
+  const saveMessageToSupabase = async (message, sender, userId, soundUrl) => {
+    const { data, error } = await supabase.from("chat_history").insert([
+      {
+        user_id: userId, // Replace with the actual user ID
+        message: message,
+        sender: sender,
+        soundUrl: soundUrl,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error saving message:", error.message);
+    } else {
+      console.log("Message saved:", data);
+    }
+  };
+
+  const getChatHistory = async (userId) => {
+    const { data, error } = await supabase
+      .from("chat_history")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("soundUrl", soundUrl)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching chat history:", error.message);
+      return [];
+    } else {
+      return data;
+    }
+  };
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const chatHistory = await getChatHistory(user.id);
+      setMessages(
+        chatHistory.map((msg) => ({
+          message: msg.message,
+          sender: msg.sender,
+        }))
+      );
+    };
+    if (soundUrl) {
+      fetchHistory();
+    }
+  }, [user.id, soundUrl]);
+
   const handleSend = async (message) => {
     const newMessage = {
       message: message,
@@ -117,6 +167,8 @@ function ChatBot() {
     const newMessages = [...messages, newMessage];
     setMessages(newMessages);
     setTyping(true);
+    // Save user message to Supabase
+    await saveMessageToSupabase(message, "User", user.id, soundUrl);
     await processMessageToChatGPT(newMessages, message);
   };
 
@@ -172,6 +224,8 @@ function ChatBot() {
             sender: "ChatGPT",
           },
         ]);
+        // Save ChatGPT response to Supabase
+        saveMessageToSupabase(response.data.text, "ChatGPT", user.id, soundUrl);
       });
 
     //return response.data.text;
