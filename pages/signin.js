@@ -97,6 +97,7 @@ const Signin = () => {
       <Auth
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
+        providers={[]} // this disables OAuth
         //theme="dark"
         //redirectTo="http://localhost:3001/password-reset"
       />
