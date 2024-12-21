@@ -83,7 +83,7 @@ const Recording = () => {
   const recordingList = useSelector(
     (state) => state.recordingReducer.recordingList
   );
-  //const recording = useSelector((state) => state.recordingReducer.recording);
+
   const isRecording = useSelector(
     (state) => state.recordingReducer.isRecording
   );
@@ -97,7 +97,6 @@ const Recording = () => {
       .from("customers")
       .select("*")
       .eq("email_address", user?.email);
-    //console.log("tokenResponse: ", tokenResponse.data[0].mic_tokens);
     setNumMicTokens(tokenResponse?.data[0]?.mic_tokens);
     setTimeDifference(tokenResponse?.data[0]?.mic_tokens);
   }, [user, setNumMicTokens]);
