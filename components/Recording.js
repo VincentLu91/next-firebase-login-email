@@ -83,7 +83,7 @@ const Recording = () => {
   const recordingList = useSelector(
     (state) => state.recordingReducer.recordingList
   );
-  //const recording = useSelector((state) => state.recordingReducer.recording);
+
   const isRecording = useSelector(
     (state) => state.recordingReducer.isRecording
   );
