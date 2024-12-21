@@ -97,7 +97,6 @@ const Recording = () => {
       .from("customers")
       .select("*")
       .eq("email_address", user?.email);
-    //console.log("tokenResponse: ", tokenResponse.data[0].mic_tokens);
     setNumMicTokens(tokenResponse?.data[0]?.mic_tokens);
     setTimeDifference(tokenResponse?.data[0]?.mic_tokens);
   }, [user, setNumMicTokens]);
