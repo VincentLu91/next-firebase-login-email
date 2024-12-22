@@ -15,6 +15,7 @@ const Signin = () => {
   const emailRef = useRef(null);
 
   const passwordRef = useRef(null);
+  const dummyVar = useRef(null);
 
   const session = useSession();
   const supabase = useSupabaseClient();
@@ -98,6 +99,7 @@ const Signin = () => {
       <Auth
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
+        providers={[]} // Disable all OAuth providers
         //theme="dark"
         //redirectTo="http://localhost:3001/password-reset"
       />
