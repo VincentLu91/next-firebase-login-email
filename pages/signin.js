@@ -22,6 +22,7 @@ const Signin = () => {
   useEffect(() => {
     if (session) {
       router.push("/dashboard");
+      alert("You are logged in");
     }
   }, [session, router]);
 
@@ -97,7 +98,6 @@ const Signin = () => {
       <Auth
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
-        providers={[]} // this disables OAuth
         //theme="dark"
         //redirectTo="http://localhost:3001/password-reset"
       />
