@@ -4,7 +4,8 @@ import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../redux/user/actions";
 import signInStyles from "../styles/signinStyles";
-import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
 import Account from "../components/account";
 
@@ -96,6 +97,7 @@ const Signin = () => {
       <Auth
         supabaseClient={supabase}
         appearance={{ theme: ThemeSupa }}
+        providers={[]} // Disable all OAuth providers
         //theme="dark"
         //redirectTo="http://localhost:3001/password-reset"
       />
