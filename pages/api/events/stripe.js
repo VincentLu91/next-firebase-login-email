@@ -1,8 +1,7 @@
 import getRawBody from "raw-body";
-const stripe = require("stripe")(
-  "sk_test_51Jx1cdLBlaDAR7THINnFtmhlbxt3oaeehIMdTtpTitqJtX5eTtBenCXEF1bnHUN8xvpzUSAxgFhut1BfRu1bZljo00F6QMtxgc",
-  { apiVersion: "2023-10-16" }
-);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-10-16",
+});
 import { supabase } from "../../../utils/initSupabase";
 
 // https://nextjs.org/docs/api-routes/request-helpers#custom-config
@@ -19,7 +18,7 @@ export default async function handler(req, res) {
   // This is your Stripe CLI webhook secret for testing your endpoint locally.
   // the code below mainly is copied/pasted from the code snippet generated when I created the webhook.
   //dev
-  const endpointSecret = "whsec_tHLfkNK7JBoewOfQHY8DiaXvbAGiNTBl";
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
   // production
   //const endpointSecret = "whsec_84sztzV0jVbkcCZcSZmWGLYW1TjO15pH";
 
