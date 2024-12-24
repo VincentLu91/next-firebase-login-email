@@ -1,13 +1,10 @@
 import { supabase } from "./initSupabase";
 import Stripe from "stripe";
 
-const stripe = new Stripe(
-  "sk_test_51Jx1cdLBlaDAR7THINnFtmhlbxt3oaeehIMdTtpTitqJtX5eTtBenCXEF1bnHUN8xvpzUSAxgFhut1BfRu1bZljo00F6QMtxgc",
-  {
-    // https://github.com/stripe/stripe-node#configuration
-    apiVersion: "2023-10-16",
-  }
-);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  // https://github.com/stripe/stripe-node#configuration
+  apiVersion: "2023-10-16",
+});
 
 // utils/useDatabase.js
 const getTokens = async (customerId, typeOfToken) => {

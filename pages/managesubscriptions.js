@@ -85,14 +85,15 @@ const ManageSubscriptions = () => {
   // have no subscription
   const checkOut = async (priceId) => {
     const stripe = await loadStripe(
-      "pk_test_51Jx1cdLBlaDAR7THzsOatgkQk8OYrYzoeZzljbQTVZvd8rcGrlrWxqmDxuLtA2waXPYnOHBIlxjWI4PMjjF8Otxa00naRp98mK"
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
     );
     // user/customer objects should already be present including stripe customer id
     // make request to backend to get session data
     // redirect user to sessions url
 
     const response = await axios.post(
-      "http://localhost:3001/api/checkout_session", // I could rewrite this with environment specific URLs
+      //"http://localhost:3001/api/checkout_session", // I could rewrite this with environment specific URLs
+      `/api/checkout_session`, // this?
       {
         success_url: `${window.location.origin}/subscription-checkout`,
         cancel_url: window.location.href,
