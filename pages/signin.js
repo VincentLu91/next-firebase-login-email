@@ -23,7 +23,6 @@ const Signin = () => {
   useEffect(() => {
     if (session) {
       router.push("/dashboard");
-      alert("You are logged in");
     }
   }, [session, router]);
 
