@@ -19,7 +19,7 @@
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/supabase-js": "^2.47.10",
     "axios": "^1.7.9",
-    "cohere-ai": "^7.15.0",
+    "cohere-ai": "^7.15.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "file2arraybuffer": "^1.2.2",
