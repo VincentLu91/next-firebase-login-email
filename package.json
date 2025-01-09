@@ -11,7 +11,7 @@
     "@chatscope/chat-ui-kit-react": "^2.0.3",
     "@reduxjs/toolkit": "^2.5.0",
     "@sanity/block-content-to-react": "^3.0.0",
-    "@sanity/client": "^6.24.2",
+    "@sanity/client": "^6.24.3",
     "@sanity/image-url": "^1.1.0",
     "@stripe/stripe-js": "^5.5.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
@@ -34,7 +34,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-media-recorder": "1.7.1",
-    "react-phone-number-input": "^3.4.10",
+    "react-phone-number-input": "^3.4.11",
     "react-redux": "^9.2.0",
     "react-select": "^5.9.0",
     "recordrtc": "^5.6.2",
@@ -43,7 +43,7 @@
     "stripe": "^17.5.0",
     "styled-jsx": "^5.1.6",
     "telnyx": "^1.27.0",
-    "twilio": "^5.4.0"
+    "twilio": "^5.4.1"
   },
   "overrides": {
     "redux-persist": {
