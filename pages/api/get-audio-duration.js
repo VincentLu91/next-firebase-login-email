@@ -10,9 +10,7 @@ export default async function handler(req, res) {
       }
 
       // Fetch the audio file and get the blob duration in seconds
-      const response = await fetch(audioURL);
-      const blob = await response.blob();
-      const durationSeconds = await getBlobDuration(blob);
+      const durationSeconds = await getBlobDuration(audioURL);
 
       // Send the duration in seconds as a response
       return res.status(200).json({ durationSeconds });
