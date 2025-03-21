@@ -48,6 +48,7 @@ const Navbar = () => {
           <Link href="/audioplayer">AudioPlayer</Link>
           <Link href="/internalrecording">Recording</Link>
           <Link href="/phonerecording">Phone Recording</Link>
+          <Link href="/phonerecording2">Phone Recording2</Link>
           <a
             href="#"
             onClick={() => {
