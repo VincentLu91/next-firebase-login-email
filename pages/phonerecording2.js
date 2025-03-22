@@ -14,9 +14,10 @@ const PhoneRecording2 = () => {
   //   setTranscriptionText(data?.transcription);
   // };
 
-  const onConnectServer = async () => {
+  useEffect(() => {
     const wsUrl = `wss://call-transcribe-heroku-b15b1132d70f.herokuapp.com`;
     let ws = new WebSocket(wsUrl);
+    let keepAliveInterval;
 
     ws.onopen = () => {
       console.log("WebSocket connected");
@@ -33,7 +34,11 @@ const PhoneRecording2 = () => {
         console.log("Sending ping to server");
         ws.send(JSON.stringify({ event: "ping" }));
       }
-      setTimeout(keepAlive, 20 * 1000); // Send every 50 seconds
+      keepAliveInterval = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ event: "ping" }));
+        }
+      }, 20 * 1000); // Send every 20 seconds
     }
 
     function reconnect() {
@@ -49,11 +54,20 @@ const PhoneRecording2 = () => {
         setTranscriptionText(data.text);
       }
     };
-  };
+
+    // Cleanup function to close WebSocket and clear intervals when component unmounts
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
+      }
+    };
+  }, []); // Empty dependency array means this runs once when component mounts
 
   return (
     <div>
-      <button onClick={onConnectServer}>Connect to Server</button>
       <div>
         <p>Your text is:</p>
         <p>{transcriptionText}</p>
