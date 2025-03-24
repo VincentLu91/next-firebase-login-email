@@ -161,8 +161,10 @@ const PhoneRecording2 = () => {
         }`
       );
       if (res_dial) {
+        console.log("res_dial full response: ", res_dial);
         console.log("res_dial.data is: ", res_dial.data);
         console.log("recording object: ", res_dial.data.recording);
+        console.log("call object: ", res_dial.data.call);
         setCallRecordingData(res_dial.data);
       }
     } catch (error) {
@@ -177,25 +179,40 @@ const PhoneRecording2 = () => {
   };
 
   function renderView() {
-    if (callRecordingData?.recording?.recordingStatus === "completed") {
-      return (
-        <div className="title">
-          <div>Recording completed!</div>
-          <div>URL: {callRecordingData.recording.recordingUrl}</div>
-        </div>
-      );
+    if (isSubscribed) {
+      if (callRecordingData?.recording?.recordingStatus === "completed") {
+        return (
+          <div className="title">
+            <div>Recording completed!</div>
+            <div>URL: {callRecordingData.recording.recordingUrl}</div>
+          </div>
+        );
+      } else if (transcriptionText) {
+        // not the most robust. we don't get the query recordingStatus during this state but still works for now.
+        // We're receiving transcription data, so recording is in progress
+        return (
+          <div className="title">
+            <div>Recording in progress...</div>
+            <p>{transcriptionText}</p>
+          </div>
+        );
+      } else {
+        return (
+          <div>
+            <button onClick={dialNumber}>Dial Number</button>
+            <PhoneInput
+              placeholder="Enter phone number with country code"
+              value={phoneNumber}
+              onChange={setPhoneNumber}
+            />
+          </div>
+        );
+      }
     } else {
       return (
-        <div>
-          <button onClick={dialNumber}>Dial Number</button>
-          <PhoneInput
-            placeholder="Enter phone number with country code"
-            value={phoneNumber}
-            onChange={setPhoneNumber}
-          />
-          <p>Your text is:</p>
-          <p>{transcriptionText}</p>
-        </div>
+        <>
+          <h1> You are not subscribed!!</h1>
+        </>
       );
     }
   }
