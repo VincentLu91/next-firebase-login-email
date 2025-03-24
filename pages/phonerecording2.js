@@ -2,10 +2,18 @@ import * as React from "react";
 import { useEffect, useCallback, useState } from "react";
 import axios from "axios";
 import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import { supabase } from "../utils/initSupabase";
+import {
+  updateRecordingList,
+  setCallControlID,
+} from "../redux/recording/actions";
+import moment from "moment";
+import { setCurrentUser } from "../redux/user/actions";
+import { useDispatch, useSelector } from "react-redux";
 
 const ASSEMBLY_AI_KEY =
   process.env.ASSEMBLY_AI_KEY || "8acedd22ef7542259df0f36dc8bf18ac";
@@ -18,6 +26,11 @@ const PhoneRecording2 = () => {
   const router = useRouter();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const dispatch = useDispatch();
+  const recordingList = useSelector(
+    (state) => state.recordingReducer.recordingList
+  );
+  const [callRecordingData, setCallRecordingData] = useState(null);
   // const fetchTranscription = async () => {
   //   const url = "/api/getTranscription";
   //   const res = await fetch(url);
@@ -147,7 +160,11 @@ const PhoneRecording2 = () => {
           customer.id
         }`
       );
-      console.log("res_dial.data is: ", res_dial.data);
+      if (res_dial) {
+        console.log("res_dial.data is: ", res_dial.data);
+        console.log("recording object: ", res_dial.data.recording);
+        setCallRecordingData(res_dial.data);
+      }
     } catch (error) {
       console.error(
         "Error making call:",
@@ -159,19 +176,65 @@ const PhoneRecording2 = () => {
     }
   };
 
+  function renderView() {
+    if (callRecordingData?.recording?.recordingStatus === "completed") {
+      return (
+        <div className="title">
+          <div>Recording completed!</div>
+          <div>URL: {callRecordingData.recording.recordingUrl}</div>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <button onClick={dialNumber}>Dial Number</button>
+          <PhoneInput
+            placeholder="Enter phone number with country code"
+            value={phoneNumber}
+            onChange={setPhoneNumber}
+          />
+          <p>Your text is:</p>
+          <p>{transcriptionText}</p>
+        </div>
+      );
+    }
+  }
+
   return (
-    <div>
-      <div>
-        <button onClick={dialNumber}>Dial Number</button>
-        <PhoneInput
-          placeholder="Enter phone number with country code"
-          //defaultCountry="US"
-          value={phoneNumber}
-          onChange={setPhoneNumber}
-        />
-        <p>Your text is:</p>
-        <p>{transcriptionText}</p>
-      </div>
+    <div
+      style={{
+        maxWidth: "600px",
+        margin: "40px auto",
+        padding: "20px",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <h1 style={{ marginBottom: "20px", color: "#333" }}>Phone Recording</h1>
+      {renderView()}
+      <style jsx global>{`
+        .PhoneInput {
+          margin: 20px 0;
+        }
+        button {
+          background: #0070f3;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 16px;
+          margin: 10px 0;
+        }
+        button:hover {
+          background: #0051cc;
+        }
+        .title {
+          background: #f0f0f0;
+          padding: 20px;
+          border-radius: 5px;
+          margin-top: 20px;
+        }
+      `}</style>
     </div>
   );
 };
