@@ -12,7 +12,7 @@ import {
   setCallControlID,
 } from "../redux/recording/actions";
 import moment from "moment";
-import { setCurrentUser } from "../redux/user/actions";
+
 import { useDispatch, useSelector } from "react-redux";
 
 const ASSEMBLY_AI_KEY =
@@ -31,13 +31,8 @@ const PhoneRecording2 = () => {
     (state) => state.recordingReducer.recordingList
   );
   const [callRecordingData, setCallRecordingData] = useState(null);
-  // const fetchTranscription = async () => {
-  //   const url = "/api/getTranscription";
-  //   const res = await fetch(url);
-  //   const data = await res.json();
-  //   console.log("data", data);
-  //   setTranscriptionText(data?.transcription);
-  // };
+  const [callRecordingInfo, setCallRecordingInfo] = useState(null);
+  const [recordingStatus, setRecordingStatus] = useState("");
 
   const checkAuth = useCallback(
     async (user) => {
@@ -89,7 +84,7 @@ const PhoneRecording2 = () => {
   }, [checkAuth, user]);
 
   useEffect(() => {
-    const wsUrl = `wss://call-transcribe-heroku-b15b1132d70f.herokuapp.com`;
+    const wsUrl = process.env.NEXT_PUBLIC_WSS_URL;
     let ws = new WebSocket(wsUrl);
     let keepAliveInterval;
 
@@ -127,6 +122,12 @@ const PhoneRecording2 = () => {
       if (data.event === "interim-transcription") {
         setTranscriptionText(data.text);
       }
+      if (data.event === "update_recording_status") {
+        const result = data.result;
+        console.log("currentRecording", result);
+        setCallRecordingInfo(result);
+        setRecordingStatus(result?.recordingStatus);
+      }
     };
 
     // Cleanup function to close WebSocket and clear intervals when component unmounts
@@ -160,12 +161,9 @@ const PhoneRecording2 = () => {
           customer.id
         }`
       );
+      setRecordingStatus("Recording In Progress...");
       if (res_dial) {
         console.log("res_dial full response: ", res_dial);
-        console.log("res_dial.data is: ", res_dial.data);
-        console.log("recording object: ", res_dial.data.recording);
-        console.log("call object: ", res_dial.data.call);
-        setCallRecordingData(res_dial.data);
       }
     } catch (error) {
       console.error(
@@ -180,20 +178,30 @@ const PhoneRecording2 = () => {
 
   function renderView() {
     if (isSubscribed) {
-      if (callRecordingData?.recording?.recordingStatus === "completed") {
+      if (recordingStatus) {
         return (
           <div className="title">
-            <div>Recording completed!</div>
-            <div>URL: {callRecordingData.recording.recordingUrl}</div>
-          </div>
-        );
-      } else if (transcriptionText) {
-        // not the most robust. we don't get the query recordingStatus during this state but still works for now.
-        // We're receiving transcription data, so recording is in progress
-        return (
-          <div className="title">
-            <div>Recording in progress...</div>
-            <p>{transcriptionText}</p>
+            <div
+              style={{
+                color: "green",
+              }}
+            >
+              {recordingStatus?.toLocaleUpperCase()}
+            </div>
+            {recordingStatus === "completed" && (
+              <div>
+                <span>Recording Url: {callRecordingInfo.recordingUrl}</span>
+                <div>
+                  <a href={callRecordingInfo.recordingUrl}>Open Url</a>
+                </div>
+              </div>
+            )}
+
+            {transcriptionText && (
+              <div className="title">
+                <p>{transcriptionText}</p>
+              </div>
+            )}
           </div>
         );
       } else {
