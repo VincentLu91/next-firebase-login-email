@@ -177,7 +177,7 @@ const PhoneRecording2 = () => {
   };
 
   function renderView() {
-    /*if (isSubscribed) {
+    if (isSubscribed) {
       if (recordingStatus) {
         return (
           <div className="title">
@@ -221,44 +221,6 @@ const PhoneRecording2 = () => {
         <>
           <h1> You are not subscribed!!</h1>
         </>
-      );
-    }*/
-    if (recordingStatus) {
-      return (
-        <div className="title">
-          <div
-            style={{
-              color: "green",
-            }}
-          >
-            {recordingStatus?.toLocaleUpperCase()}
-          </div>
-          {recordingStatus === "completed" && (
-            <div>
-              <span>Recording Url: {callRecordingInfo.recordingUrl}</span>
-              <div>
-                <a href={callRecordingInfo.recordingUrl}>Open Url</a>
-              </div>
-            </div>
-          )}
-
-          {transcriptionText && (
-            <div className="title">
-              <p>{transcriptionText}</p>
-            </div>
-          )}
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <button onClick={dialNumber}>Dial Number</button>
-          <PhoneInput
-            placeholder="Enter phone number with country code"
-            value={phoneNumber}
-            onChange={setPhoneNumber}
-          />
-        </div>
       );
     }
   }
