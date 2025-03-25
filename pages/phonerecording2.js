@@ -33,6 +33,7 @@ const PhoneRecording2 = () => {
   const [callRecordingData, setCallRecordingData] = useState(null);
   const [callRecordingInfo, setCallRecordingInfo] = useState(null);
   const [recordingStatus, setRecordingStatus] = useState("");
+  const [filename, setFilename] = React.useState("");
 
   const checkAuth = useCallback(
     async (user) => {
@@ -176,6 +177,107 @@ const PhoneRecording2 = () => {
     }
   };
 
+  function addDurationToTimestamp(timestamp, durationInSeconds) {
+    const date = new Date(timestamp);
+    const newDate = new Date(date.getTime() + durationInSeconds * 1000);
+    return newDate.toUTCString();
+  }
+
+  async function renameRecord() {
+    if (!filename && filename.length < 1) {
+      alert("Filename can not be empty!");
+      return;
+    }
+
+    try {
+      // Download the audio file from Twilio URL
+      const response = await fetch(callRecordingInfo.recordingUrl);
+      const blob = await response.blob();
+      const arrayBuffer = await blob.arrayBuffer();
+
+      // Generate unique filename
+      const file_name = `${filename}_${customer.id}_${Date.now()}.mp3`;
+
+      // Upload to Supabase storage
+      const blobResponse = await supabase.storage
+        .from("recreate-ai-storage-bucket")
+        .upload(file_name, arrayBuffer, {
+          contentType: "audio/mp3",
+        });
+
+      if (blobResponse.error) {
+        console.error("Storage upload error:", blobResponse.error);
+        alert("Failed to upload recording");
+        return;
+      }
+
+      setCallRecordingData(undefined);
+      const durationMillis = callRecordingInfo.recordingDuration * 1000;
+      const momentduration = moment.duration(durationMillis);
+      let duration = moment
+        .utc(momentduration.as("milliseconds"))
+        .format("HH:mm:ss");
+      if (momentduration.hours() === 0) {
+        duration = moment
+          .utc(momentduration.as("milliseconds"))
+          .format("mm:ss");
+      }
+      const recordingdate = moment(callRecordingInfo.recordingStartTime).format(
+        "MMMM Do YYYY"
+      );
+      const newRecordingList = [...recordingList];
+      newRecordingList.push({
+        filepath: callRecordingInfo.recordingUrl,
+        filename,
+        recordingdate: recordingdate,
+        duration: duration,
+        transcript: transcriptionText,
+      });
+
+      dispatch(updateRecordingList(newRecordingList));
+      console.log("In Phone Recording, currentUser is: ", customer);
+      console.log(
+        "In Phone Recording, newRecordingList is: ",
+        newRecordingList
+      );
+
+      const RecordingEndTime = addDurationToTimestamp(
+        callRecordingInfo.recordingStartTime,
+        callRecordingInfo.recordingDuration
+      );
+
+      const insertCallResponse = await supabase
+        .from("call_recordings")
+        .insert([
+          {
+            telnyx_call_control_id: callRecordingInfo.callSid,
+            file_name: filename,
+            duration,
+            full_transcript: transcriptionText,
+            customer_id: customer.id,
+            recording_id: callRecordingInfo.recordingSid,
+            original_file_name: file_name, // Use the new Supabase storage filename
+            durationMillis,
+            start_time: callRecordingInfo.recordingStartTime,
+            end_time: RecordingEndTime,
+            react_native_event: callRecordingInfo.recordingStatus,
+          },
+        ])
+        .select();
+
+      if (insertCallResponse.error) {
+        console.log(insertCallResponse.error);
+        throw new Error("Failed to save recording information");
+      }
+
+      setFilename("");
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error processing recording:", error);
+      alert("Failed to process recording: " + error.message);
+    }
+  }
+
   function renderView() {
     if (isSubscribed) {
       if (recordingStatus) {
@@ -194,6 +296,12 @@ const PhoneRecording2 = () => {
                 <div>
                   <a href={callRecordingInfo.recordingUrl}>Open Url</a>
                 </div>
+                <input
+                  value={filename}
+                  name="filename"
+                  onChange={(e) => setFilename(e.target.value)}
+                />
+                <button onClick={renameRecord}>Rename</button>
               </div>
             )}
 
