@@ -184,71 +184,98 @@ const PhoneRecording2 = () => {
   }
 
   async function renameRecord() {
-    // this I have to work through. get the call recording URL. Then update
-    // supabase record with filename and duration. That function is my focus now.
-    // also the transcript...find a way to save that.
     if (!filename && filename.length < 1) {
       alert("Filename can not be empty!");
       return;
     }
 
-    console.log("filename", filename);
-    // save to supabase
-    setCallRecordingData(undefined);
+    try {
+      // Download the audio file from Twilio URL
+      const response = await fetch(callRecordingInfo.recordingUrl);
+      const blob = await response.blob();
+      const arrayBuffer = await blob.arrayBuffer();
 
-    const durationMillis = callRecordingInfo.recordingDuration * 1000; // not most accurate but workaround
-    const momentduration = moment.duration(durationMillis);
-    let duration = moment
-      .utc(momentduration.as("milliseconds"))
-      .format("HH:mm:ss");
-    if (momentduration.hours() === 0) {
-      duration = moment.utc(momentduration.as("milliseconds")).format("mm:ss");
+      // Generate unique filename
+      const file_name = `${filename}_${customer.id}_${Date.now()}.mp3`;
+
+      // Upload to Supabase storage
+      const blobResponse = await supabase.storage
+        .from("recreate-ai-storage-bucket")
+        .upload(file_name, arrayBuffer, {
+          contentType: "audio/mp3",
+        });
+
+      if (blobResponse.error) {
+        console.error("Storage upload error:", blobResponse.error);
+        alert("Failed to upload recording");
+        return;
+      }
+
+      setCallRecordingData(undefined);
+      const durationMillis = callRecordingInfo.recordingDuration * 1000;
+      const momentduration = moment.duration(durationMillis);
+      let duration = moment
+        .utc(momentduration.as("milliseconds"))
+        .format("HH:mm:ss");
+      if (momentduration.hours() === 0) {
+        duration = moment
+          .utc(momentduration.as("milliseconds"))
+          .format("mm:ss");
+      }
+      const recordingdate = moment(callRecordingInfo.recordingStartTime).format(
+        "MMMM Do YYYY"
+      );
+      const newRecordingList = [...recordingList];
+      newRecordingList.push({
+        filepath: callRecordingInfo.recordingUrl,
+        filename,
+        recordingdate: recordingdate,
+        duration: duration,
+        transcript: transcriptionText,
+      });
+
+      dispatch(updateRecordingList(newRecordingList));
+      console.log("In Phone Recording, currentUser is: ", customer);
+      console.log(
+        "In Phone Recording, newRecordingList is: ",
+        newRecordingList
+      );
+
+      const RecordingEndTime = addDurationToTimestamp(
+        callRecordingInfo.recordingStartTime,
+        callRecordingInfo.recordingDuration
+      );
+
+      const insertCallResponse = await supabase
+        .from("call_recordings")
+        .insert([
+          {
+            telnyx_call_control_id: callRecordingInfo.callSid,
+            file_name: filename,
+            duration,
+            full_transcript: transcriptionText,
+            customer_id: customer.id,
+            recording_id: callRecordingInfo.recordingSid,
+            original_file_name: file_name, // Use the new Supabase storage filename
+            durationMillis,
+            start_time: callRecordingInfo.recordingStartTime,
+            end_time: RecordingEndTime,
+            react_native_event: callRecordingInfo.recordingStatus,
+          },
+        ])
+        .select();
+
+      if (insertCallResponse.error) {
+        console.log(insertCallResponse.error);
+        throw new Error("Failed to save recording information");
+      }
+
+      setFilename("");
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error processing recording:", error);
+      alert("Failed to process recording: " + error.message);
     }
-    const recordingdate = moment(callRecordingInfo.recordingStartTime).format(
-      "MMMM Do YYYY"
-    );
-    const newRecordingList = [...recordingList];
-    newRecordingList.push({
-      filepath: callRecordingInfo.recordingUrl,
-      filename,
-      recordingdate: recordingdate,
-      duration: duration,
-      //duration: durationSeconds,
-      transcript: transcriptionText,
-    });
-    //newRecordingList.reverse()   //sorting
-    //props.setRecordinglistProp(newRecordingList);
-    dispatch(updateRecordingList(newRecordingList));
-    console.log("In Phone Recording, currentUser is: ", customer);
-    console.log("In Phone Recording, newRecordingList is: ", newRecordingList); // only returns list on same page
-    // here, update the record with filename, duration (formatted) and transcript
-    const RecordingEndTime = addDurationToTimestamp(
-      callRecordingInfo.recordingStartTime,
-      callRecordingInfo.recordingDuration
-    );
-    const insertCallResponse = await supabase
-      .from("call_recordings")
-      .insert([
-        {
-          telnyx_call_control_id: callRecordingInfo.callSid,
-          file_name: filename,
-          duration,
-          full_transcript: transcriptionText,
-          customer_id: customer.id,
-          recording_id: callRecordingInfo.recordingSid,
-          original_file_name: callRecordingInfo.recordingUrl,
-          durationMillis,
-          start_time: callRecordingInfo.recordingStartTime,
-          end_time: RecordingEndTime,
-          react_native_event: callRecordingInfo.recordingStatus,
-        },
-      ])
-      .select();
-    if (insertCallResponse.error) console.log(insertCallResponse.error);
-    if (insertCallResponse.data) console.log(insertCallResponse.data[0]);
-    setFilename("");
-    // We can go to library tab
-    router.push("/dashboard");
   }
 
   function renderView() {
