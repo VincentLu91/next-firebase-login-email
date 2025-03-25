@@ -33,6 +33,7 @@ const PhoneRecording2 = () => {
   const [callRecordingData, setCallRecordingData] = useState(null);
   const [callRecordingInfo, setCallRecordingInfo] = useState(null);
   const [recordingStatus, setRecordingStatus] = useState("");
+  const [filename, setFilename] = React.useState("");
 
   const checkAuth = useCallback(
     async (user) => {
@@ -176,6 +177,80 @@ const PhoneRecording2 = () => {
     }
   };
 
+  function addDurationToTimestamp(timestamp, durationInSeconds) {
+    const date = new Date(timestamp);
+    const newDate = new Date(date.getTime() + durationInSeconds * 1000);
+    return newDate.toUTCString();
+  }
+
+  async function renameRecord() {
+    // this I have to work through. get the call recording URL. Then update
+    // supabase record with filename and duration. That function is my focus now.
+    // also the transcript...find a way to save that.
+    if (!filename && filename.length < 1) {
+      alert("Filename can not be empty!");
+      return;
+    }
+
+    console.log("filename", filename);
+    // save to supabase
+    setCallRecordingData(undefined);
+
+    const durationMillis = callRecordingInfo.recordingDuration * 1000; // not most accurate but workaround
+    const momentduration = moment.duration(durationMillis);
+    let duration = moment
+      .utc(momentduration.as("milliseconds"))
+      .format("HH:mm:ss");
+    if (momentduration.hours() === 0) {
+      duration = moment.utc(momentduration.as("milliseconds")).format("mm:ss");
+    }
+    const recordingdate = moment(callRecordingInfo.recordingStartTime).format(
+      "MMMM Do YYYY"
+    );
+    const newRecordingList = [...recordingList];
+    newRecordingList.push({
+      filepath: callRecordingInfo.recordingUrl,
+      filename,
+      recordingdate: recordingdate,
+      duration: duration,
+      //duration: durationSeconds,
+      transcript: transcriptionText,
+    });
+    //newRecordingList.reverse()   //sorting
+    //props.setRecordinglistProp(newRecordingList);
+    dispatch(updateRecordingList(newRecordingList));
+    console.log("In Phone Recording, currentUser is: ", customer);
+    console.log("In Phone Recording, newRecordingList is: ", newRecordingList); // only returns list on same page
+    // here, update the record with filename, duration (formatted) and transcript
+    const RecordingEndTime = addDurationToTimestamp(
+      callRecordingInfo.recordingStartTime,
+      callRecordingInfo.recordingDuration
+    );
+    const insertCallResponse = await supabase
+      .from("call_recordings")
+      .insert([
+        {
+          telnyx_call_control_id: callRecordingInfo.callSid,
+          file_name: filename,
+          duration,
+          full_transcript: transcriptionText,
+          customer_id: customer.id,
+          recording_id: callRecordingInfo.recordingSid,
+          original_file_name: callRecordingInfo.recordingUrl,
+          durationMillis,
+          start_time: callRecordingInfo.recordingStartTime,
+          end_time: RecordingEndTime,
+          react_native_event: callRecordingInfo.recordingStatus,
+        },
+      ])
+      .select();
+    if (insertCallResponse.error) console.log(insertCallResponse.error);
+    if (insertCallResponse.data) console.log(insertCallResponse.data[0]);
+    setFilename("");
+    // We can go to library tab
+    router.push("/dashboard");
+  }
+
   function renderView() {
     if (isSubscribed) {
       if (recordingStatus) {
@@ -194,6 +269,12 @@ const PhoneRecording2 = () => {
                 <div>
                   <a href={callRecordingInfo.recordingUrl}>Open Url</a>
                 </div>
+                <input
+                  value={filename}
+                  name="filename"
+                  onChange={(e) => setFilename(e.target.value)}
+                />
+                <button onClick={renameRecord}>Rename</button>
               </div>
             )}
 
