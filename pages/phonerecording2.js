@@ -34,6 +34,7 @@ const PhoneRecording2 = () => {
   const [callRecordingInfo, setCallRecordingInfo] = useState(null);
   const [recordingStatus, setRecordingStatus] = useState("");
   const [filename, setFilename] = React.useState("");
+  const [numCalls, setNumCalls] = React.useState(0);
 
   const checkAuth = useCallback(
     async (user) => {
@@ -84,7 +85,23 @@ const PhoneRecording2 = () => {
     //getSubscriptionsInfo();
   }, [checkAuth, user]);
 
+  const getNumCalls = useCallback(
+    async (user) => {
+      let tokenResponse = await supabase
+        .from("customers")
+        .select("*")
+        .eq("email_address", user?.email);
+      setNumCalls(tokenResponse?.data[0]?.num_calls);
+    },
+    [setNumCalls]
+  );
+
   useEffect(() => {
+    getNumCalls(user);
+  }, [getNumCalls, user]);
+
+  useEffect(() => {
+    if (!customer) return;
     const wsUrl = process.env.NEXT_PUBLIC_WSS_URL;
     let ws = new WebSocket(wsUrl);
     let keepAliveInterval;
@@ -117,7 +134,7 @@ const PhoneRecording2 = () => {
       }, 5000);
     }
 
-    ws.onmessage = function (msg) {
+    ws.onmessage = async function (msg) {
       console.log("on new message...", msg.data);
       const data = JSON.parse(msg.data);
       if (data.event === "interim-transcription") {
@@ -128,6 +145,22 @@ const PhoneRecording2 = () => {
         console.log("currentRecording", result);
         setCallRecordingInfo(result);
         setRecordingStatus(result?.recordingStatus);
+
+        // Call the API when recording is complete
+        if (result?.recordingStatus === "completed") {
+          try {
+            console.log("customer object should be: ", customer?.id);
+            if (customer?.id) {
+              const response = await axios.get(
+                `/api/calls-token?user=${customer?.id}`
+              );
+              console.log("Calls token response:", response.data);
+              setNumCalls(response.data?.data[0]?.num_calls);
+            }
+          } catch (error) {
+            console.error("Error calling /api/calls-token:", error);
+          }
+        }
       }
     };
 
@@ -140,7 +173,7 @@ const PhoneRecording2 = () => {
         clearInterval(keepAliveInterval);
       }
     };
-  }, []); // Empty dependency array means this runs once when component mounts
+  }, [customer]); // Empty dependency array means this runs once when component mounts
 
   const dialNumber = async () => {
     try {
@@ -280,49 +313,59 @@ const PhoneRecording2 = () => {
 
   function renderView() {
     if (isSubscribed) {
-      if (recordingStatus) {
+      if (numCalls == 0) {
         return (
           <div className="title">
-            <div
-              style={{
-                color: "green",
-              }}
-            >
-              {recordingStatus?.toLocaleUpperCase()}
-            </div>
-            {recordingStatus === "completed" && (
-              <div>
-                <span>Recording Url: {callRecordingInfo.recordingUrl}</span>
-                <div>
-                  <a href={callRecordingInfo.recordingUrl}>Open Url</a>
-                </div>
-                <input
-                  value={filename}
-                  name="filename"
-                  onChange={(e) => setFilename(e.target.value)}
-                />
-                <button onClick={renameRecord}>Rename</button>
-              </div>
-            )}
-
-            {transcriptionText && (
-              <div className="title">
-                <p>{transcriptionText}</p>
-              </div>
-            )}
+            <h2>You have no calls available!</h2>
           </div>
         );
       } else {
-        return (
-          <div>
-            <button onClick={dialNumber}>Dial Number</button>
-            <PhoneInput
-              placeholder="Enter phone number with country code"
-              value={phoneNumber}
-              onChange={setPhoneNumber}
-            />
-          </div>
-        );
+        if (recordingStatus) {
+          return (
+            <div className="title">
+              <div
+                style={{
+                  color: "green",
+                }}
+              >
+                {recordingStatus?.toLocaleUpperCase()}
+              </div>
+              <h2>Number of calls available: {numCalls}</h2>
+              {recordingStatus === "completed" && (
+                <div>
+                  <span>Recording Url: {callRecordingInfo.recordingUrl}</span>
+                  <div>
+                    <a href={callRecordingInfo.recordingUrl}>Open Url</a>
+                  </div>
+                  <input
+                    value={filename}
+                    name="filename"
+                    onChange={(e) => setFilename(e.target.value)}
+                  />
+                  <button onClick={renameRecord}>Rename</button>
+                </div>
+              )}
+
+              {transcriptionText && (
+                <div className="title">
+                  <p>{transcriptionText}</p>
+                </div>
+              )}
+            </div>
+          );
+        } else {
+          return (
+            <div>
+              <h2>Number of calls available: {numCalls}</h2>
+              <button onClick={dialNumber}>Dial Number</button>
+              <PhoneInput
+                placeholder="Enter phone number with country code"
+                value={phoneNumber}
+                onChange={setPhoneNumber}
+              />
+            </div>
+          );
+        }
       }
     } else {
       return (
@@ -342,7 +385,9 @@ const PhoneRecording2 = () => {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1 style={{ marginBottom: "20px", color: "#333" }}>Phone Recording</h1>
+      <h1 style={{ marginBottom: "20px", color: "#333" }}>
+        Phone Call Recording
+      </h1>
       {renderView()}
       <style jsx global>{`
         .PhoneInput {
