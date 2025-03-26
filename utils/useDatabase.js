@@ -133,9 +133,13 @@ const deductNumCallsToken = async (customerId, tokensToDeduct) => {
       id: uuid,
       num_calls: num_calls - tokensToDeduct,
     };
-
-    await supabase.from("customers").upsert(customerTokenUpdate).select();
-    return true;
+    const data = await supabase
+      .from("customers")
+      .upsert(customerTokenUpdate)
+      .select();
+    return {
+      data: data,
+    };
   } else {
     return false;
   }
