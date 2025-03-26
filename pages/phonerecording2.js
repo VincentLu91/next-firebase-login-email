@@ -385,7 +385,9 @@ const PhoneRecording2 = () => {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1 style={{ marginBottom: "20px", color: "#333" }}>Phone Recording</h1>
+      <h1 style={{ marginBottom: "20px", color: "#333" }}>
+        Phone Call Recording
+      </h1>
       {renderView()}
       <style jsx global>{`
         .PhoneInput {
