@@ -11,7 +11,7 @@
     "@chatscope/chat-ui-kit-react": "^2.0.3",
     "@reduxjs/toolkit": "^2.6.1",
     "@sanity/block-content-to-react": "^3.0.0",
-    "@sanity/client": "^6.28.4",
+    "@sanity/client": "^6.29.0",
     "@sanity/image-url": "^1.1.0",
     "@stripe/stripe-js": "^7.0.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
