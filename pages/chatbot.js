@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  Message,
-  MessageInput,
-  TypingIndicator,
-} from "@chatscope/chat-ui-kit-react";
+// import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+// import {
+//   MainContainer,
+//   ChatContainer,
+//   MessageList,
+//   Message,
+//   MessageInput,
+//   TypingIndicator,
+// } from "@chatscope/chat-ui-kit-react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/router";
@@ -234,23 +234,9 @@ function ChatBot() {
   return (
     <div>
       <button onClick={() => router.push("/audioplayer")}>Go to ChatBot</button>
-      <div style={{ position: "relative", height: "800px", width: "1000px" }}>
-        <MainContainer>
-          <ChatContainer>
-            <MessageList
-              scrollBehavior="smooth"
-              typingIndicator={
-                typing ? <TypingIndicator content="ChatGPT is typing" /> : null
-              }
-            >
-              {messages.map((message, i) => {
-                return <Message key={i} model={message} />;
-              })}
-            </MessageList>
-            <MessageInput placeholder="Type Message Here" onSend={handleSend} />
-          </ChatContainer>
-        </MainContainer>
-      </div>
+      <div
+        style={{ position: "relative", height: "800px", width: "1000px" }}
+      ></div>
     </div>
   );
 }
