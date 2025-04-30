@@ -1,13 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-// import "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
-// import {
-//   MainContainer,
-//   ChatContainer,
-//   MessageList,
-//   Message,
-//   MessageInput,
-//   TypingIndicator,
-// } from "@chatscope/chat-ui-kit-react";
+import styles from "../styles/Chat.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/router";
@@ -23,12 +15,7 @@ function ChatBot() {
   const sound = useSelector((state) => state.recordingReducer.sound);
 
   const [typing, setTyping] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      message: "Hello, I'm ChatGPT",
-      sender: "ChatGPT",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const checkAuth = useCallback(
     async (user) => {
@@ -148,7 +135,7 @@ function ChatBot() {
       setMessages(
         chatHistory.map((msg) => ({
           message: msg.message,
-          sender: msg.sender,
+          sender: msg.sender === "User" ? "user" : "ChatGPT",
         }))
       );
     };
@@ -231,12 +218,89 @@ function ChatBot() {
     //return response.data.text;
   }
 
+  const messagesEndRef = useRef(null);
+  const [inputValue, setInputValue] = useState("");
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (inputValue.trim()) {
+        handleSend(inputValue);
+        setInputValue("");
+      }
+    }
+  };
+
+  const handleSubmit = () => {
+    if (inputValue.trim()) {
+      handleSend(inputValue);
+      setInputValue("");
+    }
+  };
+
   return (
-    <div>
-      <button onClick={() => router.push("/audioplayer")}>Go to ChatBot</button>
-      <div
-        style={{ position: "relative", height: "800px", width: "1000px" }}
-      ></div>
+    <div className={styles.container}>
+      <button
+        className={styles.backButton}
+        onClick={() => router.push("/audioplayer")}
+      >
+        Back to Audio Player
+      </button>
+      <div className={styles.chatContainer}>
+        <div className={styles.messageList}>
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`${styles.messageWrapper} ${
+                msg.sender === "user" ? styles.messageWrapperUser : ""
+              }`}
+            >
+              <div
+                className={`${styles.message} ${
+                  msg.sender === "user" ? styles.messageUser : styles.messageBot
+                }`}
+              >
+                {msg.message}
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        <div className={styles.inputContainer}>
+          <div className={styles.inputWrapper}>
+            <textarea
+              className={styles.input}
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              placeholder="Type your message..."
+              rows={1}
+            />
+            <button
+              className={styles.sendButton}
+              onClick={handleSubmit}
+              disabled={!inputValue.trim() || typing}
+            >
+              Send
+            </button>
+          </div>
+          {typing && (
+            <div className={styles.typingIndicator}>ChatGPT is typing...</div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
