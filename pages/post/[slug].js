@@ -1,23 +1,55 @@
-import imageUrlBuilder from "@sanity/image-url";
 import { useState, useEffect } from "react";
-import styles from "../../styles/Post.module.css";
+import Image from "next/image";
 import BlockContent from "@sanity/block-content-to-react";
-import Image from "next/image"; // src prop isn't recognized in Image component
-import Toolbar from "../../components/toolbar";
+import imageUrlBuilder from "@sanity/image-url";
+import { Toolbar } from "../../components/toolbar";
+import styles from "../../styles/Post.module.css";
 
-export const Post = ({ title, body, image }) => {
+const serializers = {
+  types: {
+    block: (props) => (
+      <div className={styles.blockContent}>{props.children}</div>
+    ),
+    image: (props) => (
+      <div className={styles.imageWrapper}>
+        <Image
+          src={imageUrlBuilder({
+            projectId: "u6uw5l6m",
+            dataset: "production",
+          })
+            .image(props.node)
+            .url()}
+          alt={props.node.alt || ""}
+          width={500}
+          height={300}
+          priority
+        />
+      </div>
+    ),
+  },
+};
+
+const Post = ({ title, body, image }) => {
   const [imageUrl, setImageUrl] = useState("");
+  console.log("Props received:", { title, body, image });
 
   useEffect(() => {
-    const imgBuilder = imageUrlBuilder({
-      projectId: "u6uw5l6m",
-      dataset: "production",
-    });
+    if (image) {
+      const imgBuilder = imageUrlBuilder({
+        projectId: "u6uw5l6m",
+        dataset: "production",
+      });
 
-    setImageUrl(imgBuilder.image(image).url());
+      try {
+        const url = imgBuilder.image(image).url();
+        console.log("Generated image URL:", url);
+        setImageUrl(url);
+      } catch (error) {
+        console.error("Error generating image URL:", error);
+      }
+    }
   }, [image]);
 
-  const url = image[0]?.url;
   return (
     <div>
       <Toolbar />
@@ -35,7 +67,7 @@ export const Post = ({ title, body, image }) => {
         )}
 
         <div className={styles.body}>
-          <BlockContent blocks={body} />
+          <BlockContent blocks={body} serializers={serializers} />
         </div>
       </div>
     </div>
@@ -52,24 +84,36 @@ export const getServerSideProps = async (pageContext) => {
   }
 
   const query = encodeURIComponent(
-    `*[ _type == "post" && slug.current == "${pageSlug}" ]`
+    `*[ _type == "post" && slug.current == "${pageSlug}" ]{
+      ...,
+      mainImage->
+    }`
   );
   const url = `https://u6uw5l6m.api.sanity.io/v1/data/query/production?query=${query}`;
 
-  const result = await fetch(url).then((res) => res.json());
-  const post = result.result[0];
+  try {
+    const result = await fetch(url).then((res) => res.json());
+    console.log("Sanity API Response:", result);
+    const post = result.result[0];
+    console.log("Post data:", post);
 
-  if (!post) {
-    return {
-      notFound: true,
-    };
-  } else {
+    if (!post) {
+      return {
+        notFound: true,
+      };
+    }
+
     return {
       props: {
-        title: post.title,
-        body: post.body,
-        image: post.mainImage,
+        title: post.title || "",
+        body: post.body || [],
+        image: post.mainImage || null,
       },
+    };
+  } catch (error) {
+    console.error("Error fetching from Sanity:", error);
+    return {
+      notFound: true,
     };
   }
 };
