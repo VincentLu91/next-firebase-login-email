@@ -57,7 +57,7 @@ function ChatBot() {
         console.log(uri.data.publicUrl);
         setSoundUrl(uri.data.publicUrl);
       } else {
-        router.push("/library");
+        router.push("/signin");
       }
     }
   }, [dispatch, sound, customer, supabase, router]);
