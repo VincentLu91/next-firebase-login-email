@@ -23,7 +23,7 @@
     "get-blob-duration": "^1.2.0",
     "moment": "^2.30.1",
     "next": "^15.3.1",
-    "nodemailer": "^7.0.0",
+    "nodemailer": "^7.0.2",
     "npm-check-updates": "^18.0.1",
     "pubnub": "^9.5.2",
     "raw-body": "^3.0.0",
@@ -39,7 +39,7 @@
     "stripe": "^18.1.0",
     "styled-jsx": "^5.1.7",
     "telnyx": "^2.0.0",
-    "twilio": "^5.5.2",
+    "twilio": "^5.6.0",
     "ws": "^8.18.2"
   },
   "overrides": {
