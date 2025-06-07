@@ -14,7 +14,7 @@
     "@stripe/stripe-js": "^7.3.1",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/auth-helpers-react": "^0.5.0",
-    "@supabase/supabase-js": "^2.49.10",
+    "@supabase/supabase-js": "^2.50.0",
     "axios": "^1.9.0",
     "cohere-ai": "^7.17.1",
     "cors": "^2.8.5",
