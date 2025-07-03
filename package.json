@@ -39,7 +39,7 @@
     "stripe": "^18.3.0",
     "styled-jsx": "^5.1.7",
     "telnyx": "^2.0.0",
-    "twilio": "^5.7.1",
+    "twilio": "^5.7.2",
     "ws": "^8.18.3"
   },
   "overrides": {
