@@ -5,9 +5,10 @@ import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../redux/user/actions";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
 
-const SignIn = () => {
+const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", content: "" });
   const router = useRouter();
@@ -15,14 +16,19 @@ const SignIn = () => {
   const supabase = useSupabaseClient();
   const session = useSession();
 
-  const handleSignin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setMessage({ type: "error", content: "Passwords do not match" });
+      return;
+    }
 
     setLoading(true);
     setMessage({});
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
@@ -30,12 +36,17 @@ const SignIn = () => {
       if (error) {
         setMessage({ type: "error", content: error.message });
       } else if (data?.user) {
+        setMessage({
+          type: "success",
+          content:
+            "Registration successful! Please check your email to confirm your account.",
+        });
         dispatch(setCurrentUser(data.user));
       }
     } catch (error) {
       setMessage({
         type: "error",
-        content: "An error occurred during sign in",
+        content: "An error occurred during sign up",
       });
     }
 
@@ -52,7 +63,7 @@ const SignIn = () => {
     return (
       <div className="w-80 flex flex-col justify-between p-3 max-w-lg m-auto my-64">
         <div className="flex justify-center pb-12">
-          <h1 className="text-3xl font-bold text-gray-700">Sign In</h1>
+          <h1 className="text-3xl font-bold text-gray-700">Sign Up</h1>
         </div>
         <div className="flex flex-col space-y-4">
           {message.content && (
@@ -69,7 +80,7 @@ const SignIn = () => {
             </div>
           )}
 
-          <form onSubmit={handleSignin} className="block w-full">
+          <form onSubmit={handleSignup} className="block w-full">
             <div className="mb-4">
               <input
                 type="email"
@@ -80,12 +91,22 @@ const SignIn = () => {
                 className="block w-full rounded-md px-4 py-2 border focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div className="mb-6">
+            <div className="mb-4">
               <input
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+                className="block w-full rounded-md px-4 py-2 border focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-6">
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 className="block w-full rounded-md px-4 py-2 border focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
@@ -97,30 +118,19 @@ const SignIn = () => {
               type="submit"
               disabled={loading}
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Signing up..." : "Sign up"}
             </button>
           </form>
 
           <div className="flex flex-col space-y-4 pt-2">
             <div className="text-center text-sm">
-              <span className="text-gray-600">Don&apos;t have an account?</span>
+              <span className="text-gray-600">Already have an account?</span>
               {` `}
               <Link
-                href="/signup"
+                href="/signin"
                 className="text-blue-600 font-bold hover:underline cursor-pointer"
               >
-                Sign up.
-              </Link>
-            </div>
-
-            <div className="text-center text-sm">
-              <span className="text-gray-600">Forgot your password?</span>
-              {` `}
-              <Link
-                href="/password-reset"
-                className="text-blue-600 font-bold hover:underline cursor-pointer"
-              >
-                Request a reset.
+                Sign in.
               </Link>
             </div>
           </div>
@@ -139,4 +149,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignUp;
