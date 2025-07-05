@@ -117,7 +117,7 @@ const SignIn = () => {
               <span className="text-gray-600">Forgot your password?</span>
               {` `}
               <Link
-                href="/password-reset"
+                href="/request-reset"
                 className="text-blue-600 font-bold hover:underline cursor-pointer"
               >
                 Request a reset.
