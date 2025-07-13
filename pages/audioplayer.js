@@ -189,7 +189,7 @@ function AudioPlayer() {
     if (micRenameInfo) {
       // do something
       console.log("micRenameInfo is: ", micRenameInfo);
-      dispatch(setDocID(micRenameInfo.data[0].id));
+      dispatch(setDocID(micRenameInfo?.data[0]?.id));
       dispatch(setTableName("mic_recordings"));
       router.push("/editrecordingfile");
       return;
