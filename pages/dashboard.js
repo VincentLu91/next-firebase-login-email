@@ -337,11 +337,11 @@ const Dashboard = () => {
           <p>No recordings found.</p>
           <p className="sub">Try another search, or start a new recording:</p>
           <div className="ctaRow">
-            <Link href="/internalrecording">
-              <a className="btn">Recording</a>
+            <Link href="/internalrecording" className="btn">
+              Recording
             </Link>
-            <Link href="/phonerecording2">
-              <a className="btn secondary">Phone Recording</a>
+            <Link href="/phonerecording2" className="btn secondary">
+              Phone Recording
             </Link>
           </div>
         </div>
