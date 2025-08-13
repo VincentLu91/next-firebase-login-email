@@ -3,6 +3,7 @@ import { useEffect, useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setSound } from "../redux/recording/actions";
 import { useRouter } from "next/router";
+import Link from "next/link";
 //import { printTranscription } from "../../../redux/language/actions";
 import libraryStyles from "../styles/libraryStyles";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
@@ -336,12 +337,12 @@ const Dashboard = () => {
           <p>No recordings found.</p>
           <p className="sub">Try another search, or start a new recording:</p>
           <div className="ctaRow">
-            <a href="/internalrecording" className="btn">
-              Recording
-            </a>
-            <a href="/phonerecording2" className="btn secondary">
-              Phone Recording
-            </a>
+            <Link href="/internalrecording">
+              <a className="btn">Recording</a>
+            </Link>
+            <Link href="/phonerecording2">
+              <a className="btn secondary">Phone Recording</a>
+            </Link>
           </div>
         </div>
       ) : (
