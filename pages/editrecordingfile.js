@@ -1,20 +1,364 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import Select from "react-select";
+import axios from "axios";
+import getBlobDuration from "get-blob-duration";
+import styled, { keyframes, css } from "styled-components";
 import Slider from "../components/slider/Slider";
 import ControlPanel from "../components/controls/ControlPanel";
-import { useDispatch, useSelector } from "react-redux";
-import getBlobDuration from "get-blob-duration";
-// import trainML's config code
+import { setSound } from "../redux/recording/actions";
 import summarize_config from "../pages/api/summarize_config";
 import translate_config from "../pages/api/translate_config";
-import axios from "axios";
-import { useRouter } from "next/router";
-import Select from "react-select";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { setSound } from "../redux/recording/actions";
 
-import audioPlayerStyles from "../styles/audioPlayerStyles";
+// Animations
+const fadeUp = keyframes`
+  from { 
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
-function EditRecordingFile() {
+const spin = keyframes`
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+`;
+
+// Styled Components
+const PageContainer = styled.div`
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  background: #f8fafc;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color: #111827;
+  line-height: 1.45;
+  font-size: 0.875rem;
+`;
+
+const TopBar = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+`;
+
+const Title = styled.h1`
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+`;
+
+const Notice = styled.h2`
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+`;
+
+const BackButton = styled.button`
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #111827;
+  min-height: 40px;
+  cursor: pointer;
+  transition: all 180ms ease-out;
+
+  &:hover {
+    background: #f9fafb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22);
+  }
+`;
+
+const MainGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 24px;
+  margin-top: 12px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+`;
+
+const Card = styled.div`
+  background: #ffffff;
+  border: 1px solid #eef0f2;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  ${(props) => css`
+    animation: ${fadeUp} 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: ${props.delay || "0ms"};
+  `}
+  opacity: 0;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+`;
+
+const AudioPlayerCard = styled(Card)`
+  .progress-track {
+    height: 6px;
+    border-radius: 9999px;
+    background: #e5e7eb;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .progress-fill {
+    position: absolute;
+    height: 100%;
+    background: #2563eb;
+    border-radius: 9999px;
+  }
+
+  .progress-thumb {
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border: 2px solid #2563eb;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+    transition: transform 120ms ease-out;
+
+    &:hover {
+      transform: translate(-50%, -50%) scale(1.04);
+    }
+
+    &:active {
+      transform: translate(-50%, -50%) scale(1.1);
+      box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.15);
+    }
+  }
+`;
+
+const TimeLabel = styled.span`
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7280;
+`;
+
+const PlayButton = styled.button`
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #111827;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 180ms ease-out;
+
+  &:hover {
+    background: #0b1220;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+`;
+
+const EditorPanel = styled(Card)`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 24px;
+  gap: 16px;
+`;
+
+const Label = styled.label`
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  color: #6b7280;
+`;
+
+const TextArea = styled.textarea`
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #ffffff;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  transition: all 140ms ease;
+  font-size: 0.875rem;
+  caret-color: #2563eb;
+  resize: vertical;
+  line-height: 1.5;
+
+  &::selection {
+    background: rgba(37, 99, 235, 0.18);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  }
+
+  ${(props) =>
+    props.isFileName &&
+    `
+    min-height: 60px;
+    height: 60px;
+    font-weight: 600;
+    resize: none;
+    padding: 16px;
+  `}
+
+  ${(props) =>
+    props.isTranscript &&
+    `
+    min-height: 360px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    padding: 16px;
+  `}
+`;
+
+const ActionRow = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+
+  @media (max-width: 960px) {
+    gap: 8px;
+    flex-direction: column;
+  }
+`;
+
+const PrimaryButton = styled.button`
+  background: #2563eb;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 600;
+  border: 0;
+  min-height: 40px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  transition: all 180ms ease-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.32);
+  }
+
+  ${(props) =>
+    props.isLoading &&
+    css`
+      position: relative;
+      color: transparent;
+
+      &::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 2px solid rgba(255, 255, 255, 0.6);
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        ${css`
+          animation: ${spin} 0.7s linear infinite;
+        `}
+      }
+    `}
+`;
+
+// directly under: const PrimaryButton = styled.button`...`
+const RenameButton = styled(PrimaryButton)`
+  width: auto; /* stop filling the card */
+  min-width: 132px; /* keeps a nice touch target */
+  padding: 8px 12px; /* smaller visual size */
+  font-size: 0.875rem; /* tighten type */
+  border-radius: 10px;
+  align-self: flex-start; /* respects its own width inside flex rows */
+`;
+
+const StyledSelect = styled(Select)`
+  .Select__control {
+    border-radius: 12px;
+    border-color: #e5e7eb;
+    min-height: 40px;
+    box-shadow: none;
+
+    &:hover {
+      border-color: #2563eb;
+    }
+
+    &--is-focused {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    }
+  }
+
+  .Select__menu {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .Select__option {
+    padding: 10px 14px;
+    cursor: pointer;
+
+    &--is-focused {
+      background: #f9fafb;
+    }
+
+    &--is-selected {
+      background: #2563eb;
+    }
+  }
+`;
+
+export default function EditRecordingFile() {
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useUser();
@@ -27,14 +371,33 @@ function EditRecordingFile() {
   const [isAudioSelected, setIsAudioSelected] = useState(false);
   const [durationSeconds, setDurationSeconds] = useState(0);
   const [customer, setCustomer] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
-  const [editName, setEditName] = useState(sound?.file_name);
-  const [editTranscript, setEditTranscript] = useState(sound?.full_transcript);
+  const [editName, setEditName] = useState("");
+  const [editTranscript, setEditTranscript] = useState("");
+
   const docID = useSelector((state) => state.recordingReducer.docID);
   const tableName = useSelector((state) => state.recordingReducer.tableName);
+
+  useEffect(() => {
+    // Debug log the IDs we're getting
+    console.log("EditRecordingFile mounted with:", {
+      docID,
+      soundId: sound?.id,
+      fileName: sound?.file_name,
+      originalFileName: sound?.original_file_name,
+    });
+
+    if (sound) {
+      setEditName(sound.file_name || "");
+      setEditTranscript(sound.full_transcript || "");
+    }
+  }, [sound, docID]);
+
+  const audioRef = useRef();
 
   const checkAuth = useCallback(
     async (user) => {
@@ -44,19 +407,13 @@ function EditRecordingFile() {
           .from("customers")
           .select("*")
           .eq("email_address", user.email);
-        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
+        console.log("customerInfo is: ", customerInfo.data[0]);
         setCustomer(customerInfo.data[0]);
         let subscriptionResponse = await supabase
           .from("subscriptions")
           .select()
           .eq("customer_id", customerInfo.data[0].id);
-        // the below could be commented out for now, because users who cancel plan should still access recordings
-        /*console.log(
-          "subscriptionResponse is: ",
-          subscriptionResponse.data[0].stripe_product_name
-        );*/
       } else {
-        // User is signed out
         console.log(
           "The user is inauthenticated, redirecting back to signin page"
         );
@@ -74,28 +431,23 @@ function EditRecordingFile() {
     if (sound == null || transcript == null) {
       setSummary("Transcript is empty!");
       return;
-    } else {
-      //alert(typeof JSON.stringify(response.data['choices'][0]['text'].trim));
-      const rawSummary = await axios.post(
-        "/api/cohere_llm?prompt=" +
-          "generate a summary for the following transcript: " +
-          transcript
-      );
-      console.log(rawSummary.data.text);
-      setSummary(rawSummary.data.text.trim());
     }
+    const rawSummary = await axios.post(
+      "/api/cohere_llm?prompt=" +
+        "generate a summary for the following transcript: " +
+        transcript
+    );
+    console.log(rawSummary.data.text);
+    setSummary(rawSummary.data.text.trim());
   };
 
   const getTranslation = async (lang) => {
     try {
       const resp = await axios.post(
         `${translate_config.api_address}${translate_config.route_path}`,
-        {
-          lang,
-        }
+        { lang }
       );
       const translated_text = resp.data["translated_text"];
-      //console.log("Translated text is: ", translated_text);
       setTranslation(translated_text);
     } catch (error) {
       if (error.response) {
@@ -114,22 +466,17 @@ function EditRecordingFile() {
   }
 
   useEffect(() => {
-    console.log("authUser is: ", customer); // uid
-    if (customer) {
-      if (sound) {
-        const uri = supabase.storage
-          .from("recreate-ai-storage-bucket")
-          .getPublicUrl(sound.original_file_name);
-        console.log("uri is: ", uri.data.publicUrl);
-        setAudioURL(uri.data.publicUrl);
-        setIsAudioSelected(true);
-      } else {
-        setIsAudioSelected(false);
-      }
+    if (customer && sound) {
+      const uri = supabase.storage
+        .from("recreate-ai-storage-bucket")
+        .getPublicUrl(sound.original_file_name);
+      console.log("uri is: ", uri.data.publicUrl);
+      setAudioURL(uri.data.publicUrl);
+      setIsAudioSelected(true);
+    } else {
+      setIsAudioSelected(false);
     }
   }, [dispatch, sound, customer, supabase]);
-
-  const audioRef = useRef();
 
   const onChange = (e) => {
     const sliderVal = e.target.value;
@@ -159,10 +506,8 @@ function EditRecordingFile() {
       100
     ).toFixed(2);
     const time = e.currentTarget.currentTime;
-
     setPercentage(+percent);
     setCurrentTime(time.toFixed(2));
-    console.log("currentTime is: ", time);
   };
 
   const languages = [
@@ -170,7 +515,6 @@ function EditRecordingFile() {
     { value: "german", label: "German" },
   ];
 
-  // handle onChange event of the dropdown
   const handleChange = (e) => {
     setLanguage(e.label);
     console.log("Language selected: ", e.value);
@@ -178,145 +522,273 @@ function EditRecordingFile() {
 
   const handleEditName = (e) => {
     setEditName(e.target.value);
-    console.log("editName: ", e.target.value);
   };
 
   const handleEditTranscript = (e) => {
     setEditTranscript(e.target.value);
-    console.log("editName: ", e.target.value);
   };
 
-  const onSubmitRenameName = async (editName) => {
-    const fileNameRef = await supabase
-      .from(tableName)
-      .update({ file_name: editName })
-      .eq("id", docID)
-      .select();
-    alert("You just edited filename");
+  // --- helpers (put above onSubmit* functions) ---
+  const getRecordingId = () => {
+    const n = Number(docID ?? sound?.id);
+    return Number.isFinite(n) ? n : null;
   };
 
-  const onSubmitRenameTranscript = async (editTranscript) => {
-    const transcriptRef = await supabase
-      .from(tableName)
-      .update({ full_transcript: editTranscript })
-      .eq("id", docID)
-      .select();
-    alert("You just edited transcript");
+  const getCustomerId = async () => {
+    // If you already have customerInfo in this file, use it:
+    if (Number.isFinite(Number(customer?.id))) return Number(customer.id);
+
+    // Fallback: look up the customer row by the current auth user
+    const { data: auth } = await supabase.auth.getUser();
+    const authId = auth?.user?.id; // uuid
+    if (!authId) return null;
+
+    // Adjust column/table names if yours differ
+    const { data, error } = await supabase
+      .from("customers")
+      .select("id")
+      .eq("auth_user_id", authId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return Number.isFinite(Number(data?.id)) ? Number(data.id) : null;
+  };
+
+  const getUserId = async () => {
+    const { data } = await supabase.auth.getUser();
+    return data?.user?.id ?? null;
+  };
+
+  const resolveRecordingId = () => {
+    // Check both docID from Redux and sound.id, prioritizing docID
+    const id = docID || sound?.id;
+    if (!id) return null;
+
+    console.log("[resolveRecordingId] Using ID:", {
+      docID,
+      soundId: sound?.id,
+      finalId: id,
+    });
+
+    // Ensure it's a valid number
+    const s = String(id).trim();
+    return /^\d+$/.test(s) ? s : null;
+  };
+
+  const onSubmitRenameName = async (newName) => {
+    if (isLoading) return;
+
+    const idStr = resolveRecordingId();
+    const nameTrimmed = (newName ?? "").trim();
+
+    if (!idStr) {
+      console.error("[rename] invalid id", { docID, soundId: sound?.id });
+      alert(
+        `Invalid recording id for mic_recordings. (sound.id was: ${
+          sound?.id ?? "null"
+        })`
+      );
+      return;
+    }
+    if (!nameTrimmed) {
+      alert("File name cannot be empty");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      console.log("[rename] updating", {
+        tableName,
+        id: idStr,
+        file_name: nameTrimmed,
+        docID,
+        soundId: sound?.id,
+      });
+
+      const { data, error } = await supabase
+        .from(tableName) // should be "mic_recordings"
+        .update({ file_name: nameTrimmed })
+        .eq("id", idStr)
+        .select("id,file_name"); // returns [] if 0 rows matched
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        alert(`No row found to update (table: ${tableName}, id: ${idStr}).`);
+        return;
+      }
+
+      const row = data[0];
+      dispatch(setSound({ ...sound, file_name: row.file_name }));
+      setEditName(row.file_name);
+    } catch (err) {
+      console.error("Error renaming:", err);
+      alert(err.message || "Rename failed.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmitRenameTranscript = async (newTranscript) => {
+    if (isLoading) return;
+
+    const idStr = resolveRecordingId();
+    if (!idStr) {
+      console.error("[transcript] invalid id", { docID, soundId: sound?.id });
+      alert(
+        `Invalid recording id for mic_recordings. (sound.id was: ${
+          sound?.id ?? "null"
+        })`
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      console.log("[transcript] updating", { tableName, id: idStr });
+
+      const { data, error } = await supabase
+        .from(tableName)
+        .update({ full_transcript: newTranscript })
+        .eq("id", idStr)
+        .select("id,full_transcript");
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        alert(`No row found to update (table: ${tableName}, id: ${idStr}).`);
+        return;
+      }
+
+      const row = data[0];
+      dispatch(setSound({ ...sound, full_transcript: row.full_transcript }));
+      setEditTranscript(row.full_transcript);
+    } catch (err) {
+      console.error("Transcript update failed:", err);
+      alert(err.message || "Transcript save failed.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div>
-      <h2>For best results, play the recording on Chrome</h2>
-      <button onClick={() => router.push("/dashboard")}>
-        Back to Dashboard
-      </button>
-      <div className="audioplayer-body">
-        <div className="audioplayer-container">
-          <h1 className="h1-center-bold">Audio Player</h1>
-          <Slider percentage={percentage} onChange={onChange} />
-          <audio
-            ref={audioRef}
-            onTimeUpdate={getCurrDuration}
-            onLoadedData={(e) => {
-              urlToDuration(audioURL);
-              console.log("e.currentTarget is: ", e.currentTarget);
-            }}
-            src={audioURL}
-          ></audio>
-          <ControlPanel
-            play={play}
-            isPlaying={isPlaying}
-            duration={durationSeconds} // this is the duration of the audio file in seconds
-            currentTime={currentTime}
-          />
+    <PageContainer>
+      <TopBar>
+        <div>
+          <Title>Edit Recording</Title>
+          <Notice>For best results, play the recording on Chrome</Notice>
         </div>
-      </div>
-      {isAudioSelected ? (
-        <>
-          <textarea
-            type="text"
-            id="editName"
-            name="editName"
-            onChange={handleEditName}
-            value={editName}
-            cols="80"
-            rows="15"
-            placeholder="Edit the filename..."
-            className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-          />
-          <button onClick={() => onSubmitRenameName(editName)}>Rename</button>
-          <textarea
-            type="text"
-            id="editTranscript"
-            name="editTranscript"
-            onChange={handleEditTranscript}
-            value={editTranscript}
-            cols="80"
-            rows="15"
-            placeholder="Edit the transcript"
-            className="border-2 border-gray-300 rounded-md placeholder:pl-0.5"
-          />
-          <button onClick={() => onSubmitRenameTranscript(editTranscript)}>
-            Edit Transcript
-          </button>
-        </>
-      ) : (
-        <>
-          <h1 className="h1-center-bold">no audio selected</h1>
-        </>
-      )}
-      <h1 className="h1-center-bold">
-        outside of audio player: select translation and summary
-      </h1>
-      <Select
-        placeholder="Select Option"
-        value={languages.find((obj) => obj.value === language)} // set selected value
-        options={languages} // set list of the data
-        onChange={handleChange} // assign onChange function
-      />
+        <BackButton onClick={() => router.push("/dashboard")}>
+          Back to Dashboard
+        </BackButton>
+      </TopBar>
 
-      {sound && (
-        <div style={{ marginTop: 20, lineHeight: "25px" }}>
-          <div>
-            <button
-              onClick={() => {
-                console.log("placeholder getSummary()");
-                getSummary(sound.full_transcript);
+      <MainGrid>
+        <AudioPlayerCard delay="0ms">
+          <div className="audioplayer-container">
+            <Slider percentage={percentage} onChange={onChange} />
+            <audio
+              ref={audioRef}
+              onTimeUpdate={getCurrDuration}
+              onLoadedData={(e) => {
+                urlToDuration(audioURL);
               }}
-            >
-              Summary
-            </button>
-            <h2>Summary is: {summary}</h2>
-            <button onClick={() => router.push("/chatbot")}>
-              Go to ChatBot
-            </button>
+              src={audioURL}
+            />
+            <ControlPanel
+              play={play}
+              isPlaying={isPlaying}
+              duration={durationSeconds}
+              currentTime={currentTime}
+              audioRef={audioRef}
+            />
           </div>
-        </div>
-      )}
+        </AudioPlayerCard>
 
-      {language && (
-        <div style={{ marginTop: 20, lineHeight: "25px" }}>
-          <div>
-            <b>Selected Value: </b> {language}
-          </div>
-          <div>
-            <button
-              onClick={
-                () =>
-                  console.log(
-                    "placeholder getTranslation()"
-                  ) /*getTranslation(language)*/
-              }
-            >
-              Translate
-            </button>
-            <h2>Translation is: {translation}</h2>
-          </div>
-        </div>
-      )}
-      <style jsx>{audioPlayerStyles}</style>
-    </div>
+        {isAudioSelected ? (
+          <>
+            <EditorPanel delay="60ms">
+              <Label htmlFor="editName">File Name</Label>
+              <TextArea
+                id="editName"
+                name="editName"
+                onChange={handleEditName}
+                value={editName}
+                isFileName
+                placeholder="Edit the filename..."
+              />
+              <ActionRow>
+                <RenameButton
+                  onClick={() => onSubmitRenameName(editName)}
+                  isLoading={isLoading}
+                  disabled={isLoading || !editName?.trim()}
+                  aria-busy={isLoading}
+                >
+                  Rename
+                </RenameButton>
+              </ActionRow>
+            </EditorPanel>
+
+            <EditorPanel delay="120ms">
+              <Label htmlFor="editTranscript">Transcript</Label>
+              <TextArea
+                id="editTranscript"
+                name="editTranscript"
+                onChange={handleEditTranscript}
+                value={editTranscript}
+                isTranscript
+                placeholder="Edit the transcript"
+              />
+              <ActionRow>
+                <PrimaryButton
+                  onClick={() => onSubmitRenameTranscript(editTranscript)}
+                  isLoading={isLoading}
+                >
+                  Edit Transcript
+                </PrimaryButton>
+              </ActionRow>
+            </EditorPanel>
+
+            <EditorPanel delay="180ms">
+              <Label>Translation</Label>
+              <StyledSelect
+                placeholder="Select Language"
+                value={languages.find((obj) => obj.value === language)}
+                options={languages}
+                onChange={handleChange}
+              />
+              {language && (
+                <div style={{ marginTop: 20 }}>
+                  <div>Selected: {language}</div>
+                  <ActionRow>
+                    <PrimaryButton onClick={() => getTranslation(language)}>
+                      Translate
+                    </PrimaryButton>
+                  </ActionRow>
+                  {translation && <p>{translation}</p>}
+                </div>
+              )}
+            </EditorPanel>
+
+            <EditorPanel delay="240ms">
+              <Label>Summary</Label>
+              <ActionRow>
+                <PrimaryButton
+                  onClick={() => getSummary(sound.full_transcript)}
+                >
+                  Generate Summary
+                </PrimaryButton>
+                <PrimaryButton onClick={() => router.push("/chatbot")}>
+                  Go to ChatBot
+                </PrimaryButton>
+              </ActionRow>
+              {summary && <p style={{ marginTop: 12 }}>{summary}</p>}
+            </EditorPanel>
+          </>
+        ) : (
+          <Card>
+            <Title>No Audio Selected</Title>
+          </Card>
+        )}
+      </MainGrid>
+    </PageContainer>
   );
 }
-
-export default EditRecordingFile;
