@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import Slider from "../components/slider/Slider";
 import ControlPanel from "../components/controls/ControlPanel";
 import { useDispatch, useSelector } from "react-redux";
-import getBlobDuration from "get-blob-duration";
 // import trainML's config code
 import summarize_config from "../pages/api/summarize_config";
 import translate_config from "../pages/api/translate_config";
@@ -14,7 +13,39 @@ import { setSound, setDocID, setTableName } from "../redux/recording/actions";
 
 import audioPlayerStyles from "../styles/audioPlayerStyles";
 
+// Fast WAV duration from header (~4KB), no full decode
+async function getWavDurationFromHeader(url) {
+  try {
+    const res = await fetch(url, { headers: { Range: "bytes=0-4095" } });
+    if (!res.ok) return NaN;
+    const buf = await res.arrayBuffer();
+    const dv = new DataView(buf);
+    const str = (o, n) => String.fromCharCode(...new Uint8Array(buf, o, n));
+
+    let off = 12; // skip "RIFF....WAVE"
+    let byteRate = 0;
+    let dataSize = 0;
+
+    while (off + 8 <= dv.byteLength) {
+      const id = str(off, 4);
+      const size = dv.getUint32(off + 4, true);
+      off += 8;
+
+      if (id === "fmt ") {
+        if (off + 12 <= dv.byteLength) byteRate = dv.getUint32(off + 8, true);
+      } else if (id === "data") {
+        dataSize = size;
+        break;
+      }
+      off += size;
+    }
+    if (byteRate > 0 && dataSize > 0) return dataSize / byteRate;
+  } catch {}
+  return NaN;
+}
+
 function AudioPlayer() {
+  const audioRef = useRef();
   const router = useRouter();
   const dispatch = useDispatch();
   const user = useUser();
@@ -31,6 +62,32 @@ function AudioPlayer() {
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
+
+  const [fallbackDur, setFallbackDur] = useState(null);
+
+  // If URL is a WAV, compute a fallback duration once
+  useEffect(() => {
+    if (!audioURL) return;
+    const isWav = /\.wav($|\?|#)/i.test(audioURL);
+    if (!isWav) return;
+    let cancelled = false;
+    getWavDurationFromHeader(audioURL).then((d) => {
+      if (!cancelled && Number.isFinite(d) && d > 0) setFallbackDur(d);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [audioURL]);
+
+  // Use the best available duration
+  const effectiveDuration = useMemo(() => {
+    const el = audioRef.current;
+    const elDur = Number.isFinite(el?.duration) ? el.duration : 0;
+    if (elDur > 0) return elDur;
+    if (durationSeconds > 0) return durationSeconds;
+    if (Number.isFinite(fallbackDur) && fallbackDur > 0) return fallbackDur;
+    return 0;
+  }, [audioRef, durationSeconds, fallbackDur]);
 
   const checkAuth = useCallback(
     async (user) => {
@@ -103,12 +160,6 @@ function AudioPlayer() {
     }
   };
 
-  async function urlToDuration(audioURL) {
-    const durationSeconds = await getBlobDuration(audioURL);
-    console.log("durationSeconds is: ", durationSeconds);
-    setDurationSeconds(durationSeconds);
-  }
-
   useEffect(() => {
     console.log("authUser is: ", customer); // uid
     if (customer) {
@@ -125,13 +176,34 @@ function AudioPlayer() {
     }
   }, [dispatch, sound, customer, supabase]);
 
-  const audioRef = useRef();
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    // Force a reload so metadata re-fires after error overlays / fast refresh
+    try {
+      audio.load();
+    } catch (e) {}
+  }, [audioURL]);
 
   const onChange = (e) => {
-    const sliderVal = e.target.value;
-    audioRef.current.currentTime =
-      (durationSeconds / 100) * parseFloat(sliderVal).toFixed(2);
+    const sliderVal = Number(e.target.value); // 0..100
+    const audio = audioRef.current;
+    const d = effectiveDuration;
+
+    // Always let the UI move
     setPercentage(sliderVal);
+
+    // Seek when we know a duration; otherwise just reflect a best-guess time
+    if (audio && d > 0) {
+      const target = (sliderVal / 100) * d;
+      try {
+        audio.currentTime = target;
+      } catch {}
+      setCurrentTime(audio.currentTime || target || 0);
+    } else {
+      const guess = (sliderVal / 100) * (fallbackDur || 0);
+      setCurrentTime(Number.isFinite(guess) ? guess : 0);
+    }
   };
 
   const play = () => {
@@ -150,15 +222,16 @@ function AudioPlayer() {
   };
 
   const getCurrDuration = (e) => {
-    const percent = (
-      (e.currentTarget.currentTime / durationSeconds) *
-      100
-    ).toFixed(2);
-    const time = e.currentTarget.currentTime;
+    const el = e.currentTarget;
+    const d =
+      (Number.isFinite(el.duration) && el.duration) || durationSeconds || 0;
+    const t = el.currentTime || 0;
 
-    setPercentage(+percent);
-    setCurrentTime(time.toFixed(2));
-    console.log("currentTime is: ", time);
+    if (d > 0) {
+      const percent = (t / d) * 100;
+      setPercentage(Number(percent.toFixed(2)));
+    }
+    setCurrentTime(Number(t.toFixed(2)));
   };
 
   const languages = [
@@ -176,27 +249,31 @@ function AudioPlayer() {
     //dispatch(printTranscription(transcription));
     //console.log("Transcription from Library is: ", transcription);
     dispatch(setSound(sound));
+    // Query by original_file_name which should be unique
     let micRenameInfo = await supabase
       .from("mic_recordings")
       .select("*")
-      .eq("file_name", sound.file_name)
-      .eq("original_file_name", sound.original_file_name);
+      .eq("original_file_name", sound.original_file_name)
+      .single();
+
     let callRenameInfo = await supabase
       .from("call_recordings")
       .select("*")
-      .eq("file_name", sound.file_name)
-      .eq("original_file_name", sound.original_file_name);
-    if (micRenameInfo) {
-      // do something
-      console.log("micRenameInfo is: ", micRenameInfo);
-      dispatch(setDocID(micRenameInfo?.data[0]?.id));
+      .eq("original_file_name", sound.original_file_name)
+      .single();
+    console.log("Query results:", { micRenameInfo, callRenameInfo });
+
+    if (micRenameInfo?.data) {
+      console.log("Found mic recording:", micRenameInfo.data);
+      dispatch(setDocID(micRenameInfo.data.id));
       dispatch(setTableName("mic_recordings"));
       router.push("/editrecordingfile");
       return;
-    } else if (callRenameInfo) {
-      // do something
-      console.log("callRenameInfo is: ", callRenameInfo);
-      dispatch(setDocID(callRenameInfo.data[0].id));
+    }
+
+    if (callRenameInfo?.data) {
+      console.log("Found call recording:", callRenameInfo.data);
+      dispatch(setDocID(callRenameInfo.data.id));
       dispatch(setTableName("call_recordings"));
       router.push("/editrecordingfile");
       return;
@@ -212,22 +289,49 @@ function AudioPlayer() {
       </button>
       <div className="audioplayer-body">
         <div className="audioplayer-container">
-          <h1 className="h1-center-bold">Audio Player</h1>
           <Slider percentage={percentage} onChange={onChange} />
-          <audio
-            ref={audioRef}
-            onTimeUpdate={getCurrDuration}
-            onLoadedData={(e) => {
-              urlToDuration(audioURL);
-              console.log("e.currentTarget is: ", e.currentTarget);
-            }}
-            src={audioURL}
-          ></audio>
+          {(() => {
+            const isWav = audioURL && /\.wav($|\?|#)/i.test(audioURL);
+            // Safari nudge (harmless elsewhere)
+            const fixedSrc =
+              audioURL && isWav && !audioURL.includes("#t=")
+                ? `${audioURL}#t=0.001`
+                : audioURL;
+
+            return (
+              <audio
+                key={fixedSrc || "no-audio"} // keep your remount behavior
+                ref={audioRef}
+                preload="auto" // ensure metadata actually loads
+                crossOrigin="anonymous" // avoid CORS blocking duration/time
+                onTimeUpdate={getCurrDuration}
+                onLoadedMetadata={(e) => {
+                  const d = e.currentTarget.duration;
+                  setDurationSeconds(Number.isFinite(d) ? d : 0);
+                  setCurrentTime(0);
+                  setPercentage(0);
+                }}
+                onDurationChange={(e) => {
+                  const d = e.currentTarget.duration;
+                  if (Number.isFinite(d) && d > 0) setDurationSeconds(d);
+                }}
+                onEnded={() => setIsPlaying(false)}
+                onError={() => {
+                  if (Number.isFinite(fallbackDur) && fallbackDur > 0) {
+                    setDurationSeconds((d) => (d > 0 ? d : fallbackDur));
+                  }
+                }}
+                src={fixedSrc}
+              />
+            );
+          })()}
+
           <ControlPanel
             play={play}
             isPlaying={isPlaying}
-            duration={durationSeconds} // this is the duration of the audio file in seconds
+            duration={effectiveDuration}
             currentTime={currentTime}
+            audioRef={audioRef}
           />
         </div>
       </div>

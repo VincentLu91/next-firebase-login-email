@@ -8,11 +8,171 @@ import moment from "moment";
 import getBlobDuration from "get-blob-duration";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc"; // only run on the browser
 import { useRouter } from "next/router";
-import signInStyles from "../styles/signinStyles";
 import { useUser } from "@supabase/auth-helpers-react";
 import fileToArrayBuffer from "file2arraybuffer";
 import axios from "axios";
 import { supabase } from "../utils/initSupabase";
+import { storeAsMp3 } from "../utils/storeAsMp3";
+
+const recordingStyles = `
+:root {
+--bg: #0b0d12;
+--panel: #11151d;
+--muted: #a0a8b8;
+--text: #e6e8ef;
+--primary: #2563eb;
+--primary-600: #1d4ed8;
+--danger: #ef4444;
+--danger-600: #dc2626;
+--ring: rgba(37, 99, 235, 0.45);
+--shadow: 0 10px 20px rgba(0,0,0,0.25);
+--radius: 14px;
+--radius-sm: 10px;
+--gap: 20px;
+}
+
+/* Page shell */
+.rec-wrap {
+display: flex;
+flex-direction: column;
+gap: var(--gap);
+align-items: center;
+justify-content: flex-start;
+min-height: 70vh;
+padding: 40px 20px 80px;
+background: var(--bg);
+color: var(--text);
+}
+
+.headline {
+font-size: 18px;
+font-weight: 600;
+letter-spacing: .2px;
+opacity: .9;
+text-align: center;
+}
+
+.backbar {
+display: flex;
+justify-content: center;
+}
+
+/* Ghost button for back */
+.btn-ghost {
+appearance: none;
+border: 1px solid rgba(255,255,255,.1);
+background: transparent;
+color: var(--text);
+padding: 10px 14px;
+border-radius: var(--radius-sm);
+font-weight: 500;
+cursor: pointer;
+transition: transform .14s ease, background .2s ease, border-color .2s ease;
+}
+.btn-ghost:hover { background: rgba(255,255,255,.06); transform: translateY(-1px); }
+.btn-ghost:focus-visible { outline: 0; box-shadow: 0 0 0 4px var(--ring); }
+.btn-ghost:active { transform: translateY(0); }
+
+/* Card */
+.rec-card {
+width: 100%;
+max-width: 860px;
+background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)) , var(--panel);
+border: 1px solid rgba(255,255,255,.08);
+border-radius: var(--radius);
+padding: 28px;
+box-shadow: var(--shadow);
+}
+
+.rec-row {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: var(--gap);
+flex-wrap: wrap;
+}
+
+.meta {
+display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+
+.chip, .status {
+display: inline-flex; align-items: center; gap: 8px;
+padding: 8px 12px;
+border-radius: 999px;
+font-size: 12px;
+letter-spacing: .2px;
+border: 1px solid rgba(255,255,255,.1);
+background: rgba(255,255,255,.04);
+color: var(--muted);
+}
+
+.status.recording .dot {
+width: 10px; height: 10px; border-radius: 50%;
+background: var(--danger);
+box-shadow: 0 0 0 0 rgba(239,68,68,.7);
+animation: pulse 1.2s ease-in-out infinite;
+}
+.status.idle .dot {
+width: 10px; height: 10px; border-radius: 50%;
+background: rgba(255,255,255,.25);
+}
+@keyframes pulse {
+0% { box-shadow: 0 0 0 0 rgba(239,68,68,.7); transform: scale(1); }
+70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); transform: scale(1.05); }
+100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); transform: scale(1); }
+}
+
+/* Buttons */
+.btn {
+appearance: none;
+border: none;
+border-radius: 12px;
+padding: 12px 18px;
+font-weight: 600;
+letter-spacing: .2px;
+cursor: pointer;
+transition: transform .16s ease, box-shadow .2s ease, background .2s ease, opacity .2s ease;
+box-shadow: 0 6px 14px rgba(0,0,0,.25);
+color: #fff;
+}
+.btn:focus-visible { outline: 0; box-shadow: 0 0 0 4px var(--ring), 0 6px 14px rgba(0,0,0,.25); }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary { background: var(--primary); }
+.btn-primary:hover { background: var(--primary-600); }
+
+.btn-danger { background: var(--danger); }
+.btn-danger:hover { background: var(--danger-600); }
+
+/* Transcript panel */
+.transcript {
+margin-top: 18px;
+padding: 18px;
+background: rgba(255,255,255,.03);
+border: 1px solid rgba(255,255,255,.08);
+border-radius: var(--radius-sm);
+max-height: 42vh;
+overflow: auto;
+line-height: 1.6;
+font-size: 18px;
+scrollbar-width: thin;
+}
+
+/* Inputs (rename, etc.) */
+.field {
+display: flex; gap: 10px; align-items: center; margin-top: 14px;
+}
+.field input {
+width: 260px; max-width: 100%;
+background: rgba(255,255,255,.06);
+color: var(--text);
+border: 1px solid rgba(255,255,255,.12);
+padding: 10px 12px; border-radius: 10px;
+}
+.field input::placeholder { color: #9aa3b2; }
+`;
 
 const Recording = () => {
   const router = useRouter();
@@ -21,19 +181,16 @@ const Recording = () => {
 
   const storeDifferenceInSupabase = async (difference) => {
     try {
-      // Fetch customer information based on the user's email
       let { data: customerInfo, error: fetchError } = await supabase
         .from("customers")
-        .select("id") // Only select the 'id' field
+        .select("id")
         .eq("email_address", user.email)
-        .single(); // Use .single() if you expect only one result (ensures you get a single object instead of an array)
+        .single();
 
-      // Handle any errors during the fetch
       if (fetchError) {
         throw new Error(`Error fetching customer info: ${fetchError.message}`);
       }
 
-      // If customer info was found, update the mic_tokens field
       const { error: updateError } = await supabase
         .from("customers")
         .update({ mic_tokens: difference })
@@ -53,7 +210,7 @@ const Recording = () => {
     useReactMediaRecorder({
       audio: true,
       onStart: () => {
-        setElapsedTime(0); // Reset the timer
+        setElapsedTime(0);
         timerRef.current = setInterval(() => {
           setElapsedTime((prevTime) => {
             const newElapsedTime = prevTime + 1;
@@ -62,12 +219,12 @@ const Recording = () => {
             storeDifferenceInSupabase(difference);
             return newElapsedTime;
           });
-        }, 1000); // Update the time every second
+        }, 1000);
       },
       onStop: () => {
         clearInterval(timerRef.current);
       },
-    }); // could also put video and screen props as true!
+    });
 
   const [filename, setFilename] = React.useState("");
   const [liveTranscript, setLiveTranscript] = React.useState("");
@@ -77,7 +234,6 @@ const Recording = () => {
   const [numMicTokens, setNumMicTokens] = React.useState(0);
   const [elapsedTime, setElapsedTime] = React.useState(0);
   const timerRef = React.useRef(null);
-  // state to check stopwatch running or not
   const intervalIdRef = React.useRef(null);
   const dispatch = useDispatch();
   const recordingList = useSelector(
@@ -88,7 +244,6 @@ const Recording = () => {
     (state) => state.recordingReducer.isRecording
   );
   const recordURI = useSelector((state) => state.recordingReducer.recordURI);
-  console.log("Internal Recording isRecording: ", isRecording);
 
   let recorder;
 
@@ -102,95 +257,89 @@ const Recording = () => {
   }, [user, setNumMicTokens]);
 
   useEffect(() => {
-    getNumMicTokens(); // Run on mount
+    getNumMicTokens();
   }, [getNumMicTokens]);
 
-  // Hours calculation
   const hours = Math.floor(time / 3600);
-
-  // Minutes calculation
   const minutes = Math.floor((time % 3600) / 60);
-
-  // Seconds calculation
   const seconds = time % 60;
 
-  // Method to reset timer back to 0
   const reset = () => {
     setTime(0);
   };
 
   const uploadAudio = async (audioData) => {
-    let uriParts = mediaBlobUrl.split(".").toString().replace("//", "");
-    const fileType = uriParts[uriParts.length - 1];
-    const file_name =
-      audioData.file_name + "_" + user.id + `${Date.now()}.${fileType}`;
-    audioData.original_file_name = file_name;
-    console.log("FILE NAME", file_name);
-    audioData.file_name = file_name;
-
     try {
-      const blob = await new Promise((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.onload = () => {
-          try {
-            resolve(xhr.response);
-          } catch (error) {
-            console.log("error:", error);
-          }
-        };
-        xhr.onerror = (e) => {
-          console.log(e);
-          reject(new TypeError("Network request failed"));
-        };
-        xhr.responseType = "blob";
-        xhr.open("GET", mediaBlobUrl, true);
-        xhr.send(null);
-      });
-      if (blob != null) {
-        console.log("blob is: ", blob);
-        const arrayBuffer = await blob.arrayBuffer();
-        console.log("arrayBuffer is: ", arrayBuffer);
-        const blobResponse = await supabase.storage
-          .from("recreate-ai-storage-bucket")
-          .upload(file_name, arrayBuffer, {
-            // works with blob as well but it's not supported in React Native
-            contentType: "audio/mp3",
-          });
-        if (blobResponse.error) {
-          console.log("blobResponse Error: ", blobResponse.error);
-        }
-        if (blobResponse.data) {
-          console.log("blobResponse data: ", blobResponse.data);
-          let micRecordingResponse = await supabase
-            .from("mic_recordings")
-            .insert([audioData])
-            .select();
-          if (micRecordingResponse.error) {
-            console.log("Cannot insert, see error: ");
-            console.log(micRecordingResponse.error);
-          }
-          if (micRecordingResponse.data) {
-            console.log("micRecording Success!");
-            console.log(micRecordingResponse.data);
-            // refresh the page so the websocket doesn't remain open
-            window.location.reload(true);
-          }
-        }
-      } else {
-        console.log("erroor with blob");
+      if (!mediaBlobUrl) {
+        alert("No recording found.");
+        return;
       }
-    } catch (error) {
-      console.log("error:", error);
+      if (!user) {
+        alert("You must be signed in to save recordings.");
+        return;
+      }
+
+      // Resolve customer_id like phonerecording2.js
+      let customerId = audioData?.customer_id ?? null;
+      if (!customerId && user?.email) {
+        const { data: customer, error: custErr } = await supabase
+          .from("customers")
+          .select("id")
+          .eq("email_address", user.email)
+          .single();
+        if (custErr || !customer)
+          throw new Error("Could not resolve customer_id");
+        customerId = customer.id;
+      }
+
+      // Recorded blob (should be real WAV if recorder is configured as audio/wav)
+      const resp = await fetch(mediaBlobUrl);
+      if (!resp.ok) throw new Error("Could not read the recording blob");
+      const blob = await resp.blob();
+
+      // Build clean .wav name (upload to bucket ROOT like phone)
+      const base = (audioData?.file_name || "recording")
+        .toString()
+        .trim()
+        .replace(/[^\w\-]+/g, "_");
+      const wavName = `${base}_${customerId || user.id}_${Date.now()}.wav`;
+
+      const BUCKET = "recreate-ai-storage-bucket";
+      const storageKey = wavName; // root key
+      const file = new File([blob], wavName, { type: "audio/wav" });
+
+      const { error: upErr } = await supabase.storage
+        .from(BUCKET)
+        .upload(storageKey, file, { contentType: "audio/wav", upsert: false });
+      if (upErr) throw upErr;
+
+      // Insert ONLY columns that exist in mic_recordings
+      const row = {
+        file_name: audioData?.file_name ?? base, // display label
+        original_file_name: wavName, // stored filename
+        full_transcript:
+          audioData?.full_transcript ?? audioData?.transcript ?? null,
+        duration: audioData?.duration ?? null,
+        customer_id: customerId ?? null,
+      };
+
+      const { error: insErr } = await supabase
+        .from("mic_recordings")
+        .insert([row]);
+      if (insErr) throw insErr;
+
+      console.log("Mic recording saved:", row);
+    } catch (err) {
+      console.error("uploadAudio error:", err);
+      alert(`Saving failed: ${err?.message || err}`);
     }
   };
 
   const startRecordingAudio = async () => {
     startRecording();
-    // call transcription function later
     setIsTranscribing(true);
     const response = await fetch("/api/token");
     const data = await response.json();
-    console.log("DATOKEN", data);
     if (data.error) {
       alert(data.error);
     }
@@ -198,17 +347,13 @@ const Recording = () => {
     const { token } = data;
 
     if (!window.socket) {
-      // establish wss with AssemblyAI (AAI) at 16000 sample rate
       window.socket = await new WebSocket(
         `wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}`
       );
     }
 
-    // handle incoming messages to display transcription to the DOM
     const texts = {};
     window.socket.onmessage = (message) => {
-      console.log("Entering onmessage");
-      console.log("onwindow.socket message is: ", message);
       let msg = "";
       const res = JSON.parse(message.data);
       texts[res.audio_start] = res.text;
@@ -219,9 +364,7 @@ const Recording = () => {
           msg += ` ${texts[key]}`;
         }
       }
-      console.log("Leaving onmessage. msg is: ", msg);
       setLiveTranscript(msg);
-      console.log("Opening. window.socket is: ", window.socket);
     };
 
     window.socket.onerror = (event) => {
@@ -230,46 +373,17 @@ const Recording = () => {
       setIsTranscribing(false);
     };
 
-    /*window.socket.onclose = (event) => {
-      console.log(event);
-      //window.socket = null;
-      setIsTranscribing(false);
-    };*/
-
     window.socket.onopen = (e) => {
-      // solution to reopen websocket instance:
-      // https://stackoverflow.com/questions/47180904/websocket-even-after-firing-onopen-event-still-in-connecting-state
       if (e.target.readyState !== WebSocket.OPEN) return;
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then((stream) => {
           recorder = new RecordRTC(stream, {
             type: "audio",
-            mimeType: "audio/webm;codecs=pcm", // endpoint requires 16bit PCM audio
             recorderType: StereoAudioRecorder,
-            timeSlice: 250, // set 250 ms intervals of data that sends to AAI
+            mimeType: "audio/wav",
+            numberOfAudioChannels: 1,
             desiredSampRate: 16000,
-            numberOfAudioChannels: 1, // real-time requires only one channel
-            bufferSize: 4096,
-            audioBitsPerSecond: 128000,
-            ondataavailable: (blob) => {
-              const reader = new FileReader();
-              reader.onload = () => {
-                const base64data = reader.result;
-
-                // audio data must be sent as a base64 encoded string
-                //if (window.socket) {
-                //window.socket.send(
-
-                e.target.send(
-                  JSON.stringify({
-                    audio_data: base64data.split("base64,")[1],
-                  })
-                );
-                //}
-              };
-              reader.readAsDataURL(blob);
-            },
           });
 
           recorder.startRecording();
@@ -285,143 +399,156 @@ const Recording = () => {
   }, [liveTranscript, stopRecording]);
 
   useEffect(() => {
-    if (isTranscribing) {
-      if (numMicTokens == 0) {
-        stopRecordingAudio();
-      }
+    if (isTranscribing && numMicTokens == 0) {
+      stopRecordingAudio();
     }
   }, [isTranscribing, numMicTokens, stopRecordingAudio]);
 
   async function renameRecord() {
-    if (!filename && filename.length < 1) {
+    if (!filename || filename.length < 1) {
       alert("Filename can not be empty!");
       return;
     }
-    setRecordURI(mediaBlobUrl);
-
-    const durationSeconds = await getBlobDuration(mediaBlobUrl); // or it could just be mediaBlobUrl
-    const durationMillis = durationSeconds * 1000;
-    console.log("durationSeconds is: ", durationSeconds);
-    const momentduration = moment.duration(durationMillis);
-    let duration = moment
-      .utc(momentduration.as("milliseconds"))
-      .format("HH:mm:ss");
-    if (momentduration.hours() === 0) {
-      duration = moment.utc(momentduration.as("milliseconds")).format("mm:ss");
+    if (!mediaBlobUrl) {
+      alert("No recording to save.");
+      return;
     }
-    const recordingdate = moment().format("MMMM Do YYYY");
-    const newRecordingList = [...recordingList];
-    newRecordingList.push({
-      filepath: mediaBlobUrl,
-      filename,
-      recordingdate: recordingdate,
-      duration: duration,
-      transcript: transcript,
-    });
 
-    let customerInfo = await supabase
-      .from("customers")
-      .select("*")
-      .eq("email_address", user.email);
+    try {
+      setRecordURI(mediaBlobUrl);
 
-    //newRecordingList.reverse()   //sorting
-    //props.setRecordinglistProp(newRecordingList);
-    dispatch(updateRecordingList(newRecordingList));
-    console.log("In Internal Recording, currentUser is: ", user);
-    const audioData = {
-      //user: currentUser,
-      customer_id: customerInfo.data[0].id,
-      file_name: filename,
-      //recordingdate: recordingdate,
-      duration: duration,
-      //duration: durationSeconds,
-      full_transcript: transcript,
-    };
-    reset();
-    uploadAudio(audioData);
+      // duration (mm:ss / HH:mm:ss)
+      const seconds = await getBlobDuration(mediaBlobUrl);
+      const md = moment.duration(Math.round(seconds * 1000));
+      let duration = moment.utc(md.as("milliseconds")).format("HH:mm:ss");
+      if (md.hours() === 0)
+        duration = moment.utc(md.as("milliseconds")).format("mm:ss");
 
-    // Reset the field
-    setFilename("");
-    dispatch(setRecordURI(null));
-    //alert("entered..."); // if I hold the alert for too long, the websocket will error out
+      // Resolve customer_id (same pattern as phone)
+      let customerId = null;
+      if (user?.email) {
+        const { data: customer, error: custErr } = await supabase
+          .from("customers")
+          .select("id")
+          .eq("email_address", user.email)
+          .single();
+        if (custErr) throw custErr;
+        customerId = customer?.id ?? null;
+      }
 
-    // We can go to library tab
-    router.push("/dashboard");
+      const audioData = {
+        customer_id: customerId,
+        file_name: filename,
+        duration,
+        full_transcript: transcript || liveTranscript || null,
+      };
+
+      if (typeof reset === "function") reset();
+
+      await uploadAudio(audioData);
+
+      setFilename("");
+      dispatch(setRecordURI(null));
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error processing recording:", error);
+      alert("Failed to process recording: " + (error?.message || error));
+    }
   }
 
   function renderView() {
     if (status === "recording" || status === "idle") {
       if (numMicTokens == 0) {
         return (
-          <div className="title">
-            <h2>You have no seconds left!</h2>
+          <div className="rec-card">
+            <div className="rec-row">
+              <div className="status idle">
+                <span className="dot" /> Idle
+              </div>
+              <div className="meta">
+                <span className="chip">Seconds left: 0</span>
+              </div>
+            </div>
+            <p style={{ marginTop: 10, color: "var(--muted)" }}>
+              You have no seconds left.
+            </p>
           </div>
         );
       }
       if (isTranscribing) {
-        // while recording or not recording yet
         return (
-          <div className="title">
-            {<p>{status}</p>}
-            <button onClick={stopRecordingAudio}>Stop Recording</button>
-            {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
-            <div className="stopwatch-container">
-              <p className="stopwatch-time">
-                {/*hours}:{minutes.toString().padStart(2, "0")*/}
-                {/*seconds.toString().padStart(2, "0")*/}
-                {/*milliseconds.toString().padStart(2, "0")*/}
-                Number of seconds available to use: {numMicTokens}
-                <p>Recording Time: {timeDifference} seconds</p>
-              </p>
+          <div className="rec-card">
+            <div className="rec-row">
+              <div className={`status ${status}`}>
+                <span className="dot" />
+                <span style={{ textTransform: "capitalize" }}>{status}</span>
+              </div>
+              <div className="meta">
+                <span className="chip">Seconds left: {numMicTokens}</span>
+                <span className="chip">
+                  Elapsed: {elapsedTime ?? timeDifference ?? 0}s
+                </span>
+              </div>
+              <button className="btn btn-danger" onClick={stopRecordingAudio}>
+                Stop Recording
+              </button>
             </div>
-            <h1>Transcript below</h1>
-            <p>{liveTranscript}</p>
+            <div className="transcript" aria-live="polite">
+              {liveTranscript}
+            </div>
           </div>
         );
       } else {
         return (
-          <div className="title">
-            {<p>{status}</p>}
-            <button onClick={startRecordingAudio}>Start Recording</button>
-            {/*<video src={mediaBlobUrl} controls autoPlay loop />*/}
-            <p>Number of seconds available to use: {numMicTokens}</p>
-            <h1>Transcript below</h1>
+          <div className="rec-card">
+            <div className="rec-row">
+              <div className={`status ${status}`}>
+                <span className="dot" />
+                <span style={{ textTransform: "capitalize" }}>{status}</span>
+              </div>
+              <div className="meta">
+                <span className="chip">Seconds left: {numMicTokens}</span>
+              </div>
+              <button className="btn btn-primary" onClick={startRecordingAudio}>
+                Start Recording
+              </button>
+            </div>
           </div>
         );
       }
     }
     if (status === "stopped") {
-      // finished recording
       return (
-        <div className="title">
-          <p>{mediaBlobUrl}</p>
-          <p>recordURI is: {recordURI}</p>
-          <input
-            value={filename}
-            name="filename"
-            onChange={(e) => setFilename(e.target.value)}
-          />
-          <button onClick={renameRecord}>Rename</button>
+        <div className="rec-card">
+          <div className="field">
+            <input
+              value={filename}
+              onChange={(e) => setFilename(e.target.value)}
+              placeholder="Rename transcript…"
+            />
+            <button className="btn btn-ghost" onClick={renameRecord}>
+              Rename
+            </button>
+          </div>
+          <div className="transcript">{transcript}</div>
         </div>
       );
     }
   }
 
   return (
-    <div
-      style={{
-        flexDirection: "row",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <h2>For best results, record audio on Chrome</h2>
-      <button onClick={() => router.push("/dashboard")}>
-        Back to Dashboard
-      </button>
+    <div className="rec-wrap">
+      {/*<div className="backbar">
+        <button className="btn-ghost" onClick={() => router.push("/dashboard")}>
+          Back to Dashboard
+        </button>
+      </div>*/}
+
+      <h2 className="headline">For best results, record audio on Chrome</h2>
+
       {renderView()}
-      <style jsx>{signInStyles}</style>
+
+      <style jsx>{recordingStyles}</style>
     </div>
   );
 };

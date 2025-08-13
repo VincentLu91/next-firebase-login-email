@@ -14,6 +14,115 @@ import {
 import moment from "moment";
 
 import { useDispatch, useSelector } from "react-redux";
+/* === STYLE: same look as Recording.js (no logic changes) === */
+const phoneRecordingStyles = `
+:root{
+  --bg:#0b0d12; --panel:#11151d; --muted:#a0a8b8; --text:#e6e8ef;
+  --primary:#2563eb; --primary-600:#1d4ed8; --danger:#ef4444; --danger-600:#dc2626;
+  --ring:rgba(37,99,235,.45); --shadow:0 10px 20px rgba(0,0,0,.25);
+  --radius:14px; --radius-sm:10px;
+}
+.rec-wrap{min-height:calc(100vh - 80px);background:var(--bg);padding:48px 20px 80px;color:var(--text);}
+.headline{font-size:18px;font-weight:600;letter-spacing:.2px;opacity:.9;text-align:center;margin:0 0 18px;}
+.rec-card{width:100%;max-width:860px;margin:0 auto;background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+.rec-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.status,.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--muted);}
+.status{text-transform:capitalize;}
+.status.idle{color:var(--muted);} .status.recording{color:#f59e0b;} .status.completed{color:#10b981;}
+.dot{width:10px;height:10px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px rgba(255,255,255,.05) inset;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.7);transform:scale(1);}70%{box-shadow:0 0 0 10px rgba(239,68,68,0);transform:scale(1.05);}100%{box-shadow:0 0 0 0 rgba(239,68,68,0);transform:scale(1);}}
+.status.recording .dot{background:var(--danger);animation:pulse 1.5s infinite;}
+.btn{appearance:none;border:0;border-radius:12px;padding:12px 18px;font-weight:600;letter-spacing:.2px;cursor:pointer;transition:transform .16s ease,background .2s ease,box-shadow .2s ease;box-shadow:0 6px 14px rgba(0,0,0,.25);color:#fff;}
+.btn:hover{transform:translateY(-1px);} .btn:focus-visible{outline:0;box-shadow:0 0 0 4px var(--ring),0 6px 14px rgba(0,0,0,.25);}
+.btn-primary{background:var(--primary);} .btn-primary:hover{background:var(--primary-600);}
+.btn-danger{background:var(--danger);} .btn-danger:hover{background:var(--danger-600);}
+.btn-ghost{border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--text);padding:10px 14px;border-radius:var(--radius-sm);font-weight:500;}
+.btn-ghost:hover{background:rgba(255,255,255,.04);}
+.field{display:flex;gap:10px;align-items:center;margin-top:14px;width:100%;}
+.field input[type="text"]{flex:1;min-width:240px;background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12);padding:12px 14px;border-radius:var(--radius-sm);outline:0;}
+.field input[type="text"]:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--ring);}
+.transcript{margin-top:18px;padding:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);max-height:42vh;overflow:auto;line-height:1.6;font-size:16px;}
+.PhoneInput{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);padding:8px 10px;max-width:420px;width:100%;}
+.PhoneInput input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:16px;}
+.PhoneInput input::placeholder{color:rgba(230,232,239,.55);}
+
+/* === INTERACTION HOTFIX: ensure inputs & buttons stay clickable === */
+.rec-wrap,
+.rec-card {
+  position: relative; /* establish stacking context for overlays */
+}
+
+/* Any decorative overlays (tints, gradients, shimmer) must not capture clicks */
+.rec-card::before,
+.rec-wrap::before,
+.rec-row::before,
+.sticky-footer::before,
+.sticky-footer::after {
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Interactive elements sit above any overlays */
+.field,
+.PhoneInput,
+.btn,
+.btn-ghost,
+.btn-primary,
+input,
+textarea,
+select,
+a {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto !important;
+}
+
+/* Do NOT "disable" via pointer-events; use the HTML disabled attribute instead */
+.btn[disabled],
+button[disabled],
+.btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  pointer-events: auto; /* keep focus/tooltip available */
+}
+
+/* If you use a state tint overlay, keep it behind content */
+.state-tint,
+.gradient-overlay {
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* styled-jsx: ensure 3rd-party PhoneInput remains interactive */
+:global(.PhoneInput) { pointer-events: auto; }
+:global(.PhoneInput input) { pointer-events: auto; }
+
+/* OPTIONAL: if you add a recording/completed tint via ::before, keep it click-through */
+.rec-card.is-recording::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(245, 158, 11, 0.05); /* subtle amber tint */
+  opacity: 1;
+  transition: opacity 200ms ease;
+  pointer-events: none; /* critical: never block clicks */
+  z-index: 0;           /* behind content */
+}
+.rec-card.is-completed::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(16, 185, 129, 0.05); /* subtle green tint */
+  opacity: 1;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Keep existing hover/focus styles as-is */
+
+/* === END HOTFIX === */
+`;
 
 const ASSEMBLY_AI_KEY =
   process.env.ASSEMBLY_AI_KEY || "8acedd22ef7542259df0f36dc8bf18ac";
@@ -314,105 +423,138 @@ const PhoneRecording2 = () => {
   function renderView() {
     if (isSubscribed) {
       if (numCalls == 0) {
+        // ── No calls left
         return (
-          <div className="title">
-            <h2>You have no calls available!</h2>
+          <div className="rec-card">
+            <div className="rec-row">
+              <div className="status idle">
+                <span className="dot" /> Ready to dial
+              </div>
+              <div className="meta">
+                <span className="chip">Calls left: 0</span>
+              </div>
+            </div>
+
+            <h2 className="headline" style={{ marginTop: 12 }}>
+              You have no calls available!
+            </h2>
           </div>
         );
       } else {
         if (recordingStatus) {
+          // ── Status present (in-progress or completed)
+          const s = (recordingStatus || "").toLowerCase();
+          const tone = s === "completed" ? "completed" : "recording";
+
           return (
-            <div className="title">
-              <div
-                style={{
-                  color: "green",
-                }}
-              >
-                {recordingStatus?.toLocaleUpperCase()}
+            <div className="rec-card">
+              <div className="rec-row">
+                <div className={`status ${tone}`}>
+                  <span className="dot" />
+                  <span>{recordingStatus?.toLocaleUpperCase()}</span>
+                </div>
+                <div className="meta">
+                  <span className="chip">Calls left: {numCalls}</span>
+                </div>
               </div>
-              <h2>Number of calls available: {numCalls}</h2>
+
               {recordingStatus === "completed" && (
-                <div>
-                  <span>Recording Url: {callRecordingInfo.recordingUrl}</span>
+                <div className="field" style={{ marginTop: 14 }}>
                   <div>
-                    <a href={callRecordingInfo.recordingUrl}>Open Url</a>
+                    <span className="chip" style={{ borderRadius: 10 }}>
+                      Recording Url:
+                    </span>
+                    <div style={{ marginTop: 8 }}>
+                      <a
+                        className="btn-ghost"
+                        href={callRecordingInfo.recordingUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Open Url
+                      </a>
+                    </div>
                   </div>
+
                   <input
                     value={filename}
                     name="filename"
                     onChange={(e) => setFilename(e.target.value)}
+                    placeholder="Rename filename"
                   />
-                  <button onClick={renameRecord}>Rename</button>
+                  <button className="btn btn-primary" onClick={renameRecord}>
+                    Rename
+                  </button>
                 </div>
               )}
 
               {transcriptionText && (
-                <div className="title">
-                  <p>{transcriptionText}</p>
+                <div className="transcript" aria-live="polite">
+                  <p style={{ margin: 0 }}>{transcriptionText}</p>
                 </div>
               )}
             </div>
           );
         } else {
+          // ── Ready to dial
           return (
-            <div>
-              <h2>Number of calls available: {numCalls}</h2>
-              <button onClick={dialNumber}>Dial Number</button>
-              <PhoneInput
-                placeholder="Enter phone number with country code"
-                value={phoneNumber}
-                onChange={setPhoneNumber}
-              />
+            <div className="rec-card">
+              <div className="rec-row">
+                <div className="status idle">
+                  <span className="dot" /> Ready to dial
+                </div>
+                <div className="meta">
+                  <span className="chip">Calls left: {numCalls}</span>
+                </div>
+                <button className="btn btn-primary" onClick={dialNumber}>
+                  Dial Number
+                </button>
+              </div>
+
+              <div className="field">
+                <PhoneInput
+                  placeholder="Enter phone number with country code"
+                  value={phoneNumber}
+                  onChange={setPhoneNumber}
+                />
+              </div>
             </div>
           );
         }
       }
     } else {
+      // ── Not subscribed
       return (
-        <>
-          <h1> You are not subscribed!!</h1>
-        </>
+        <div className="rec-card">
+          <div className="rec-row">
+            <div className="status idle">
+              <span className="dot" /> Locked
+            </div>
+          </div>
+          <h2 className="headline" style={{ marginTop: 12 }}>
+            You are not subscribed!!
+          </h2>
+        </div>
       );
     }
   }
 
   return (
-    <div
-      style={{
-        maxWidth: "600px",
-        margin: "40px auto",
-        padding: "20px",
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <h1 style={{ marginBottom: "20px", color: "#333" }}>
-        Phone Call Recording
-      </h1>
-      {renderView()}
-      <style jsx global>{`
-        .PhoneInput {
-          margin: 20px 0;
-        }
-        button {
-          background: #0070f3;
-          color: white;
-          border: none;
-          padding: 10px 20px;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 16px;
-          margin: 10px 0;
-        }
-        button:hover {
-          background: #0051cc;
-        }
-        .title {
-          background: #f0f0f0;
-          padding: 20px;
-          border-radius: 5px;
-          margin-top: 20px;
-        }
-      `}</style>
+    <div className="rec-wrap">
+      <h2 className="headline">Phone Call Recording</h2>
+      <div className="rec-card">
+        <div
+          style={{
+            maxWidth: "600px",
+            margin: "40px auto",
+            padding: "20px",
+            fontFamily: "Arial, sans-serif",
+          }}
+        >
+          {renderView()}
+          <style jsx>{phoneRecordingStyles}</style>
+        </div>
+      </div>
     </div>
   );
 };
