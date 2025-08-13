@@ -245,7 +245,8 @@ const Recording = () => {
   );
   const recordURI = useSelector((state) => state.recordingReducer.recordURI);
 
-  let recorder;
+  // Keep recorder reference in a ref to persist between renders
+  const recorderRef = React.useRef(null);
 
   const getNumMicTokens = useCallback(async () => {
     let tokenResponse = await supabase
@@ -317,11 +318,12 @@ const Recording = () => {
       const row = {
         file_name: audioData?.file_name ?? base, // display label
         original_file_name: wavName, // stored filename
-        full_transcript:
-          audioData?.full_transcript ?? audioData?.transcript ?? null,
+        full_transcript: audioData.full_transcript, // Use transcript from audioData
         duration: audioData?.duration ?? null,
         customer_id: customerId ?? null,
       };
+
+      console.log("Saving transcript:", audioData.full_transcript); // Debug log
 
       const { error: insErr } = await supabase
         .from("mic_recordings")
@@ -335,13 +337,21 @@ const Recording = () => {
     }
   };
 
+  // Store texts in component state to reset between recordings
+  const [texts, setTexts] = React.useState({});
+
   const startRecordingAudio = async () => {
+    // Reset state for new recording
+    setTexts({});
+    setLiveTranscript("");
+
     startRecording();
     setIsTranscribing(true);
     const response = await fetch("/api/token");
     const data = await response.json();
     if (data.error) {
       alert(data.error);
+      return;
     }
 
     const { token } = data;
@@ -352,19 +362,21 @@ const Recording = () => {
       );
     }
 
-    const texts = {};
     window.socket.onmessage = (message) => {
       let msg = "";
       const res = JSON.parse(message.data);
-      texts[res.audio_start] = res.text;
-      const keys = Object.keys(texts);
-      keys.sort((a, b) => a - b);
-      for (const key of keys) {
-        if (texts[key]) {
-          msg += ` ${texts[key]}`;
+      setTexts((prevTexts) => {
+        const newTexts = { ...prevTexts, [res.audio_start]: res.text };
+        const keys = Object.keys(newTexts);
+        keys.sort((a, b) => a - b);
+        for (const key of keys) {
+          if (newTexts[key]) {
+            msg += ` ${newTexts[key]}`;
+          }
         }
-      }
-      setLiveTranscript(msg);
+        setLiveTranscript(msg);
+        return newTexts;
+      });
     };
 
     window.socket.onerror = (event) => {
@@ -378,25 +390,70 @@ const Recording = () => {
       navigator.mediaDevices
         .getUserMedia({ audio: true })
         .then((stream) => {
-          recorder = new RecordRTC(stream, {
+          recorderRef.current = new RecordRTC(stream, {
             type: "audio",
             recorderType: StereoAudioRecorder,
             mimeType: "audio/wav",
             numberOfAudioChannels: 1,
             desiredSampRate: 16000,
+            // Add timeSlice to get data periodically
+            timeSlice: 250,
+            // Get data every 250ms
+            ondataavailable: (blob) => {
+              // Convert blob to array buffer
+              const reader = new FileReader();
+              reader.onload = () => {
+                const buffer = reader.result;
+                if (window.socket.readyState === WebSocket.OPEN) {
+                  window.socket.send(buffer);
+                }
+              };
+              reader.readAsArrayBuffer(blob);
+            },
           });
 
-          recorder.startRecording();
+          recorderRef.current.startRecording();
         })
         .catch((err) => console.error(err));
     };
   };
 
   const stopRecordingAudio = useCallback(async () => {
-    stopRecording();
-    setIsTranscribing(false);
-    setTranscript(liveTranscript);
+    if (recorderRef.current) {
+      recorderRef.current.stopRecording(() => {
+        if (window.socket) {
+          window.socket.close();
+          window.socket = null;
+        }
+        recorderRef.current = null;
+        stopRecording();
+        setIsTranscribing(false);
+        setTranscript(liveTranscript);
+      });
+    } else {
+      if (window.socket) {
+        window.socket.close();
+        window.socket = null;
+      }
+      stopRecording();
+      setIsTranscribing(false);
+      setTranscript(liveTranscript);
+    }
   }, [liveTranscript, stopRecording]);
+
+  // Cleanup on component unmount
+  useEffect(() => {
+    return () => {
+      if (window.socket) {
+        window.socket.close();
+        window.socket = null;
+      }
+      if (recorderRef.current) {
+        recorderRef.current.stopRecording();
+        recorderRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (isTranscribing && numMicTokens == 0) {
@@ -440,8 +497,11 @@ const Recording = () => {
         customer_id: customerId,
         file_name: filename,
         duration,
-        full_transcript: transcript || liveTranscript || null,
+        full_transcript: transcript || liveTranscript, // Use either transcript or liveTranscript
+        transcript: transcript || liveTranscript, // Include both for backward compatibility
       };
+
+      console.log("Audio data with transcript:", audioData); // Debug log
 
       if (typeof reset === "function") reset();
 
