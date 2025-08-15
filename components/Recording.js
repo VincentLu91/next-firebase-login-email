@@ -14,6 +14,74 @@ import axios from "axios";
 import { supabase } from "../utils/initSupabase";
 import { storeAsMp3 } from "../utils/storeAsMp3";
 
+// --- MP3 transcode (browser-only) ---
+let _ffmpeg; // singleton
+let _ffmpegLoading = null;
+
+async function ensureFFmpeg() {
+  if (typeof window === "undefined") return null;
+  if (_ffmpeg) return _ffmpeg;
+  if (_ffmpegLoading) return _ffmpegLoading;
+
+  _ffmpegLoading = (async () => {
+    const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+    const { toBlobURL } = await import("@ffmpeg/util");
+    const ffmpeg = new FFmpeg();
+
+    const version = "0.12.10"; // set to your installed @ffmpeg/ffmpeg
+    const isIso = window.crossOriginIsolated === true;
+    const pkg = isIso ? "core-mt" : "core";
+    const base = `https://unpkg.com/@ffmpeg/${pkg}@${version}/dist/umd`;
+
+    console.log("[ffmpeg] iso:", isIso, "| using:", pkg);
+
+    const loadOpts = {
+      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
+    };
+    if (isIso) {
+      loadOpts.workerURL = await toBlobURL(
+        `${base}/ffmpeg-core.worker.js`,
+        "text/javascript"
+      );
+    }
+
+    await ffmpeg.load(loadOpts);
+    _ffmpeg = ffmpeg;
+    return ffmpeg;
+  })();
+
+  return _ffmpegLoading;
+}
+
+async function wavBlobToMp3(
+  wavBlob,
+  { bitrate = "128k", outName = "out.mp3" } = {}
+) {
+  const ffmpeg = await ensureFFmpeg();
+  if (!ffmpeg) throw new Error("FFmpeg not available (SSR?)");
+
+  const inName = "input.wav";
+  const bytes = new Uint8Array(await wavBlob.arrayBuffer());
+  await ffmpeg.writeFile(inName, bytes);
+
+  await ffmpeg.exec([
+    "-i",
+    inName,
+    "-vn",
+    "-ar",
+    "44100",
+    "-ac",
+    "2",
+    "-b:a",
+    bitrate,
+    outName,
+  ]);
+
+  const mp3Data = await ffmpeg.readFile(outName);
+  return new Blob([mp3Data.buffer], { type: "audio/mpeg" });
+}
+
 const recordingStyles = `
 :root {
 --bg: #0b0d12;
@@ -270,70 +338,75 @@ const Recording = () => {
   };
 
   const uploadAudio = async (audioData) => {
+    console.log("Starting uploadAudio with data:", audioData);
+
     try {
-      if (!mediaBlobUrl) {
-        alert("No recording found.");
-        return;
-      }
-      if (!user) {
-        alert("You must be signed in to save recordings.");
-        return;
-      }
+      if (!mediaBlobUrl) throw new Error("No recording to save.");
+      if (!audioData?.customer_id) throw new Error("Customer ID is required.");
 
-      // Resolve customer_id like phonerecording2.js
-      let customerId = audioData?.customer_id ?? null;
-      if (!customerId && user?.email) {
-        const { data: customer, error: custErr } = await supabase
-          .from("customers")
-          .select("id")
-          .eq("email_address", user.email)
-          .single();
-        if (custErr || !customer)
-          throw new Error("Could not resolve customer_id");
-        customerId = customer.id;
-      }
+      // 1) Read the recorded WAV blob
+      console.log("Fetching WAV blob...");
+      const resp = await fetch(mediaBlobUrl, { cache: "no-store" });
+      if (!resp.ok) throw new Error(`Blob fetch failed: ${resp.status}`);
+      const wavBlob = await resp.blob();
+      console.log("WAV blob fetched successfully");
 
-      // Recorded blob (should be real WAV if recorder is configured as audio/wav)
-      const resp = await fetch(mediaBlobUrl);
-      if (!resp.ok) throw new Error("Could not read the recording blob");
-      const blob = await resp.blob();
-
-      // Build clean .wav name (upload to bucket ROOT like phone)
-      const base = (audioData?.file_name || "recording")
+      // 2) Ensure ffmpeg (multi-thread) is ready and transcode to MP3
+      console.log("Starting MP3 conversion...");
+      await ensureFFmpeg();
+      const base = (audioData.file_name || "recording")
         .toString()
         .trim()
         .replace(/[^\w\-]+/g, "_");
-      const wavName = `${base}_${customerId || user.id}_${Date.now()}.wav`;
+      const stamp = Date.now();
+      const mp3Name = `${base}_${audioData.customer_id}_${stamp}.mp3`;
 
+      const mp3Blob = await wavBlobToMp3(wavBlob, {
+        bitrate: "128k",
+        outName: "out.mp3",
+      });
+      console.log("MP3 conversion complete");
+
+      // 3) Upload MP3 to Supabase Storage
+      console.log("Uploading MP3 to storage...");
       const BUCKET = "recreate-ai-storage-bucket";
-      const storageKey = wavName; // root key
-      const file = new File([blob], wavName, { type: "audio/wav" });
-
-      const { error: upErr } = await supabase.storage
+      const { data: uploadData, error: upErr } = await supabase.storage
         .from(BUCKET)
-        .upload(storageKey, file, { contentType: "audio/wav", upsert: false });
-      if (upErr) throw upErr;
+        .upload(mp3Name, mp3Blob, {
+          contentType: "audio/mpeg",
+          upsert: false,
+          cacheControl: "3600",
+        });
+      if (upErr) throw new Error(`Failed to upload MP3: ${upErr.message}`);
+      console.log("MP3 upload successful:", uploadData);
 
-      // Insert ONLY columns that exist in mic_recordings
+      // 4) Insert DB row
+      console.log("Saving to database...");
       const row = {
-        file_name: audioData?.file_name ?? base, // display label
-        original_file_name: wavName, // stored filename
-        full_transcript: audioData.full_transcript, // Use transcript from audioData
-        duration: audioData?.duration ?? null,
-        customer_id: customerId ?? null,
+        file_name: audioData.file_name,
+        original_file_name: mp3Name,
+        full_transcript: audioData.full_transcript,
+        duration: audioData.duration,
+        customer_id: audioData.customer_id,
       };
+      console.log("Row data:", row);
 
-      console.log("Saving transcript:", audioData.full_transcript); // Debug log
-
-      const { error: insErr } = await supabase
+      const { data, error: dbErr } = await supabase
         .from("mic_recordings")
-        .insert([row]);
-      if (insErr) throw insErr;
+        .insert([row])
+        .select()
+        .single();
 
-      console.log("Mic recording saved:", row);
-    } catch (err) {
-      console.error("uploadAudio error:", err);
-      alert(`Saving failed: ${err?.message || err}`);
+      if (dbErr) {
+        console.error("Database error:", dbErr);
+        throw new Error(`Failed to save to database: ${dbErr.message}`);
+      }
+
+      console.log("Successfully saved to database:", data);
+      return data;
+    } catch (e) {
+      console.error("uploadAudio error:", e);
+      throw e; // Re-throw to handle in renameRecord
     }
   };
 
@@ -481,20 +554,26 @@ const Recording = () => {
       if (md.hours() === 0)
         duration = moment.utc(md.as("milliseconds")).format("mm:ss");
 
-      // Resolve customer_id (same pattern as phone)
-      let customerId = null;
-      if (user?.email) {
-        const { data: customer, error: custErr } = await supabase
-          .from("customers")
-          .select("id")
-          .eq("email_address", user.email)
-          .single();
-        if (custErr) throw custErr;
-        customerId = customer?.id ?? null;
+      if (!user?.email) {
+        throw new Error("You must be logged in to save recordings");
+      }
+
+      // Get customer ID
+      const { data: customer, error: custErr } = await supabase
+        .from("customers")
+        .select("id")
+        .eq("email_address", user.email)
+        .single();
+
+      if (custErr) throw custErr;
+      if (!customer?.id) {
+        throw new Error(
+          "Customer ID not found. Please ensure you have an active subscription."
+        );
       }
 
       const audioData = {
-        customer_id: customerId,
+        customer_id: customer.id,
         file_name: filename,
         duration,
         full_transcript: transcript || liveTranscript, // Use either transcript or liveTranscript

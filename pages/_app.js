@@ -7,24 +7,32 @@ import PubnubProvider from "../contexts/pubnub";
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useState } from "react";
+import { Nunito } from "next/font/google";
+const nunito = Nunito({
+  subsets: ["latin"],
+  weight: ["300", "400", "600", "700"],
+  display: "swap",
+});
 
 function MyApp({ Component, pageProps }) {
   const [supabase] = useState(() => createPagesBrowserClient());
   return (
-    <SessionContextProvider
-      supabaseClient={supabase}
-      initialSession={pageProps.initialSession}
-    >
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <PubnubProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </PubnubProvider>
-        </PersistGate>
-      </Provider>
-    </SessionContextProvider>
+    <div className={nunito.className}>
+      <SessionContextProvider
+        supabaseClient={supabase}
+        initialSession={pageProps.initialSession}
+      >
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <PubnubProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </PubnubProvider>
+          </PersistGate>
+        </Provider>
+      </SessionContextProvider>
+    </div>
   );
 }
 
