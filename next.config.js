@@ -18,4 +18,23 @@ module.exports = {
       },
     ],
   },
+  async headers() {
+    return [
+      // Apply only to the pages that use ffmpeg to avoid breaking other routes
+      {
+        source: "/internalrecording",
+        headers: [
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+        ],
+      },
+      {
+        source: "/internalrecording/:path*",
+        headers: [
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Embedder-Policy", value: "require-corp" },
+        ],
+      },
+    ];
+  },
 };
