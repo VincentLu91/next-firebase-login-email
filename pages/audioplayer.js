@@ -64,10 +64,12 @@ export default function AudioPlayer() {
   }
 
   const onChange = (e) => {
-    const sliderVal = e.target.value;
-    audioRef.current.currentTime =
-      (durationSeconds / 100) * parseFloat(sliderVal).toFixed(2);
-    setPercentage(sliderVal);
+    const p = Number(e.target.value);
+    setPercentage(p);
+    if (!audioRef.current) return;
+    const d = audioRef.current.duration || durationSeconds;
+    if (!d) return; // ← guard: avoids jumping to 0
+    audioRef.current.currentTime = (p / 100) * d;
   };
 
   const play = () => {
@@ -159,11 +161,19 @@ export default function AudioPlayer() {
           <Slider onChange={onChange} percentage={percentage} />
           <audio
             ref={audioRef}
-            onTimeUpdate={getCurrDuration}
-            onLoadedData={(e) => {
-              urlToDuration(audioUrl);
+            crossOrigin="anonymous"
+            preload="metadata"
+            src={audioUrl || undefined}
+            onLoadedMetadata={(e) => {
+              const d = e.currentTarget.duration || 0;
+              setDurationSeconds(d);
             }}
-            src={audioUrl}
+            onTimeUpdate={(e) => {
+              const t = e.currentTarget.currentTime || 0;
+              const d = e.currentTarget.duration || durationSeconds || 1;
+              setCurrentTime(t);
+              setPercentage(Number(((t / d) * 100).toFixed(2)));
+            }}
           />
           <ControlPanel
             play={play}
