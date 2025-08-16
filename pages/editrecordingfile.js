@@ -479,10 +479,12 @@ export default function EditRecordingFile() {
   }, [dispatch, sound, customer, supabase]);
 
   const onChange = (e) => {
-    const sliderVal = e.target.value;
-    audioRef.current.currentTime =
-      (durationSeconds / 100) * parseFloat(sliderVal).toFixed(2);
-    setPercentage(sliderVal);
+    const p = Number(e.target.value);
+    setPercentage(p);
+    if (!audioRef.current) return;
+    const d = audioRef.current.duration || durationSeconds;
+    if (!d) return; // ← guard: avoids jumping to 0
+    audioRef.current.currentTime = (p / 100) * d;
   };
 
   const play = () => {
@@ -687,11 +689,20 @@ export default function EditRecordingFile() {
             <Slider percentage={percentage} onChange={onChange} />
             <audio
               ref={audioRef}
-              onTimeUpdate={getCurrDuration}
-              onLoadedData={(e) => {
-                urlToDuration(audioURL);
+              key={audioURL} // force a clean reload when URL changes
+              crossOrigin="anonymous" // CORS fetch under COEP
+              preload="metadata"
+              src={audioURL || undefined} // never pass an empty string
+              onLoadedMetadata={(e) => {
+                const d = e.currentTarget.duration || 0;
+                setDurationSeconds(d); // use your duration state setter
               }}
-              src={audioURL}
+              onTimeUpdate={(e) => {
+                const t = e.currentTarget.currentTime || 0;
+                const d = e.currentTarget.duration || 1;
+                setCurrentTime(t); // use your currentTime setter
+                setPercentage(Number(((t / d) * 100).toFixed(2)));
+              }}
             />
             <ControlPanel
               play={play}

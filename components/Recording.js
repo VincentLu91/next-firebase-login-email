@@ -13,40 +13,76 @@ import fileToArrayBuffer from "file2arraybuffer";
 import axios from "axios";
 import { supabase } from "../utils/initSupabase";
 import { storeAsMp3 } from "../utils/storeAsMp3";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { toBlobURL } from "@ffmpeg/util";
 
 // --- MP3 transcode (browser-only) ---
 let _ffmpeg; // singleton
 let _ffmpegLoading = null;
 
+// Dev helper: reset the cached ffmpeg instance
+export function resetFFmpeg() {
+  try {
+    _ffmpeg?.terminate?.();
+  } catch {}
+  try {
+    _ffmpeg?.exit?.();
+  } catch {}
+  _ffmpeg = undefined;
+  _ffmpegLoading = null;
+}
+
+if (typeof window !== "undefined") {
+  // quick access from the DevTools console
+  window.__resetFFmpeg = resetFFmpeg;
+}
+
 async function ensureFFmpeg() {
-  if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") return null; // SSR guard
   if (_ffmpeg) return _ffmpeg;
   if (_ffmpegLoading) return _ffmpegLoading;
 
   _ffmpegLoading = (async () => {
     const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-    const { toBlobURL } = await import("@ffmpeg/util");
     const ffmpeg = new FFmpeg();
 
-    const version = "0.12.10"; // set to your installed @ffmpeg/ffmpeg
-    const isIso = window.crossOriginIsolated === true;
-    const pkg = isIso ? "core-mt" : "core";
-    const base = `https://unpkg.com/@ffmpeg/${pkg}@${version}/dist/umd`;
+    // helpful logs while we verify mt vs core
+    ffmpeg.on("log", ({ message }) => console.debug("[ffmpeg]", message));
 
-    console.log("[ffmpeg] iso:", isIso, "| using:", pkg);
+    async function loadVariant(subdir /* 'core' | 'core-mt' */) {
+      const { toBlobURL } = await import("@ffmpeg/util"); // dynamic import = SSR safe
+      const base = `/ffmpeg/${subdir}`; // served from /public
 
-    const loadOpts = {
-      coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
-    };
-    if (isIso) {
-      loadOpts.workerURL = await toBlobURL(
-        `${base}/ffmpeg-core.worker.js`,
-        "text/javascript"
+      const loadOpts = {
+        coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
+        wasmURL: await toBlobURL(
+          `${base}/ffmpeg-core.wasm`,
+          "application/wasm"
+        ),
+      };
+
+      if (subdir === "core-mt") {
+        loadOpts.workerURL = await toBlobURL(
+          `${base}/ffmpeg-core.worker.js`,
+          "text/javascript"
+        );
+      }
+
+      await ffmpeg.load(loadOpts);
+      console.log(
+        `[ffmpeg] iso:${window.crossOriginIsolated} | using: ${subdir}`
       );
     }
 
-    await ffmpeg.load(loadOpts);
+    try {
+      // Force core-mt and let it fail if not supported
+      await loadVariant("core-mt");
+      console.log("[ffmpeg] Successfully loaded core-mt");
+    } catch (e) {
+      console.warn("[ffmpeg] mt load failed:", e);
+      throw new Error("core-mt is required for optimal performance");
+    }
+
     _ffmpeg = ffmpeg;
     return ffmpeg;
   })();
@@ -61,25 +97,58 @@ async function wavBlobToMp3(
   const ffmpeg = await ensureFFmpeg();
   if (!ffmpeg) throw new Error("FFmpeg not available (SSR?)");
 
-  const inName = "input.wav";
+  // Unique temp names to avoid collisions across runs
+  const stamp = Date.now();
+  const inName = `input_${stamp}.wav`;
+  const outTmp = `out_${stamp}.mp3`;
+
+  // Write input
   const bytes = new Uint8Array(await wavBlob.arrayBuffer());
   await ffmpeg.writeFile(inName, bytes);
 
-  await ffmpeg.exec([
-    "-i",
-    inName,
-    "-vn",
-    "-ar",
-    "44100",
-    "-ac",
-    "2",
-    "-b:a",
-    bitrate,
-    outName,
-  ]);
+  try {
+    // Encode MP3 (stereo, 44.1kHz, target bitrate)
+    await ffmpeg.exec([
+      "-i",
+      inName,
+      "-vn", // No video
+      "-ar",
+      "44100", // Audio rate
+      "-ac",
+      "2", // Stereo
+      "-b:a",
+      bitrate, // Bitrate
+      "-c:a",
+      "libmp3lame", // Force MP3 codec
+      "-joint_stereo",
+      "1", // Use joint stereo
+      "-compression_level",
+      "0", // Fast encoding
+      "-application",
+      "audio", // Audio-optimized encoding
+      "-cutoff",
+      "18000", // Limit frequency range
+      "-write_xing",
+      "1", // Write MP3 headers
+      "-id3v2_version",
+      "3", // Add ID3 tags
+      "-f",
+      "mp3", // Force MP3 format
+      outTmp,
+    ]);
 
-  const mp3Data = await ffmpeg.readFile(outName);
-  return new Blob([mp3Data.buffer], { type: "audio/mpeg" });
+    // Read output & return as Blob
+    const mp3Data = await ffmpeg.readFile(outTmp);
+    return new Blob([mp3Data.buffer], { type: "audio/mpeg" });
+  } finally {
+    // Best-effort cleanup (supported in @ffmpeg/ffmpeg >= 0.12)
+    try {
+      ffmpeg.deleteFile && (await ffmpeg.deleteFile(inName));
+    } catch {}
+    try {
+      ffmpeg.deleteFile && (await ffmpeg.deleteFile(outTmp));
+    } catch {}
+  }
 }
 
 const recordingStyles = `

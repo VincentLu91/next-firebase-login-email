@@ -3,17 +3,22 @@ import { NextResponse } from "next/server";
 export function middleware(req) {
   const res = NextResponse.next();
 
-  // Apply only to the internal recording page and anything under it
+  // Apply headers to all routes to ensure SharedArrayBuffer support
   res.headers.set("Cross-Origin-Opener-Policy", "same-origin");
   res.headers.set("Cross-Origin-Embedder-Policy", "require-corp");
-
-  // (Optional, but often helpful)
-  // res.headers.set("Origin-Agent-Cluster", "?1");
+  res.headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+  res.headers.set("Origin-Agent-Cluster", "?1");
 
   return res;
 }
 
-// Tell Next which routes get these headers
+// Apply to all routes
 export const config = {
-  matcher: ["/internalrecording", "/internalrecording/:path*"],
+  matcher: [
+    // Apply to all pages
+    "/",
+    "/:path*",
+    // Ensure static files are covered
+    "/ffmpeg/:path*",
+  ],
 };
