@@ -316,7 +316,7 @@ const Recording = () => {
   const user = useUser();
   const [timeDifference, setTimeDifference] = React.useState(0);
 
-  const storeDifferenceInSupabase = async (difference) => {
+  const updateMicTokens = async (newTokens) => {
     try {
       let { data: customerInfo, error: fetchError } = await supabase
         .from("customers")
@@ -324,22 +324,19 @@ const Recording = () => {
         .eq("email_address", user.email)
         .single();
 
-      if (fetchError) {
-        throw new Error(`Error fetching customer info: ${fetchError.message}`);
-      }
+      if (fetchError) throw fetchError;
 
       const { error: updateError } = await supabase
         .from("customers")
-        .update({ mic_tokens: difference })
+        .update({ mic_tokens: newTokens })
         .eq("id", customerInfo.id);
 
-      if (updateError) {
-        throw new Error(`Error updating mic_tokens: ${updateError.message}`);
-      }
+      if (updateError) throw updateError;
 
-      console.log("Successfully stored difference in Supabase.");
+      setNumMicTokens(newTokens);
+      setTimeDifference(newTokens);
     } catch (error) {
-      console.error("Error storing difference in Supabase:", error.message);
+      console.error("Error updating mic tokens:", error.message);
     }
   };
 
@@ -351,9 +348,8 @@ const Recording = () => {
         timerRef.current = setInterval(() => {
           setElapsedTime((prevTime) => {
             const newElapsedTime = prevTime + 1;
-            const difference = numMicTokens - newElapsedTime;
-            setTimeDifference(difference);
-            storeDifferenceInSupabase(difference);
+            const remainingTokens = numMicTokens - newElapsedTime;
+            updateMicTokens(remainingTokens);
             return newElapsedTime;
           });
         }, 1000);
