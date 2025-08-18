@@ -1,3 +1,4 @@
+// components/Recording.js
 import { useReactMediaRecorder } from "react-media-recorder";
 // keep it at 1.6.5: https://github.com/DeltaCircuit/react-media-recorder/issues/98
 import * as React from "react";
@@ -361,6 +362,7 @@ const Recording = () => {
 
   const [filename, setFilename] = React.useState("");
   const [liveTranscript, setLiveTranscript] = React.useState("");
+  const [turns, setTurns] = React.useState({}); // { [turn_order]: { text, formatted } }
   const [transcript, setTranscript] = React.useState("");
   const [isTranscribing, setIsTranscribing] = React.useState(false);
   const [time, setTime] = React.useState(0);
@@ -380,6 +382,8 @@ const Recording = () => {
 
   // Keep recorder reference in a ref to persist between renders
   const recorderRef = React.useRef(null);
+
+  const [interim, setInterim] = React.useState("");
 
   const getNumMicTokens = useCallback(async () => {
     let tokenResponse = await supabase
@@ -445,12 +449,12 @@ const Recording = () => {
       if (upErr) throw new Error(`Failed to upload MP3: ${upErr.message}`);
       console.log("MP3 upload successful:", uploadData);
 
-      // 4) Insert DB row
+      // 4) Insert DB row with transcript
       console.log("Saving to database...");
       const row = {
         file_name: audioData.file_name,
         original_file_name: mp3Name,
-        full_transcript: audioData.full_transcript,
+        full_transcript: transcript || liveTranscript,
         duration: audioData.duration,
         customer_id: audioData.customer_id,
       };
@@ -481,8 +485,9 @@ const Recording = () => {
   const startRecordingAudio = async () => {
     // Reset state for new recording
     setTexts({});
+    setTurns({});
     setLiveTranscript("");
-
+    setInterim("");
     startRecording();
     setIsTranscribing(true);
     const response = await fetch("/api/token");
@@ -495,30 +500,67 @@ const Recording = () => {
     const { token } = data;
 
     if (!window.socket) {
-      window.socket = await new WebSocket(
-        `wss://api.assemblyai.com/v2/realtime/ws?sample_rate=16000&token=${token}`
+      const params = new URLSearchParams({
+        sample_rate: "16000",
+        format_turns: "true",
+        token,
+      });
+      window.socket = new WebSocket(
+        `wss://streaming.assemblyai.com/v3/ws?${params}`
       );
+      window.socket.binaryType = "arraybuffer";
     }
 
     window.socket.onmessage = (message) => {
-      let msg = "";
-      const res = JSON.parse(message.data);
-      setTexts((prevTexts) => {
-        const newTexts = { ...prevTexts, [res.audio_start]: res.text };
-        const keys = Object.keys(newTexts);
-        keys.sort((a, b) => a - b);
-        for (const key of keys) {
-          if (newTexts[key]) {
-            msg += ` ${newTexts[key]}`;
+      try {
+        const data = JSON.parse(message.data);
+        if (data.type === "Begin") return;
+        if (data.type === "Turn") {
+          // Show live partial for current utterance
+          if (!data.end_of_turn) {
+            setInterim(
+              typeof data.transcript === "string" ? data.transcript : ""
+            );
+            return;
           }
+          // Commit on endpoint; prefer formatted if present
+          const order = Number(data.turn_order ?? 0);
+          const text =
+            typeof data.transcript === "string" ? data.transcript : "";
+          const formatted = !!data.turn_is_formatted;
+
+          setTurns((prev) => {
+            const next = { ...prev };
+            const curr = next[order];
+            // upgrade/insert: if we don't have it yet, or we now have a formatted one
+            if (!curr || (formatted && !curr.formatted)) {
+              next[order] = { text, formatted };
+            }
+            // rebuild the display string from ordered turns
+            const joined = Object.keys(next)
+              .map((k) => Number(k))
+              .sort((a, b) => a - b)
+              .map((k) => next[k].text)
+              .join(" ")
+              .trim();
+            setLiveTranscript(joined);
+            return next;
+          });
+          setInterim("");
+          return;
         }
-        setLiveTranscript(msg);
-        return newTexts;
-      });
+        if (data.type === "Termination") return;
+      } catch (e) {
+        console.warn("onmessage parse error", e);
+      }
     };
 
     window.socket.onerror = (event) => {
       console.error(event);
+      try {
+        window.socket.send(JSON.stringify({ type: "Terminate" }));
+      } catch {}
+      setInterim("");
       window.socket.close();
       setIsTranscribing(false);
     };
@@ -535,8 +577,8 @@ const Recording = () => {
             numberOfAudioChannels: 1,
             desiredSampRate: 16000,
             // Add timeSlice to get data periodically
-            timeSlice: 250,
-            // Get data every 250ms
+            timeSlice: 120,
+            // Get data every 120ms
             ondataavailable: (blob) => {
               // Convert blob to array buffer
               const reader = new FileReader();
@@ -560,6 +602,10 @@ const Recording = () => {
     if (recorderRef.current) {
       recorderRef.current.stopRecording(() => {
         if (window.socket) {
+          try {
+            window.socket.send(JSON.stringify({ type: "Terminate" }));
+          } catch {}
+          setInterim("");
           window.socket.close();
           window.socket = null;
         }
@@ -570,6 +616,10 @@ const Recording = () => {
       });
     } else {
       if (window.socket) {
+        try {
+          window.socket.send(JSON.stringify({ type: "Terminate" }));
+        } catch {}
+        setInterim("");
         window.socket.close();
         window.socket = null;
       }
@@ -583,6 +633,10 @@ const Recording = () => {
   useEffect(() => {
     return () => {
       if (window.socket) {
+        try {
+          window.socket.send(JSON.stringify({ type: "Terminate" }));
+        } catch {}
+        setInterim("");
         window.socket.close();
         window.socket = null;
       }
@@ -698,7 +752,10 @@ const Recording = () => {
               </button>
             </div>
             <div className="transcript" aria-live="polite">
-              {liveTranscript}
+              <p>
+                {liveTranscript}{" "}
+                <span style={{ opacity: 0.55 }}>{interim}</span>
+              </p>
             </div>
           </div>
         );
