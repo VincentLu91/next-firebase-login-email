@@ -96,15 +96,17 @@ const MainGrid = styled.div`
   }
 `;
 
-const Card = styled.div`
+const Card = styled.div.attrs(({ delay, ...props }) => ({
+  ...props, // Only pass through valid HTML attributes
+}))`
   background: #ffffff;
   border: 1px solid #eef0f2;
   border-radius: 16px;
   padding: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-  ${(props) => css`
+  ${({ delay }) => css`
     animation: ${fadeUp} 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    animation-delay: ${props.delay || "0ms"};
+    animation-delay: ${delay || "0ms"};
   `}
   opacity: 0;
 
@@ -205,7 +207,11 @@ const Label = styled.label`
   color: #6b7280;
 `;
 
-const TextArea = styled.textarea`
+const TextArea = styled.textarea.attrs(
+  ({ isFileName, isTranscript, ...props }) => ({
+    ...props, // Only pass through valid HTML attributes
+  })
+)`
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 12px 14px;
@@ -229,8 +235,8 @@ const TextArea = styled.textarea`
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
   }
 
-  ${(props) =>
-    props.isFileName &&
+  ${({ isFileName }) =>
+    isFileName &&
     `
     min-height: 60px;
     height: 60px;
@@ -239,8 +245,8 @@ const TextArea = styled.textarea`
     padding: 16px;
   `}
 
-  ${(props) =>
-    props.isTranscript &&
+  ${({ isTranscript }) =>
+    isTranscript &&
     `
     min-height: 360px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -260,7 +266,9 @@ const ActionRow = styled.div`
   }
 `;
 
-const PrimaryButton = styled.button`
+const PrimaryButton = styled.button.attrs(({ isLoading, ...props }) => ({
+  ...props, // Only pass through valid HTML attributes
+}))`
   background: #2563eb;
   color: #ffffff;
   padding: 10px 14px;
@@ -287,8 +295,8 @@ const PrimaryButton = styled.button`
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.32);
   }
 
-  ${(props) =>
-    props.isLoading &&
+  ${({ isLoading }) =>
+    isLoading &&
     css`
       position: relative;
       color: transparent;
