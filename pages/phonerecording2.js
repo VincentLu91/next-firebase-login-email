@@ -489,8 +489,12 @@ const PhoneRecording2 = () => {
               )}
 
               {transcriptionText && (
-                <div className="transcript" aria-live="polite">
-                  <p style={{ margin: 0 }}>{transcriptionText}</p>
+                <div
+                  className="transcript"
+                  aria-live="polite"
+                  style={{ whiteSpace: "pre-wrap" }}
+                >
+                  {transcriptionText}
                 </div>
               )}
             </div>
