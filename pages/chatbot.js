@@ -182,40 +182,55 @@ function ChatBot() {
 
     await axios
       .post(
-        "https://api.cohere.ai/v1/chat",
+        "/api/agent", // <-- proxy to your FastAPI agent
         {
-          model: "command",
-          message: message,
-          temperature: 0.3,
-          chat_history: [],
-          prompt_truncation: "auto",
-          stream: false,
-          citation_quality: "accurate",
-          connectors: [],
+          // keep your exact inputs
+          query: message,
           documents: splitStringIntoChunks(sound.full_transcript, 30),
-        },
-        {
-          headers: {
-            Authorization: "Bearer q9pUdf7PjyyKMPM1Hk2Jhtv4tXJZY41dzEZ19Nuy",
-            "Content-Type": "application/json",
-          },
+
+          // (optional) pass history in a generic form many agents accept
+          chat_history: apiMessages, // [{role, content}, ...]
+          messages: apiMessages, // duplicate key for compatibility
+          // add any metadata you want your agent to see:
+          metadata: { soundUrl },
         }
       )
       .then((response) => {
         setTyping(false);
-        console.log(response.data.text);
+
+        // normalize: agent may return {text} or {answer} etc.
+        const agentText =
+          response?.data?.text ??
+          response?.data?.answer ??
+          response?.data?.output ??
+          response?.data?.reply ??
+          "(No response from agent)";
+
+        console.log(agentText);
+
         setMessages([
           ...chatMessages,
           {
-            message: response.data.text,
+            message: agentText,
             sender: "ChatGPT",
           },
         ]);
-        // Save ChatGPT response to Supabase
-        saveMessageToSupabase(response.data.text, "ChatGPT", user.id, soundUrl);
-      });
 
-    //return response.data.text;
+        // Save ChatGPT response to Supabase
+        saveMessageToSupabase(agentText, "ChatGPT", user.id, soundUrl);
+      })
+      .catch((err) => {
+        setTyping(false);
+        console.error("Agent error:", err?.response?.data || err.message);
+        setMessages([
+          ...chatMessages,
+          {
+            message:
+              "Sorry—I'm having trouble reaching the AI agent right now. Please try again.",
+            sender: "ChatGPT",
+          },
+        ]);
+      });
   }
 
   const messagesEndRef = useRef(null);
