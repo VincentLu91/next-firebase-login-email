@@ -1,12 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
-import ToggleSwitch from "../components/controls/ToggleSwitch";
-
 const Pricing = () => {
-  const [billingInterval, setBillingInterval] = useState("month");
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [customer, setCustomer] = useState(null);
@@ -48,15 +44,13 @@ const Pricing = () => {
     }
 
     try {
-      const stripe = await loadStripe(
-        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-      );
       const response = await axios.post("/api/checkout_session", {
         success_url: `${window.location.origin}/subscription-checkout`,
         cancel_url: window.location.href,
         stripe_customer_id: customer?.stripe_customer_id,
         price_id: priceId,
       });
+
       window.location.href = response.data.url;
     } catch (error) {
       console.error("Error during checkout:", error);
@@ -84,8 +78,6 @@ const Pricing = () => {
           <h1 className="text-2xl font-semibold text-white sm:text-center">
             Choose Your Plan
           </h1>
-
-          <ToggleSwitch value={billingInterval} onChange={setBillingInterval} />
         </div>
 
         <div
@@ -120,7 +112,7 @@ const Pricing = () => {
                       {priceString}
                     </span>
                     <span className="text-base font-medium text-gray-300">
-                      /{billingInterval}
+                      /month
                     </span>
                   </div>
 
