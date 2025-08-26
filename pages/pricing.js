@@ -6,6 +6,7 @@ const Pricing = () => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [customer, setCustomer] = useState(null);
+  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const router = useRouter();
   const supabase = useSupabaseClient();
   const user = useUser();
@@ -31,10 +32,36 @@ const Pricing = () => {
           .select("*")
           .eq("email_address", user.email);
         setCustomer(customerInfo.data?.[0]);
+
+        if (customerInfo.data?.[0]) {
+          let subscriptionResponse = await supabase
+            .from("subscriptions")
+            .select()
+            .eq("customer_id", customerInfo.data[0].id);
+
+          if (subscriptionResponse.data?.[0]) {
+            setSubscriptionInfo(subscriptionResponse.data[0]);
+          }
+        }
       }
     };
     checkAuth();
   }, [user, supabase]);
+
+  const switchPlan = async (subscription_id, stripe_price_id) => {
+    setLoading(true);
+    try {
+      const response = await axios.post("/api/switch-plan", {
+        subscription_id,
+        customer,
+        return_url: `${window.location.origin}/dashboard`,
+      });
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.error("Error switching plan:", error);
+      setLoading(false);
+    }
+  };
 
   const checkOut = async (priceId) => {
     setLoading(true);
@@ -186,11 +213,48 @@ const Pricing = () => {
                   </ul>
 
                   <button
-                    onClick={() => checkOut(price.stripe_price_id)}
-                    disabled={loading}
-                    className="block w-full bg-purple-600 border border-transparent rounded-lg py-3 text-sm font-semibold text-white text-center hover:bg-purple-700"
+                    onClick={() => {
+                      if (!user) {
+                        checkOut(price.stripe_price_id);
+                        return;
+                      }
+
+                      const isCurrentPlan = product.product_name
+                        ?.toLowerCase()
+                        .includes(subscriptionInfo?.stripe_product_name);
+
+                      if (subscriptionInfo) {
+                        if (!isCurrentPlan) {
+                          switchPlan(
+                            subscriptionInfo.stripe_subscription_id,
+                            price.stripe_price_id
+                          );
+                        }
+                      } else {
+                        checkOut(price.stripe_price_id);
+                      }
+                    }}
+                    disabled={
+                      loading ||
+                      (user &&
+                        subscriptionInfo?.stripe_product_name &&
+                        product.product_name
+                          ?.toLowerCase()
+                          .includes(subscriptionInfo?.stripe_product_name))
+                    }
+                    className="block w-full bg-purple-600 border border-transparent rounded-lg py-3 text-sm font-semibold text-white text-center hover:bg-purple-700 disabled:opacity-50"
                   >
-                    {loading ? "Loading..." : "Subscribe"}
+                    {loading
+                      ? "Loading..."
+                      : !user
+                      ? "Subscribe"
+                      : subscriptionInfo?.stripe_product_name
+                      ? product.product_name
+                          ?.toLowerCase()
+                          .includes(subscriptionInfo?.stripe_product_name)
+                        ? "Current Plan"
+                        : "Switch Plan"
+                      : "Subscribe"}
                   </button>
                 </div>
               </div>
