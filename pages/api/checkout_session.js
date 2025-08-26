@@ -7,7 +7,8 @@ export default async function handler(req, res) {
   try {
     const payload = {
       // https://stripe.com/docs/payments/checkout/custom-success-page
-      success_url: `${success_url}?session_id={CHECKOUT_SESSION_ID}`,
+      success_url,
+      cancel_url,
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
