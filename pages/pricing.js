@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import ToggleSwitch from "../components/controls/ToggleSwitch";
 
 const Pricing = () => {
   const [billingInterval, setBillingInterval] = useState("month");
@@ -84,38 +85,14 @@ const Pricing = () => {
             Choose Your Plan
           </h1>
 
-          <div className="relative w-[400px] h-12 mx-auto mt-8 bg-gray-200 rounded-full">
-            <div
-              className={`absolute top-0 left-0 w-1/2 h-full bg-blue-500 rounded-full transition-transform duration-200 transform ${
-                billingInterval === "year" ? "translate-x-full" : ""
-              }`}
-            ></div>
-            <div className="relative flex h-full">
-              <button
-                onClick={() => setBillingInterval("month")}
-                className={`flex-1 text-sm font-medium z-10 ${
-                  billingInterval === "month" ? "text-white" : "text-gray-600"
-                }`}
-              >
-                MONTHLY
-              </button>
-              <button
-                onClick={() => setBillingInterval("year")}
-                className={`flex-1 text-sm font-medium z-10 ${
-                  billingInterval === "year" ? "text-white" : "text-gray-600"
-                }`}
-              >
-                YEARLY
-              </button>
-            </div>
-          </div>
+          <ToggleSwitch value={billingInterval} onChange={setBillingInterval} />
         </div>
 
         <div
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, minmax(300px, 1fr))",
-            gap: "24px",
+            gap: "0",
             width: "100%",
             maxWidth: "1200px",
             margin: "40px auto 0",
@@ -132,7 +109,7 @@ const Pricing = () => {
             }).format((price.unit_amount || 0) / 100);
 
             return (
-              <div key={product.id} className="rounded-lg bg-gray-800 p-8">
+              <div key={product.id} className="bg-gray-800 p-8">
                 <div>
                   <h2 className="text-xl leading-6 font-semibold text-white">
                     {product.product_name}
