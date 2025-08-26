@@ -1,109 +1,235 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import styles from "../styles/Home.module.css";
+import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
+import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 
-// this page can be edited later with live plans for production purposes.
 const Pricing = () => {
+  const [billingInterval, setBillingInterval] = useState("month");
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [customer, setCustomer] = useState(null);
   const router = useRouter();
+  const supabase = useSupabaseClient();
+  const user = useUser();
+
+  const getProductsDisplay = useCallback(async () => {
+    let productsData = await supabase
+      .from("products")
+      .select("*, prices(*)")
+      .eq("active", true);
+    console.log("Products are: ", productsData);
+    setProducts(productsData.data || []);
+  }, [supabase]);
+
+  useEffect(() => {
+    getProductsDisplay();
+  }, [getProductsDisplay]);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (user) {
+        let customerInfo = await supabase
+          .from("customers")
+          .select("*")
+          .eq("email_address", user.email);
+        setCustomer(customerInfo.data?.[0]);
+      }
+    };
+    checkAuth();
+  }, [user, supabase]);
+
+  const checkOut = async (priceId) => {
+    setLoading(true);
+    if (!user) {
+      router.push("/signin");
+      return;
+    }
+
+    try {
+      const stripe = await loadStripe(
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+      );
+      const response = await axios.post("/api/checkout_session", {
+        success_url: `${window.location.origin}/subscription-checkout`,
+        cancel_url: window.location.href,
+        stripe_customer_id: customer?.stripe_customer_id,
+        price_id: priceId,
+      });
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.error("Error during checkout:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!products.length) {
+    return (
+      <section className="bg-black relative">
+        <div className="max-w-[1000px] mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8">
+          <p className="text-4xl font-bold text-white text-center">
+            No subscription pricing plans found.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <main className={styles["main-mini"]}>
-      <h1>Pricing</h1>
-      <p className="fs-5 text-muted">Below is the list of pricing plans</p>
-      <div className="row row-cols-1 row-cols-md-3">
-        <div className={styles["alt-grid"]}>
-          <div className={styles["alt-card"]}>
-            <div className="card text-center">
-              <div className="card-header">
-                <h4 className="fw-normal">Free</h4>
-              </div>
-              <div className="card-body">
-                <h1 className="card-title">
-                  $0 <small className="text-muted fw-light">/mo</small>
-                </h1>
-                <ul className="list-unstyled py-3">
-                  <li>10 users included</li>
-                  <li>10GB of storage</li>
-                  <li>Priority email support</li>
-                  <li>Help center access</li>
-                </ul>
-                <button onClick={() => router.push("/signin")}>
-                  Sign Up Free
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className={styles["alt-card"]}>
-            <div className="card text-center">
-              <div className="card-header">
-                <h4 className="fw-normal">Pro</h4>
-              </div>
-              <div className="card-body">
-                <h1 className="card-title">
-                  $20 <small className="text-muted fw-light">/mo</small>
-                </h1>
-                <ul className="list-unstyled py-3">
-                  <li>20 users included</li>
-                  <li>10GB of storage</li>
-                  <li>Priority email support</li>
-                  <li>Help center access</li>
-                </ul>
-                <button onClick={() => router.push("/signin")}>
-                  Get Started
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className={styles["alt-card"]}>
-            <div className="card text-center">
-              <div className="card-header">
-                <h4 className="fw-normal">Enterprise</h4>
-              </div>
-              <div className="card-body">
-                <h1 className="card-title">
-                  $30 <small className="text-muted fw-light">/mo</small>
-                </h1>
-                <ul className="list-unstyled py-3">
-                  <li>30 users included</li>
-                  <li>10GB of storage</li>
-                  <li>Priority email support</li>
-                  <li>Help center access</li>
-                </ul>
-                <button onClick={() => router.push("/signin")}>
-                  Get Started
-                </button>
-              </div>
+    <section className="bg-black">
+      <div className="max-w-[1200px] mx-auto px-6 py-20">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold text-white sm:text-center">
+            Choose Your Plan
+          </h1>
+
+          <div className="relative w-[400px] h-12 mx-auto mt-8 bg-gray-200 rounded-full">
+            <div
+              className={`absolute top-0 left-0 w-1/2 h-full bg-blue-500 rounded-full transition-transform duration-200 transform ${
+                billingInterval === "year" ? "translate-x-full" : ""
+              }`}
+            ></div>
+            <div className="relative flex h-full">
+              <button
+                onClick={() => setBillingInterval("month")}
+                className={`flex-1 text-sm font-medium z-10 ${
+                  billingInterval === "month" ? "text-white" : "text-gray-600"
+                }`}
+              >
+                MONTHLY
+              </button>
+              <button
+                onClick={() => setBillingInterval("year")}
+                className={`flex-1 text-sm font-medium z-10 ${
+                  billingInterval === "year" ? "text-white" : "text-gray-600"
+                }`}
+              >
+                YEARLY
+              </button>
             </div>
           </div>
         </div>
-        <h2 className={styles["main-mini"]}>Compare Plan</h2>
-        <div className={styles["main-mini"]}>
-          <table className="table text-center">
-            <thead>
-              <tr>
-                <th style={{ width: "34%" }}></th>
-                <th style={{ width: "22%" }}>Free</th>
-                <th style={{ width: "22%" }}>Pro</th>
-                <th style={{ width: "22%" }}>Enterprise</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>Public</th>
-                <td>&#10003;</td>
-                <td>&#10003;</td>
-                <td>&#10003;</td>
-              </tr>
-              <tr>
-                <th>Private</th>
-                <td></td>
-                <td>&#10003;</td>
-                <td>&#10003;</td>
-              </tr>
-            </tbody>
-          </table>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(300px, 1fr))",
+            gap: "24px",
+            width: "100%",
+            maxWidth: "1200px",
+            margin: "40px auto 0",
+          }}
+        >
+          {products.map((product) => {
+            const price = product.prices?.[0];
+            if (!price) return null;
+
+            const priceString = new Intl.NumberFormat("en-US", {
+              style: "currency",
+              currency: price.currency || "USD",
+              minimumFractionDigits: 0,
+            }).format((price.unit_amount || 0) / 100);
+
+            return (
+              <div key={product.id} className="rounded-lg bg-gray-800 p-8">
+                <div>
+                  <h2 className="text-xl leading-6 font-semibold text-white">
+                    {product.product_name}
+                  </h2>
+                  <p className="mt-2 text-gray-300">{product.description}</p>
+                  <div className="mt-8 mb-8">
+                    <span className="text-4xl font-bold text-white">
+                      {priceString}
+                    </span>
+                    <span className="text-base font-medium text-gray-300">
+                      /{billingInterval}
+                    </span>
+                  </div>
+
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="w-4 h-4 text-green-500 flex-none"
+                          height="16"
+                          width="16"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                      <p className="ml-3 text-base text-gray-300">
+                        {price.mic_tokens} Microphone Minutes
+                      </p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="w-4 h-4 text-green-500 flex-none"
+                          height="16"
+                          width="16"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                      <p className="ml-3 text-base text-gray-300">
+                        {price.call_tokens} Call Minutes
+                      </p>
+                    </li>
+                    <li className="flex items-start">
+                      <div className="flex-shrink-0">
+                        <svg
+                          className="w-4 h-4 text-green-500 flex-none"
+                          height="16"
+                          width="16"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      </div>
+                      <p className="ml-3 text-base text-gray-300">
+                        {price.num_calls} Number of Calls
+                      </p>
+                    </li>
+                  </ul>
+
+                  <button
+                    onClick={() => checkOut(price.stripe_price_id)}
+                    disabled={loading}
+                    className="block w-full bg-purple-600 border border-transparent rounded-lg py-3 text-sm font-semibold text-white text-center hover:bg-purple-700"
+                  >
+                    {loading ? "Loading..." : "Subscribe"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </main>
+    </section>
   );
 };
 
