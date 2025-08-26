@@ -1,272 +1,283 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import axios from "axios";
-import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
-import dashboardStyles from "../styles/dashboardStyles";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+// pages/account.js (B2C) — button opens the same Stripe pages as your Pricing cards
 
-const ManageSubscriptions = () => {
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import axios from "axios"; // NEW
+import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+
+function Button({ children, loading, disabled, onClick, variant = "slim" }) {
+  const base =
+    "inline-flex items-center justify-center rounded-md px-4 py-2 font-medium transition";
+  const slim =
+    "bg-white text-black hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed";
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled || loading}
+      className={`${base} ${variant === "slim" ? slim : ""}`}
+    >
+      {loading ? "Loading..." : children}
+    </button>
+  );
+}
+
+function LoadingDots() {
+  return (
+    <span className="inline-flex gap-1">
+      <span className="animate-pulse">•</span>
+      <span className="animate-pulse delay-150">•</span>
+      <span className="animate-pulse delay-300">•</span>
+    </span>
+  );
+}
+
+function Card({ title, description, footer, children }) {
+  return (
+    <div className="border border-accents-1 max-w-3xl w-full rounded-lg m-auto my-8 overflow-hidden">
+      <div className="px-5 py-4">
+        <h3 className="text-2xl mb-1 font-medium">{title}</h3>
+        {description && <p className="text-white/80">{description}</p>}
+        {children}
+      </div>
+      <div className="border-t border-accents-1 bg-red-100-2 p-4 text-blue-300 rounded-b-lg">
+        {footer}
+      </div>
+    </div>
+  );
+}
+
+export default function Account() {
   const router = useRouter();
-  const dispatch = useDispatch();
   const supabase = useSupabaseClient();
   const user = useUser();
-  const [products, setProducts] = useState([]);
-  const [customer, setCustomer] = useState(null);
-  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
-  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const [loading, setLoading] = useState(false);
-  const checkAuth = useCallback(
-    async (user) => {
-      if (user) {
-        console.log("Supabase user is: ", user);
-        let customerInfo = await supabase
-          .from("customers")
-          .select("*")
-          .eq("email_address", user.email);
-        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
-        setCustomer(customerInfo.data[0]);
-        let subscriptionResponse = await supabase
-          .from("subscriptions")
-          .select()
-          .eq("customer_id", customerInfo.data[0].id);
+  const [loadingMe, setLoadingMe] = useState(true);
 
-        console.log("subscription REsponse >>>>>>", subscriptionResponse);
-        if (!subscriptionResponse) {
-          setIsSubscribed(false);
-          setSubscriptionInfo(null);
-        } else {
-          if (!subscriptionResponse.data[0]) {
-            setIsSubscribed(false);
-            setSubscriptionInfo(null);
-          } else {
-            console.log(
-              "subscriptionResponse is: ",
-              subscriptionResponse.data[0].stripe_product_name
-            );
-            setIsSubscribed(true);
-            setSubscriptionInfo(subscriptionResponse.data[0]);
-          }
-        }
-        let micRecordingInfo = await supabase
-          .from("mic_recordings")
-          .select("*")
-          .eq("customer_id", customerInfo.data[0].id);
-        // setCloudRecordingList(micRecordingInfo.data);
-      } else {
-        // User is signed out
-        console.log(
-          "The user is inauthenticated, redirecting back to signin page"
-        );
-        router.push("/signin");
-      }
-    },
-    [router, supabase]
-  );
+  const [customer, setCustomer] = useState(null);
+  const [subscription, setSubscription] = useState(null);
+  const [priceRow, setPriceRow] = useState(null);
 
-  // this is to check for the user status and subscriptions before loading all recording objects
+  // NEW: products for fallback price when user has no subscription
+  const [products, setProducts] = useState([]);
+
+  // redirect if not signed in
   useEffect(() => {
-    checkAuth(user);
-  }, [checkAuth, user]);
+    if (user === null) router.replace("/signin");
+  }, [user, router]);
 
+  // Load products (active) like your Pricing page
   const getProductsDisplay = useCallback(async () => {
-    let products = await supabase
+    const { data, error } = await supabase
       .from("products")
       .select("*, prices(*)")
       .eq("active", true);
-    console.log("Products are: ", products);
-    setProducts(products);
+    if (!error) setProducts(data || []);
   }, [supabase]);
   useEffect(() => {
     getProductsDisplay();
   }, [getProductsDisplay]);
 
-  // have no subscription
-  const checkOut = async (priceId) => {
-    const stripe = await loadStripe(
-      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-    );
-    // user/customer objects should already be present including stripe customer id
-    // make request to backend to get session data
-    // redirect user to sessions url
+  // Load customer + subscription + price
+  const fetchMe = useCallback(
+    async (u) => {
+      if (!u) {
+        setLoadingMe(false);
+        return;
+      }
+      try {
+        const { data: custData } = await supabase
+          .from("customers")
+          .select("*")
+          .eq("email_address", u.email)
+          .maybeSingle();
 
-    const response = await axios.post(
-      //"http://localhost:3001/api/checkout_session", // I could rewrite this with environment specific URLs
-      `/api/checkout_session`, // this?
-      {
+        setCustomer(custData || null);
+
+        if (!custData) {
+          setSubscription(null);
+          setPriceRow(null);
+          setLoadingMe(false);
+          return;
+        }
+
+        const { data: subsData } = await supabase
+          .from("subscriptions")
+          .select("*")
+          .eq("customer_id", custData.id)
+          .order("created", { ascending: false })
+          .limit(1);
+
+        const sub = subsData?.[0] || null;
+        setSubscription(sub);
+
+        if (sub?.stripe_price_id) {
+          const { data: priceData } = await supabase
+            .from("prices")
+            .select("*")
+            .eq("stripe_price_id", sub.stripe_price_id)
+            .maybeSingle();
+          setPriceRow(priceData || null);
+        } else {
+          setPriceRow(null);
+        }
+      } catch (e) {
+        console.error("account load error:", e);
+      } finally {
+        setLoadingMe(false);
+      }
+    },
+    [supabase]
+  );
+
+  useEffect(() => {
+    fetchMe(user);
+  }, [user, fetchMe]);
+
+  // Derived display
+  const subscriptionName = subscription?.stripe_product_name || null;
+  const subscriptionPrice = useMemo(() => {
+    if (!priceRow?.unit_amount || !priceRow?.currency) return null;
+    try {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: (priceRow.currency || "usd").toUpperCase(),
+        minimumFractionDigits: 0,
+      }).format(priceRow.unit_amount / 100);
+    } catch {
+      return `$${(priceRow.unit_amount / 100).toFixed(0)}`;
+    }
+  }, [priceRow]);
+  const interval = priceRow?.interval || "month";
+
+  // --- Stripe actions copied from your Pricing page ---
+
+  const switchPlan = async (subscription_id, stripe_price_id) => {
+    setLoading(true);
+    try {
+      const response = await axios.post("/api/switch-plan", {
+        subscription_id,
+        customer,
+        return_url: `${window.location.origin}/dashboard`,
+      });
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.error("Error switching plan:", error);
+      setLoading(false);
+    }
+  };
+
+  const checkOut = async (priceId) => {
+    setLoading(true);
+    if (!user) {
+      router.push("/signin");
+      return;
+    }
+    try {
+      const response = await axios.post("/api/checkout_session", {
         success_url: `${window.location.origin}/subscription-checkout`,
         cancel_url: window.location.href,
         stripe_customer_id: customer?.stripe_customer_id,
         price_id: priceId,
-      }
-    );
-    window.location.href = response.data.url; // by calling the API to start checkout, redirect user to checkout page
-
-    /*let customerResponse = await supabase
-      .from("customers")
-      .insert([{}])
-      .select();
-    if (customerResponse.error) {
-      console.log("Cannot insert, see error: ");
-      console.log(customerResponse.error);
-    }
-    if (customerResponse.data) {
-      console.log("Customer Success!");
-      console.log(customerResponse.data);
-    }*/
-  };
-
-  console.log("customer", customer);
-
-  const updateSubscription = async (subscriptionObj, stripe_price_id) => {
-    console.log("subscriptionObj is: ", subscriptionObj);
-    //console.log("stripe_price_id is: ", stripe_price_id);
-    let priceResponse = await supabase
-      .from("prices")
-      .select("*")
-      .eq("stripe_price_id", stripe_price_id);
-    console.log("priceResponse when switching plans is: ", priceResponse);
-    let productResponse = await supabase
-      .from("products")
-      .select("*")
-      .eq("stripe_product_id", priceResponse.data[0].stripe_product_id);
-    console.log("productResponse when switching plans is: ", productResponse);
-    let subscriptionUpdateResponse = await supabase
-      .from("subscriptions")
-      .update([
-        {
-          //stripe_subscription_id: res.data.subscription, // subscription id is the same no matter the product
-          stripe_price_id: subscriptionObj.id,
-          stripe_product_id: subscriptionObj.product,
-          price_id: priceResponse.data[0].id,
-          product_id: priceResponse.data[0].product_id,
-          stripe_product_name: productResponse.data[0].product_name,
-          //cancel_at_period_end: false,
-        },
-      ])
-      .eq("customer_id", customer.id)
-      .select();
-    console.log("subscriptionUpdateResponse is: ", subscriptionUpdateResponse);
-  };
-
-  //Stripe APIs
-  const switchPlan = async (subscription_id, stripe_price_id) => {
-    // https://stripe.com/docs/billing/subscriptions/upgrade-downgrade
-    //await checkAuth(user);
-    //setLoading(true);
-    const response = await axios.post("/api/switch-plan", {
-      subscription_id,
-      customer,
-      return_url: `${window.location.origin}/dashboard`,
-    });
-    window.location.href = response.data.url;
-    /*.then((subscriptionRes) => {
-        //console.log("subscription is: ", subscriptionRes.data.plan);
-        //console.log("stripe_price_id is: ", stripe_price_id);
-        updateSubscription(subscriptionRes.data.plan, stripe_price_id);
-      });*/
-    //setSubscription(null); // reverting back to commented code; not needed
-    //await checkAuth(user);
-    //setLoading(false);
-    //window.location.reload(true); // workaround for screen refresh
-    //await checkAuth(user); // no need to router.push('/dashboard') anymore.
-  };
-
-  const deleteSubscription = async (stripe_subscription_id) => {
-    console.log(
-      "in deleteSubscription(), stripe_subscription_id is: ",
-      stripe_subscription_id
-    );
-    let deletedSubscription = await supabase
-      .from("subscriptions")
-      .delete()
-      .eq("stripe_subscription_id", stripe_subscription_id);
-    console.log("deletedSubscription in the works: ", deletedSubscription);
-    if (deletedSubscription.error) {
-      console.log("Cannot delete subscription");
-      console.log(deletedSubscription.error);
-    }
-    if (deletedSubscription.data) {
-      console.log("Subscription deletion success");
-      console.log(deletedSubscription.data);
-    }
-  };
-
-  const cancelPlan = async (subscription_id) => {
-    // https://stripe.com/docs/billing/subscriptions/cancel
-    await checkAuth(user);
-    setLoading(true);
-    //perform the cancellation of plan. For now, when cancelling, delete the whole subscription record to test things
-    await axios
-      .post("/api/cancel-plan", { subscription_id })
-      .then((subscriptionRes) => {
-        //console.log("subscriptionRes to delete is: ", subscriptionRes.data.id);
-        deleteSubscription(subscriptionRes.data.id);
       });
-    //setSubscriptionInfo(null);
-    await checkAuth(user);
-    setLoading(false);
-    //window.location.reload(true);
-    //router.push("/dashboard");
+      window.location.href = response.data.url;
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      setLoading(false);
+    }
   };
-  return (
-    <div>
-      <button onClick={() => router.push("/dashboard")}>
-        Back to Dashboard
-      </button>
-      <h1>ManageSubscriptions</h1>
-      {loading && (
-        <div>
-          <h3>Updating Subscriptions...</h3>
-        </div>
-      )}
-      <div className="plans-container">
-        {Object.entries(products.data || {}).map(([productId, productData]) => {
-          console.log(productData, subscriptionInfo);
-          const isCurrentPlan = productData?.product_name
-            ?.toLowerCase()
-            .includes(subscriptionInfo?.stripe_product_name);
-          return (
-            <div className="plans" key={productId}>
-              <div>
-                {productData.product_name} - {productData.description}
-              </div>
-              <button
-                className={isCurrentPlan && "subscribed" ? "subscribed" : null}
-                disabled={isCurrentPlan}
-                onClick={() =>
-                  subscriptionInfo?.stripe_product_name
-                    ? isCurrentPlan
-                      ? undefined
-                      : switchPlan(
-                          subscriptionInfo.stripe_subscription_id,
-                          productData.prices[0].stripe_price_id
-                        )
-                    : checkOut(productData.prices[0].stripe_price_id)
-                }
-              >
-                {subscriptionInfo?.stripe_product_name
-                  ? isCurrentPlan
-                    ? "Subscribed"
-                    : "Switch Plan"
-                  : "Buy Plan"}
-              </button>
-              {isCurrentPlan && (
-                <button
-                  onClick={() =>
-                    cancelPlan(subscriptionInfo.stripe_subscription_id)
-                  }
-                >
-                  Cancel
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
 
-export default ManageSubscriptions;
+  // Helper: pick a fallback price id if no subscription
+  const firstActivePriceId =
+    priceRow?.stripe_price_id ||
+    products?.[0]?.prices?.[0]?.stripe_price_id ||
+    null;
+
+  // NEW: Replace portal behavior with same Stripe redirect as cards
+  const handleStripeClick = () => {
+    if (!user) {
+      router.push("/signin");
+      return;
+    }
+    if (subscription?.stripe_subscription_id) {
+      // Manage/upgrade via your /api/switch-plan flow
+      return switchPlan(
+        subscription.stripe_subscription_id,
+        priceRow?.stripe_price_id
+      );
+    }
+    // No sub yet → start checkout
+    if (firstActivePriceId) return checkOut(firstActivePriceId);
+    alert("No active prices found. Please try again later.");
+  };
+
+  return (
+    <section className="bg-[#0C0C0C] mb-32 min-h-screen">
+      <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
+        <div className="sm:flex sm:flex-col sm:align-center">
+          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
+            Account
+          </h1>
+          <p className="mt-5 text-xl text-white sm:text-center sm:text-2xl max-w-2xl m-auto">
+            We partnered with Stripe for a simplified billing.
+          </p>
+        </div>
+      </div>
+
+      <div className="p-4">
+        <Card
+          title="Your Plan"
+          description={
+            subscriptionName &&
+            `You are currently on the ${subscriptionName} plan.`
+          }
+          footer={
+            <div className="flex items-start justify-between flex-col sm:flex-row sm:items-center gap-3">
+              <p className="text-white">
+                Manage or change your plan on Stripe.
+              </p>
+              <p className="text-white">
+                Go to your <Link href="/dashboard">dashboard</Link>.
+              </p>
+              <Button
+                variant="slim"
+                loading={loading}
+                disabled={loading}
+                onClick={handleStripeClick} // 👈 now mirrors Pricing page behavior
+              >
+                {subscription ? "Manage / Switch Plan" : "Subscribe"}
+              </Button>
+            </div>
+          }
+        >
+          <div className="text-xl mt-8 mb-4 font-semibold text-white">
+            {loadingMe ? (
+              <div className="h-12 mb-6 flex items-center">
+                <LoadingDots />
+              </div>
+            ) : subscription && subscriptionPrice ? (
+              `${subscriptionPrice}/${interval}`
+            ) : (
+              <Link href="/pricing">Choose your plan</Link>
+            )}
+          </div>
+        </Card>
+
+        <Card
+          title="Your Email"
+          description="Please enter the email address you want to use to login."
+          footer={
+            <p className="text-white">
+              We will email you to verify the change.
+            </p>
+          }
+        >
+          <p className="text-xl mt-8 mb-4 font-semibold text-white">
+            {user?.email ?? ""}
+          </p>
+        </Card>
+      </div>
+    </section>
+  );
+}
