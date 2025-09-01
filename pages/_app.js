@@ -7,17 +7,17 @@ import PubnubProvider from "../contexts/pubnub";
 import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useState } from "react";
-import { Nunito } from "next/font/google";
-const nunito = Nunito({
+import { Manrope } from "next/font/google";
+const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["300", "400", "600", "700"],
+  weight: ["500", "600", "700"],
   display: "swap",
 });
 
 function MyApp({ Component, pageProps }) {
   const [supabase] = useState(() => createPagesBrowserClient());
   return (
-    <div className={`theme-black ${nunito.className}`}>
+    <div className={`app-shell ${manrope.className}`}>
       <SessionContextProvider
         supabaseClient={supabase}
         initialSession={pageProps.initialSession}

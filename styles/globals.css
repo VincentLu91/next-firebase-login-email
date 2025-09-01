@@ -70,18 +70,53 @@ a {
    Flat Minimal Black – app-wide tokens + atoms
    (active because your _app.js wraps everything in <div class="theme-black ...">)
 =================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap");
+
 :root {
-  --bg: #0f1115; /* page */
-  --panel: #151821; /* cards/sections */
-  --panel-2: #1b1f2a; /* inset areas/inputs */
-  --border: #262b36; /* hairline */
-  --text: #e8eaf1; /* primary text */
-  --muted: #9aa3b2; /* secondary text */
-  --accent: #f59e0b; /* amber */
-  --accent-2: #ff7a18; /* warm gradient end */
-  --radius: 14px;
-  --shadow: 0 0 0 1px var(--border);
-  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.35);
+  /* Color tokens */
+  --bg-900: #0f1115; /* page */
+  --bg-800: #151922; /* elevated panels */
+  --bg-700: #1e232d; /* cards/rows */
+  --text-100: #f5f7fa;
+  --text-300: #c9cfda;
+  --muted-600: #2a2f3a; /* borders/dividers */
+  --accent-400: #fbbf24;
+  --accent-500: #f59e0b; /* primary */
+  --accent-600: #d97706; /* active/pressed */
+  --success: #22c55e;
+  --danger: #ef4444;
+
+  /* Layout */
+  --header-height: 56px;
+  --sidebar-width: 264px;
+  --utility-width: 360px;
+  --resizer-width: 6px;
+  --resizer-hit-area: 12px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Radii */
+  --radius-card: 12px;
+  --radius-button: 10px;
+
+  /* Typography */
+  --font-family: "Manrope", system-ui, sans-serif;
+  --line-height: 1.5;
+
+  /* Animation */
+  --transition-base: 180ms ease;
+  --transition-spring: 260ms cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Z-index */
+  --z-header: 100;
+  --z-sidebar: 90;
+  --z-overlay: 1000;
 }
 
 html,
@@ -90,12 +125,155 @@ body,
   height: 100%;
 }
 
+/* Base styles */
 body {
-  margin: 0; /* <-- the important bit */
+  margin: 0;
   padding: 0;
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg-900);
+  color: var(--text-100);
+  font-family: var(--font-family);
+  font-weight: 500;
+  line-height: var(--line-height);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.app-container {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-4);
+  background: var(--bg-900);
+  border-bottom: 1px solid var(--muted-600);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+}
+
+.app-sidebar {
+  grid-column: 1;
+  grid-row: 2;
+  background: var(--bg-800);
+  border-right: 1px solid var(--muted-600);
+  overflow-y: auto;
+}
+
+.app-content {
+  grid-column: 2;
+  grid-row: 2;
+  background: var(--bg-900);
+  overflow-y: auto;
+  padding: var(--space-5);
+}
+
+.app-utility {
+  grid-column: 3;
+  grid-row: 2;
+  background: var(--bg-800);
+  border-left: 1px solid var(--muted-600);
+  overflow-y: auto;
+}
+
+/* Header components */
+.header-search {
+  max-width: 560px;
+  width: 100%;
+  margin: 0 var(--space-5);
+  position: relative;
+}
+
+.header-search input {
+  width: 100%;
+  height: 36px;
+  padding: 0 var(--space-4) 0 var(--space-5);
+  border: 1px solid var(--muted-600);
+  border-radius: var(--radius-button);
+  background: var(--bg-800);
+  color: var(--text-100);
+  font-family: var(--font-family);
+}
+
+.header-search input::placeholder {
+  color: var(--text-300);
+  opacity: 0.7;
+}
+
+/* Interactive states */
+.nav-item {
+  height: 40px;
+  padding: 0 var(--space-4);
+  display: flex;
+  align-items: center;
+  color: var(--text-300);
+  transition: var(--transition-base);
+}
+
+.nav-item:hover {
+  background: var(--bg-700);
+  color: var(--text-100);
+}
+
+.nav-item.active {
+  background: var(--bg-700);
+  color: var(--text-100);
+  border-left: 3px solid var(--accent-500);
+}
+
+/* Resizers */
+.resizer {
+  position: absolute;
+  top: 0;
+  width: var(--resizer-hit-area);
+  height: 100%;
+  cursor: col-resize;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.resizer::after {
+  content: "";
+  width: var(--resizer-width);
+  height: 40px;
+  background: var(--muted-600);
+  border-radius: 999px;
+}
+
+.resizer-left {
+  right: calc(var(--resizer-hit-area) / -2);
+}
+
+.resizer-right {
+  left: calc(var(--resizer-hit-area) / -2);
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  .app-container {
+    grid-template-columns: 72px 1fr;
+  }
+
+  .header-search {
+    width: 40px;
+    margin: 0 var(--space-2);
+  }
+}
+
+/* Accessibility */
+:focus-visible {
+  outline: 2px solid var(--accent-500);
+  outline-offset: 2px;
 }
 
 /* Root wrapper set in _app.js */
