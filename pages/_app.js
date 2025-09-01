@@ -17,7 +17,7 @@ const nunito = Nunito({
 function MyApp({ Component, pageProps }) {
   const [supabase] = useState(() => createPagesBrowserClient());
   return (
-    <div className={nunito.className}>
+    <div className={`theme-black ${nunito.className}`}>
       <SessionContextProvider
         supabaseClient={supabase}
         initialSession={pageProps.initialSession}
