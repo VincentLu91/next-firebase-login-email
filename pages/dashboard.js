@@ -337,10 +337,10 @@ const Dashboard = () => {
           <p>No recordings found.</p>
           <p className="sub">Try another search, or start a new recording:</p>
           <div className="ctaRow">
-            <Link href="/internalrecording" className="btn">
+            <Link href="/internalrecording" className="u-pill btn-primary">
               Recording
             </Link>
-            <Link href="/phonerecording2" className="btn secondary">
+            <Link href="/phonerecording2" className="u-pill btn-muted">
               Phone Recording
             </Link>
           </div>
@@ -415,7 +415,8 @@ const Dashboard = () => {
                       <td className="actionsCell">
                         <div className="actionsStack">
                           <button
-                            className="link actionBtn"
+                            type="button"
+                            className="btn-primary actionBtn"
                             onClick={(e) => {
                               e.stopPropagation();
                               viewContent(item);
@@ -424,7 +425,8 @@ const Dashboard = () => {
                             View
                           </button>
                           <button
-                            className="danger actionBtn"
+                            type="button"
+                            className="btn-danger actionBtn"
                             onClick={(e) => {
                               e.stopPropagation();
                               requestDelete(item);
@@ -494,10 +496,10 @@ const Dashboard = () => {
               <strong>{pendingDelete?.file_name}</strong> from your account.
             </p>
             <div className="modalActions">
-              <button className="btn secondary" onClick={handleCancelDelete}>
+              <button className="btn-muted" onClick={handleCancelDelete}>
                 Cancel
               </button>
-              <button className="btn danger" onClick={handleConfirmDelete}>
+              <button className="btn-danger" onClick={handleConfirmDelete}>
                 Delete
               </button>
             </div>
@@ -511,7 +513,7 @@ const Dashboard = () => {
       {/* new scoped styles for the improved UI */}
       <style jsx>{`
         .page {
-          max-width: 960px;
+          max-width: 1060px;
           margin: 0 auto;
           padding: 24px;
         }
@@ -523,8 +525,9 @@ const Dashboard = () => {
           margin-bottom: 16px;
         }
         .title {
-          font-size: 20px;
-          font-weight: 600;
+          font-size: 22px;
+          font-weight: 800;
+          letter-spacing: -0.01em;
         }
 
         .searchWrap {
@@ -537,55 +540,149 @@ const Dashboard = () => {
           max-width: 420px;
           height: 40px;
           padding: 0 12px;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          outline: none;
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          background: var(--panel-2);
+          color: var(--text);
+        }
+        .search::placeholder {
+          color: var(--muted);
         }
         .search:focus {
-          border-color: #3b82f6;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+          border-color: var(--accent);
+          box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
         }
 
         .table {
           width: 100%;
-          table-layout: fixed;
           border-collapse: collapse;
-          background: #fff;
         }
-        th,
-        td {
-          padding: 12px;
-          border-bottom: 1px solid #f1f5f9;
-          vertical-align: middle;
-        }
-        th {
+        thead th {
           text-align: left;
           font-size: 12px;
-          color: #64748b;
-          font-weight: 600;
-          letter-spacing: 0.02em;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: var(--muted);
+          padding: 0 12px 6px;
+          position: sticky;
+          top: 0;
+          z-index: 2;
+          background: var(--bg);
         }
-        td.file {
-          font-weight: 500;
-          color: #0f172a;
+        td,
+        th {
+          padding: 14px 12px;
+          vertical-align: middle;
         }
-
+        tbody tr > td {
+          background: var(--panel);
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
+        }
+        tbody tr > td:first-child {
+          border-left: 1px solid var(--border);
+          border-top-left-radius: 12px;
+          border-bottom-left-radius: 12px;
+        }
+        tbody tr > td:last-child {
+          border-right: 1px solid var(--border);
+          border-top-right-radius: 12px;
+          border-bottom-right-radius: 12px;
+        }
         tr:hover td {
-          background: #f8fafc;
+          background: linear-gradient(
+              0deg,
+              rgba(255, 255, 255, 0.02),
+              rgba(255, 255, 255, 0.02)
+            ),
+            var(--panel);
         }
 
-        .link {
-          background: transparent;
-          border: none;
-          color: #2563eb;
-          cursor: pointer;
-          margin-right: 12px;
+        td.file .fileCell {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          min-width: 0;
+        }
+        .fileName {
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-weight: 600;
+        }
+
+        .rowToggle {
+          width: 28px;
+          height: 28px;
+          display: inline-grid;
+          place-items: center;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          background: var(--panel-2);
+          color: var(--text);
+          transition: transform 0.16s ease, background 0.16s ease;
+        }
+        .rowToggle:hover {
+          background: var(--panel);
+        }
+        .chev {
+          display: inline-block;
+          transition: transform 0.18s ease;
+        }
+        .chev.open {
+          transform: rotate(90deg);
+        }
+
+        .expand td {
+          background: var(--panel-2);
+        }
+        .transcript {
+          color: var(--muted);
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .actionsHeader,
+        .actionsCell {
+          text-align: center !important;
+        }
+        .actionsStack {
+          width: 112px;
+          margin-left: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .link,
+        .danger,
+        .actionBtn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 8px 12px;
+          border-radius: 10px;
+          border: 1px solid var(--border);
+          background: var(--panel-2);
+          color: var(--text);
+          transition: transform 0.15s ease, box-shadow 0.15s ease,
+            background 0.15s ease;
+        }
+        .link:hover,
+        .danger:hover,
+        .actionBtn:hover {
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-hover);
         }
         .danger {
-          background: transparent;
-          border: none;
-          color: #ef4444;
-          cursor: pointer;
+          color: #ffb4b4;
+          border-color: #4b2a2a;
+          background: #2a1b1b;
         }
 
         .pager {
@@ -598,338 +695,111 @@ const Dashboard = () => {
         .pill {
           padding: 6px 12px;
           border-radius: 999px;
-          border: 1px solid #e5e7eb;
-          background: #fff;
-          cursor: pointer;
+          background: var(--panel);
+          border: 1px solid var(--border);
+          color: var(--text);
         }
         .pill:disabled {
           opacity: 0.5;
-          cursor: not-allowed;
-        }
-        .pages {
-          font-size: 12px;
-          color: #64748b;
-        }
-
-        .empty {
-          text-align: center;
-          padding: 64px 0;
-        }
-        .empty .sub {
-          color: #64748b;
-          margin-top: 4px;
-        }
-        .ctaRow {
-          display: inline-flex;
-          gap: 12px;
-          margin-top: 16px;
-        }
-        .btn {
-          padding: 8px 14px;
-          border-radius: 8px;
-          border: 1px solid #e5e7eb;
-          background: #fff;
-        }
-        .btn.secondary {
-          background: #f8fafc;
-        }
-        .btn.danger {
-          background: #fee2e2;
-          border-color: #fecaca;
         }
 
         .skeleton .row {
           height: 52px;
+          border-radius: 12px;
+          margin-bottom: 8px;
           background: linear-gradient(
             90deg,
-            #f1f5f9 25%,
-            #f8fafc 37%,
-            #f1f5f9 63%
+            #1d2230 25%,
+            #22283a 37%,
+            #1d2230 63%
           );
           background-size: 400% 100%;
           animation: shimmer 1.4s ease infinite;
-          border-radius: 8px;
-          margin-bottom: 8px;
         }
-        @keyframes shimmer {
-          0% {
-            background-position: 100% 0;
-          }
-          100% {
-            background-position: -100% 0;
-          }
+        /* ---- EXPAND ROW SHOULD ATTACH TO ROW ABOVE ---- */
+        tbody tr:not(.expand) td {
+          background: var(--panel);
+          border-top: 1px solid var(--border);
+          border-bottom: 1px solid var(--border);
         }
-
-        .alert {
-          background: #fef3c7;
-          color: #92400e;
-          border: 1px solid #fde68a;
-          padding: 12px;
-          border-radius: 8px;
+        tbody tr:not(.expand) td:first-child {
+          border-left: 1px solid var(--border);
+        }
+        tbody tr:not(.expand) td:last-child {
+          border-right: 1px solid var(--border);
         }
 
+        /* When a row is expanded, remove its bottom border so details connect */
+        tbody tr[aria-expanded="true"] td {
+          border-bottom: 0;
+        }
+
+        /* The expanded details row: visually continue the previous row */
+        tbody tr.expand td {
+          background: var(--panel-2);
+          border: 1px solid var(--border);
+          border-top: 0; /* attach to the row above */
+          padding-top: 12px;
+          padding-bottom: 16px;
+        }
+
+        /* Optional: tidy rounding so the pair reads as one “unit” */
+        tbody tr:not(.expand) td {
+          border-radius: 0;
+        }
+        tbody tr[aria-expanded="true"] td:first-child {
+          border-top-left-radius: 12px;
+        }
+        tbody tr[aria-expanded="true"] td:last-child {
+          border-top-right-radius: 12px;
+        }
+        tbody tr.expand td {
+          border-bottom-left-radius: 12px;
+          border-bottom-right-radius: 12px;
+        }
+
+        /* Keep hover only on main rows */
+        tbody tr.expand:hover td {
+          background: var(--panel-2);
+        }
+        /* Delete confirmation overlay & dialog (missing styles) */
         .modalOverlay {
           position: fixed;
           inset: 0;
-          background: rgba(2, 6, 23, 0.6);
+          background: rgba(15, 17, 21, 0.6); /* dim the page */
           display: grid;
           place-items: center;
+          padding: 16px;
+          z-index: 9999; /* sit above everything */
         }
+
         .modal {
           width: 100%;
           max-width: 420px;
-          background: #fff;
+          background: var(--panel); /* matches theme */
+          color: var(--text);
+          border: 1px solid var(--border);
+          border-radius: 14px;
+          box-shadow: var(--shadow-hover);
           padding: 20px;
-          border-radius: 12px;
-          box-shadow: 0 10px 40px rgba(2, 6, 23, 0.25);
+          position: relative;
+        }
+
+        .modal h3 {
+          margin: 0 0 8px;
+          font-size: 18px;
+          font-weight: 800;
+        }
+
+        .modal p {
+          color: var(--muted);
+          margin: 0;
         }
         .modalActions {
           display: flex;
           justify-content: flex-end;
-          gap: 12px;
-          margin-top: 20px;
-        }
-
-        /* Force legible text on light controls even in dark/global themes */
-        .page,
-        .table,
-        .pager,
-        .btn,
-        .pill,
-        .pages {
-          color: #0f172a;
-        }
-
-        .pill {
-          color: #0f172a;
-          background: #fff;
-          border-color: #e2e8f0;
-        }
-        .pill:disabled {
-          background: #f8fafc;
-          color: #94a3b8;
-          border-color: #e2e8f0;
-        }
-
-        .btn {
-          color: #0f172a;
-        }
-        .btn.secondary {
-          color: #0f172a;
-        }
-        .pages {
-          color: #334155;
-        } /* pagination text */
-        th {
-          color: #475569;
-        } /* header cells */
-        td {
-          color: #0f172a;
-        } /* body cells */
-
-        .rowToggle {
-          margin-right: 8px;
-          border: 0;
-          background: transparent;
-          cursor: pointer;
-        }
-        .chev {
-          display: inline-block;
-          transition: transform 180ms ease;
-        }
-        .chev.open {
-          transform: rotate(90deg);
-        }
-
-        tr:focus-within td {
-          outline: 2px solid #93c5fd;
-          outline-offset: -2px;
-        }
-
-        .expand td {
-          background: #f8fafc;
-          padding-top: 16px;
-          padding-bottom: 16px;
-        }
-        .transcript {
-          max-height: 4.5em; /* ~2-3 lines visible */
-          overflow: hidden;
-          display: -webkit-box;
-          -webkit-line-clamp: 2; /* clamp to 2 lines */
-          -webkit-box-orient: vertical;
-          color: #334155;
-        }
-        .expandActions {
-          margin-top: 8px;
-        }
-        .rowToggle {
-          width: 28px;
-          height: 28px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 6px;
-          border: 1px solid #e2e8f0;
-          background: #f1f5f9;
-          color: #0f172a; /* ensure visible icon */
-          cursor: pointer;
-          transition: background 160ms ease, box-shadow 160ms ease,
-            transform 160ms ease;
-        }
-        .rowToggle:hover {
-          background: #e2e8f0;
-        }
-        .rowToggle:active {
-          transform: translateY(1px);
-        }
-        .rowToggle:focus-visible {
-          outline: 2px solid #93c5fd;
-          outline-offset: 2px;
-        }
-
-        .chev {
-          display: inline-block;
-          transition: transform 180ms ease;
-          transform-origin: 50% 50%;
-        }
-        .chev.open {
-          transform: rotate(90deg);
-        }
-        th.actionsHeader,
-        td.actionsCell {
-          text-align: center !important;
-          vertical-align: middle;
-        }
-        .actionsStack {
-          width: 112px; /* exact width of the buttons */
-          margin-left: auto; /* pushes the stack to the right edge */
-          display: flex;
-          flex-direction: column;
           gap: 8px;
-          align-items: stretch; /* buttons fill the stack width */
-        }
-
-        /* Make THESE buttons short, even if global styles set width:100% */
-        .actionBtn {
-          width: 100% !important;
-          display: inline-flex !important;
-          justify-content: center;
-          align-items: center;
-          padding: 8px 10px;
-          font-size: 12px;
-          line-height: 1.1;
-          border-radius: 8px;
-        }
-
-        /* Keep the “danger” look tidy in compact size */
-        .danger.actionBtn {
-          border-color: #fecaca;
-          color: #b91c1c;
-          background: #fff5f5;
-        }
-        .danger.actionBtn:hover {
-          background: #fee2e2;
-        }
-
-        .link,
-        .danger {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 12px;
-          border-radius: 8px;
-          border: 1px solid #e2e8f0;
-          background: #ffffff;
-          color: #0f172a; /* force readable text */
-          cursor: pointer;
-          transition: box-shadow 150ms ease, transform 150ms ease,
-            background 150ms ease;
-        }
-        .link:hover,
-        .danger:hover {
-          box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04),
-            0 1px 2px rgba(15, 23, 42, 0.1);
-          transform: translateY(-1px);
-        }
-        .link:focus-visible,
-        .danger:focus-visible {
-          outline: 2px solid #93c5fd;
-          outline-offset: 2px;
-        }
-
-        /* Emphasis for destructive action */
-        .danger {
-          border-color: #fecaca;
-          color: #b91c1c;
-          background: #fff5f5;
-        }
-        .danger:hover {
-          background: #fee2e2;
-        }
-
-        /* Make sure global dark styles don't turn labels white */
-        .btn,
-        .link,
-        .danger,
-        .pager,
-        .pages,
-        th,
-        td {
-          color: #0f172a;
-        }
-        thead th {
-          position: sticky;
-          top: 0;
-          z-index: 2;
-          background: #ffffff; /* ensure it doesn't inherit dark text/bg */
-          border-bottom: 1px solid #e2e8f0;
-        }
-        /* File cell layout */
-        td.file {
-          width: clamp(240px, 40vw, 560px);
-        }
-        .fileName {
-          flex: 1; /* take remaining space */
-          min-width: 0; /* critical for ellipsis inside flex */
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          vertical-align: middle;
-        }
-
-        /* enables ellipsis & honors col widths */
-        .tableWrap {
-          overflow-x: auto;
-        } /* if you wrap the table, keep this */
-
-        /* Columns: adjust percentages if needed */
-        .col-file {
-          width: auto;
-        } /* filename + caret */
-        .col-date {
-          width: 140px;
-        }
-        .col-duration {
-          width: 110px;
-        }
-        .col-actions {
-          width: 200px;
-        } /* guarantees room for View/Delete */
-
-        /* File cell truncation */
-        td.file {
-          /* remove any previous width clamp here */
-        }
-        .fileCell {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          min-width: 0; /* allows .fileName to shrink */
-        }
-        /* Buttons shouldn’t stretch */
-        .link,
-        .danger {
-          display: inline-flex;
+          margin-top: 16px;
         }
       `}</style>
     </div>

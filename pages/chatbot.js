@@ -267,11 +267,8 @@ function ChatBot() {
 
   return (
     <div className={styles.container}>
-      <button
-        className={styles.backButton}
-        onClick={() => router.push("/audioplayer")}
-      >
-        Back to Audio Player
+      <button className="u-pill" onClick={() => router.push("/audioplayer")}>
+        ← Back to Audio Player
       </button>
       <div className={styles.chatContainer}>
         <div className={styles.messageList}>
@@ -304,7 +301,7 @@ function ChatBot() {
               rows={1}
             />
             <button
-              className={styles.sendButton}
+              className="btn-primary"
               onClick={handleSubmit}
               disabled={!inputValue.trim() || typing}
             >

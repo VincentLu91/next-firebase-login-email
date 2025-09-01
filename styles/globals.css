@@ -1,69 +1,26 @@
-/*html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+/* ===================================================================
+   Base (keep simple; themes override inside .theme-*)
+=================================================================== */
+* {
+  box-sizing: border-box;
 }
-
 a {
-  color: inherit;
   text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
-}*/
-
-/* additional styles for buttons */
-button {
-  background: #2e8dcc;
-  padding: 1rem 4rem;
-  border-radius: 6px;
-  font-size: 14px;
-  text-transform: uppercase;
-  flex-shrink: 0;
-  outline: none;
-  border: none;
-  color: #ffffff;
-  font-weight: bold;
-  width: 300px;
-  cursor: pointer;
-  transition: all 0.3s linear;
-}
-
-button:hover {
-  background: #27ae60;
-}
-
-button.logout {
-  background: #e74c3c;
-}
-
-button.subscribed {
-  background: #2c3e50;
-}
-
-button:disabled {
-  background-color: #ccc; /* Light gray background */
-  color: #666; /* Darker gray text */
-  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
-  opacity: 0.6; /* Reduce opacity */
-}
-
-body {
+/* Optional: keep your old light theme reachable via .theme-light */
+.theme-light {
   background: #f2f2f2;
   color: #333;
 }
-a {
+.theme-light a {
   color: #333;
-  text-decoration: none;
 }
-.content {
+.theme-light .content {
   max-width: 960px;
   margin: 0 auto;
 }
-nav {
+.theme-light nav {
   margin: 10px auto 80px;
   padding: 10px 0;
   display: flex;
@@ -71,13 +28,13 @@ nav {
   align-items: flex-end;
   border-bottom: 1px solid #ddd;
 }
-nav a {
+.theme-light nav a {
   margin-left: 12px;
 }
-nav .logo {
+.theme-light nav .logo {
   margin-right: auto;
 }
-footer {
+.theme-light footer {
   display: block;
   text-align: center;
   padding: 30px 0;
@@ -85,33 +42,235 @@ footer {
   color: #777;
   border-top: 1px solid #eaeaea;
 }
-
-.register {
+.theme-light .register {
   color: rgb(100, 128, 0);
 }
-
-.footerstyle {
+.theme-light .footerstyle {
   flex-direction: column;
   margin-top: 60px;
 }
-
-/* test vertically align text next to image */
-.landing-page-container {
+.theme-light .landing-page-container {
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
-.vertical-align-image-left {
+.theme-light .vertical-align-image-left {
   flex-basis: 40%;
 }
-
-.vertical-align-image-right {
+.theme-light .vertical-align-image-right {
   flex-basis: 70%;
   order: 2;
 }
-
-.vertical-align-text {
+.theme-light .vertical-align-text {
   font-size: 20px;
   padding-left: 20px;
+}
+
+/* ===================================================================
+   Flat Minimal Black – app-wide tokens + atoms
+   (active because your _app.js wraps everything in <div class="theme-black ...">)
+=================================================================== */
+:root {
+  --bg: #0f1115; /* page */
+  --panel: #151821; /* cards/sections */
+  --panel-2: #1b1f2a; /* inset areas/inputs */
+  --border: #262b36; /* hairline */
+  --text: #e8eaf1; /* primary text */
+  --muted: #9aa3b2; /* secondary text */
+  --accent: #f59e0b; /* amber */
+  --accent-2: #ff7a18; /* warm gradient end */
+  --radius: 14px;
+  --shadow: 0 0 0 1px var(--border);
+  --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+html,
+body,
+#__next {
+  height: 100%;
+}
+
+body {
+  margin: 0; /* <-- the important bit */
+  padding: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Root wrapper set in _app.js */
+.theme-black {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Links & text */
+.theme-black a {
+  color: inherit;
+}
+.theme-black .muted {
+  color: var(--muted);
+}
+
+/* Layout helpers you can reuse */
+.theme-black .content {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.theme-black .u-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.theme-black .u-card-inset {
+  background: var(--panel-2);
+}
+.theme-black .u-hr {
+  height: 1px;
+  border: 0;
+  background: var(--border);
+}
+.theme-black .u-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+}
+
+/* Nav / Footer (dark) */
+.theme-black nav {
+  margin: 10px auto 24px;
+  padding: 10px 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border);
+}
+.theme-black nav a {
+  margin-left: 12px;
+  color: var(--text);
+}
+.theme-black nav .logo {
+  margin-right: auto;
+}
+.theme-black footer {
+  display: block;
+  text-align: center;
+  padding: 30px 0;
+  margin-top: 60px;
+  color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+/* Inputs */
+.theme-black input[type="text"],
+.theme-black input[type="search"],
+.theme-black textarea,
+.theme-black select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-2);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.theme-black textarea {
+  height: auto;
+  padding: 10px 12px;
+}
+.theme-black input::placeholder,
+.theme-black textarea::placeholder {
+  color: var(--muted);
+}
+.theme-black input:focus,
+.theme-black textarea:focus,
+.theme-black select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+/* Buttons
+   - Neutral default matches the matte look
+   - Add .btn-primary for amber CTA, .btn-danger for destructive, .btn-muted for subtle
+*/
+.theme-black button {
+  appearance: none;
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  width: auto; /* remove the old fixed 300px width */
+}
+.theme-black button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+.theme-black button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* CTA variants */
+.theme-black .btn-primary {
+  background: var(--accent);
+  color: #111;
+  border-color: #d08307;
+}
+.theme-black .btn-primary:hover {
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.25);
+}
+.theme-black .btn-danger {
+  background: #2a1b1b;
+  color: #ffb4b4;
+  border-color: #4b2a2a;
+}
+.theme-black .btn-muted {
+  background: var(--panel);
+  color: var(--muted);
+}
+
+/* Keep your old named buttons working if you still use them anywhere */
+.theme-black button.logout {
+  background: #2a1b1b;
+  color: #ffb4b4;
+  border-color: #4b2a2a;
+}
+.theme-black button.subscribed {
+  background: #1e2230;
+  color: var(--muted);
+}
+
+/* Landing helpers from original file (dark-compatible) */
+.theme-black .landing-page-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-black .vertical-align-image-left {
+  flex-basis: 40%;
+}
+.theme-black .vertical-align-image-right {
+  flex-basis: 70%;
+  order: 2;
+}
+.theme-black .vertical-align-text {
+  font-size: 20px;
+  padding-left: 20px;
+  color: var(--text);
 }
