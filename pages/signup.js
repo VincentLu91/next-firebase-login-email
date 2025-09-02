@@ -36,11 +36,43 @@ const SignUp = () => {
       if (error) {
         setMessage({ type: "error", content: error.message });
       } else if (data?.user) {
-        setMessage({
-          type: "success",
-          content:
-            "Registration successful! Please check your email to confirm your account.",
-        });
+        // Initialize free tokens for the new user
+        try {
+          const response = await fetch("/api/initializeFreeUser", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ id: data.user.id }),
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            console.error("Token initialization error:", result);
+            setMessage({
+              type: "warning",
+              content: `Account created successfully. ${
+                result.error === "User tokens already initialized"
+                  ? "Your tokens are already set up."
+                  : "There was an issue setting up your free tokens. Please try again later or contact support."
+              }`,
+            });
+          } else {
+            setMessage({
+              type: "success",
+              content:
+                "Registration successful! Please check your email to confirm your account. Your free tokens have been initialized.",
+            });
+          }
+        } catch (tokenError) {
+          console.error("Error initializing free tokens:", tokenError);
+          setMessage({
+            type: "warning",
+            content:
+              "Account created successfully, but there was an issue setting up your free tokens. Please try again later or contact support.",
+          });
+        }
         dispatch(setCurrentUser(data.user));
       }
     } catch (error) {

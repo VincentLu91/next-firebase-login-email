@@ -46,8 +46,7 @@ const Sidebar = () => {
       </NavSection>
 
       <NavSection title="WORKSPACE">
-        <NavItem href="/phonerecording">Phone Calls</NavItem>
-        <NavItem href="/phonerecording2">Meetings</NavItem>
+        <NavItem href="/phonerecording2">Phone Calls</NavItem>
       </NavSection>
 
       {user && (
