@@ -131,25 +131,37 @@ export default function ChatPanel({ sound, soundUrl }) {
 
   return (
     <div
-      style={{ display: "grid", gridTemplateRows: "1fr auto", minHeight: 420 }}
+      style={{
+        display: "grid",
+        gridTemplateRows: "1fr auto",
+        height: "600px", // Leave room for input area which is ~100px
+      }}
     >
-      <div style={{ overflowY: "auto", padding: 8 }}>
+      <div style={{ overflowY: "auto", padding: "var(--space-4)" }}>
         {messages.map((m, i) => (
           <div
             key={i}
             style={{
               display: "flex",
               justifyContent: m.sender === "user" ? "flex-end" : "flex-start",
-              marginBottom: 8,
+              marginBottom: "var(--space-3)",
             }}
           >
             <div
-              className="u-card"
               style={{
-                maxWidth: "80%",
-                padding: "8px 12px",
+                maxWidth: "86%",
+                padding: "var(--space-4)",
+                borderRadius: "var(--radius-card)",
                 background:
-                  m.sender === "user" ? "var(--panel-2)" : "var(--panel)",
+                  m.sender === "user"
+                    ? "rgba(245, 184, 61, 0.16)"
+                    : "var(--bg-700)",
+                color: "var(--text-100)",
+                fontFamily: "var(--font-family)",
+                fontSize: "16px",
+                lineHeight: "24px",
+                fontWeight: 500,
+                letterSpacing: "-0.1px",
               }}
             >
               {m.message}
@@ -159,32 +171,96 @@ export default function ChatPanel({ sound, soundUrl }) {
         <div ref={endRef} />
       </div>
 
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <textarea
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder="Ask about this transcript…"
-          rows={1}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          padding: "var(--space-3)",
+          borderTop: "1px solid var(--muted-600)",
+          background: "var(--bg-800)",
+        }}
+      >
+        {typing && (
+          <div
+            style={{
+              fontSize: "12px",
+              color: "var(--text-400)",
+              marginBottom: "var(--space-2)",
+            }}
+          >
+            Chatbot is thinking...
+          </div>
+        )}
+        <div
           style={{
-            flex: 1,
-            resize: "none",
-            height: 40,
-            padding: "10px 12px",
-            border: "1px solid var(--border)",
-            borderRadius: 10,
-            background: "var(--panel-2)",
-            color: "var(--text)",
+            display: "flex",
+            gap: "var(--space-2)",
+            alignItems: "center",
           }}
-        />
-        <button
-          type="button"
-          className="btn-primary u-pill"
-          onClick={send}
-          disabled={typing || !inputValue.trim()}
         >
-          {typing ? "Thinking…" : "Send"}
-        </button>
+          <textarea
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder="Type your message..."
+            rows={1}
+            style={{
+              flex: 1,
+              resize: "none",
+              height: 48,
+              padding: "var(--space-3) var(--space-5)",
+              border: "1px solid var(--muted-600)",
+              borderRadius: "var(--radius-input)",
+              background: "var(--bg-700)",
+              color: "var(--text-100)",
+              fontFamily: "var(--font-family)",
+              fontSize: "14px",
+              fontWeight: 500,
+              letterSpacing: "-0.1px",
+            }}
+          />
+          <button
+            type="button"
+            onClick={send}
+            disabled={typing || !inputValue.trim()}
+            style={{
+              width: 44,
+              height: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "var(--accent-400)",
+              border: "none",
+              borderRadius: "50%",
+              color: "#101114",
+              cursor: "pointer",
+              transition: "var(--transition-base)",
+            }}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M22 2L11 13"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M22 2L15 22L11 13L2 9L22 2Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   );

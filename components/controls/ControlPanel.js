@@ -100,70 +100,84 @@ export default function ControlPanel({
       <style jsx>{`
         .cp {
           display: grid;
-          grid-template-columns: 64px 1fr 120px; /* left | center | right */
+          grid-template-columns: 80px 1fr 80px;
           align-items: center;
-          gap: 12px;
+          gap: var(--space-4);
+          padding: var(--space-4);
         }
+
         .times {
           display: grid;
           grid-template-columns: auto 1fr auto;
-          gap: 10px;
+          gap: var(--space-3);
           align-items: center;
         }
+
         .time {
           font-variant-numeric: tabular-nums;
           font-size: 12px;
-          color: #334155;
+          color: black;
           text-align: center;
           min-width: 48px;
+          font-family: var(--font-family);
+          font-weight: 600;
+          letter-spacing: -0.1px;
         }
 
         .playBtn {
-          border: 1px solid #e2e8f0;
-          background: #f8fafc;
-          border-radius: 8px;
-          padding: 8px;
+          border: 1px solid var(--muted-600);
+          background: var(--bg-700);
+          border-radius: var(--radius-input);
+          padding: var(--space-2);
           font-weight: 500;
           font-size: 14px;
           cursor: pointer;
-          transition: background 150ms ease, transform 150ms ease;
-          width: 32px;
-          height: 32px;
+          transition: var(--transition-base);
+          width: 44px;
+          height: 44px;
           display: flex;
           align-items: center;
           justify-content: center;
           line-height: 1;
           margin-left: auto;
           margin-right: auto;
+          color: var(--text-100);
         }
+
         .playBtn:hover {
-          background: #eef2f7;
-          transform: translateY(-1px);
+          transform: scale(0.98);
+          opacity: 0.92;
         }
+
         .playBtn.on {
-          background: #e0e7ff;
-          border-color: #c7d2fe;
+          background: var(--accent-400);
+          border-color: var(--accent-400);
+          color: #101114;
         }
 
         .pill {
-          border: 1px solid #e2e8f0;
-          background: #f8fafc;
-          border-radius: 10px;
-          padding: 8px 10px;
+          border: 1px solid var(--muted-600);
+          background: var(--bg-700);
+          border-radius: var(--radius-pill);
+          padding: var(--space-2) var(--space-3);
           font-size: 12px;
           line-height: 1.1;
           cursor: pointer;
-          transition: background 120ms ease, transform 120ms ease;
+          transition: var(--transition-base);
           width: auto !important;
+          color: var(--text-300);
+          font-family: var(--font-family);
+          font-weight: 600;
+          letter-spacing: -0.1px;
         }
+
         .pill:hover {
-          background: #eef2f7;
-          transform: translateY(-1px);
+          color: var(--text-100);
         }
 
         .rightTools {
           display: flex;
-          gap: 8px;
+          gap: var(--space-2);
           justify-content: flex-end;
         }
       `}</style>

@@ -61,6 +61,20 @@ export default function AudioPlayer() {
     }
   }, [customer, sound, supabase]);
 
+  useEffect(() => {
+    const v = router.query.view;
+    if (v === "transcript" || v === "chat" || v === "split") setView(v);
+  }, [router.query.view]);
+
+  const setViewAndURL = (v) => {
+    setView(v);
+    router.replace(
+      { pathname: router.pathname, query: { ...router.query, view: v } },
+      undefined,
+      { shallow: true }
+    );
+  };
+
   async function urlToDuration(audioUrl) {
     const durationSeconds = await getBlobDuration(audioUrl);
     console.log("durationSeconds is: ", durationSeconds);
@@ -156,136 +170,388 @@ export default function AudioPlayer() {
   return (
     <div>
       {/* Tabs + Back (no routes, just state) */}
-      <div className="u-card" style={{ margin: "16px 24px", padding: 10 }}>
+      <div
+        className="u-card"
+        style={{ margin: "16px 24px", padding: "var(--space-3)" }}
+      >
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button
             type="button"
-            className={`u-pill ${view === "transcript" ? "btn-muted" : ""}`}
-            onClick={() => setView("transcript")}
-            style={{ padding: "6px 10px" }}
+            className="u-pill btn-muted"
+            onClick={() => setViewAndURL("transcript")}
+            style={{
+              backgroundColor: "transparent",
+              borderColor:
+                view === "transcript"
+                  ? "var(--accent-400)"
+                  : "var(--muted-600)",
+              borderRadius: "50px",
+              padding: "8px 24px",
+            }}
           >
-            Transcript
+            <span
+              style={{
+                color:
+                  view === "transcript"
+                    ? "var(--accent-400)"
+                    : "var(--text-300)",
+              }}
+            >
+              Transcript
+            </span>
           </button>
           <button
             type="button"
-            className={`u-pill ${view === "chat" ? "btn-muted" : ""}`}
-            onClick={() => setView("chat")}
-            style={{ padding: "6px 10px" }}
+            className="u-pill btn-muted"
+            onClick={() => setViewAndURL("chat")}
+            style={{
+              backgroundColor: "transparent",
+              borderColor:
+                view === "chat" ? "var(--accent-400)" : "var(--muted-600)",
+              borderRadius: "50px",
+              padding: "8px 24px",
+            }}
           >
-            Chat
+            <span
+              style={{
+                color:
+                  view === "chat" ? "var(--accent-400)" : "var(--text-300)",
+              }}
+            >
+              Chat
+            </span>
           </button>
           <button
             type="button"
-            className={`u-pill ${view === "split" ? "btn-muted" : ""}`}
-            onClick={() => setView("split")}
-            style={{ padding: "6px 10px" }}
+            className="u-pill btn-muted"
+            onClick={() => setViewAndURL("split")}
+            style={{
+              backgroundColor: "transparent",
+              borderColor:
+                view === "split" ? "var(--accent-400)" : "var(--muted-600)",
+              borderRadius: "50px",
+              padding: "8px 24px",
+            }}
           >
-            Split
+            <span
+              style={{
+                color:
+                  view === "split" ? "var(--accent-400)" : "var(--text-300)",
+              }}
+            >
+              Split
+            </span>
           </button>
 
           <div style={{ marginLeft: "auto" }}>
             <button
               type="button"
-              className="u-pill"
+              className="u-pill btn-muted"
               onClick={() => router.push("/dashboard")}
-              style={{ padding: "6px 10px" }}
+              style={{
+                backgroundColor: "transparent",
+                borderColor: "var(--muted-600)",
+                borderRadius: "50px",
+                padding: "8px 24px",
+              }}
             >
-              ← Back to Dashboard
+              <span style={{ color: "var(--text-300)" }}>
+                ← Back to Dashboard
+              </span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Layout container driven by 'view' */}
-      <div className={`pair ${view}`} style={{ margin: "0 24px 24px" }}>
-        {/* Transcript pane (your original UI, unchanged) */}
-        <section id="transcriptPane" className="u-card" style={{ padding: 16 }}>
-          <div className="audioplayer-body">
-            <div className="audioplayer-container">
-              <Slider onChange={onChange} percentage={percentage} />
-              <audio
-                ref={audioRef}
-                crossOrigin="anonymous"
-                preload="metadata"
-                src={audioUrl || undefined}
-                onLoadedMetadata={(e) => {
-                  const d = e.currentTarget.duration || 0;
-                  setDurationSeconds(d);
-                }}
-                onTimeUpdate={(e) => {
-                  const t = e.currentTarget.currentTime || 0;
-                  const d = e.currentTarget.duration || durationSeconds || 1;
-                  setCurrentTime(t);
-                  setPercentage(Number(((t / d) * 100).toFixed(2)));
-                }}
-              />
-              <ControlPanel
-                play={play}
-                isPlaying={isPlaying}
-                duration={durationSeconds}
-                currentTime={currentTime}
-                audioRef={audioRef}
-              />
-            </div>
-          </div>
+      {/* Layout (conditional render — no CSS tricks) */}
+      <div style={{ margin: "0 24px 24px" }}>
+        {view === "split" ? (
+          <div
+            className="pair split"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 16,
+              alignItems: "start",
+            }}
+          >
+            {/* Transcript pane */}
+            <section
+              id="transcriptPane"
+              className="u-card"
+              style={{
+                padding: 16,
+                display: "flex",
+                flexDirection: "column",
+                height: "800px",
+              }}
+            >
+              {isAudioSelected ? (
+                <>
+                  <h3 style={{ marginBottom: 8, fontWeight: 800 }}>
+                    {sound?.file_name}
+                  </h3>
+                  <div className="u-hr" />
+                  <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                    <button
+                      type="button"
+                      className="u-pill btn-muted"
+                      onClick={() => goEditFile(sound)}
+                      style={{
+                        backgroundColor: "transparent",
+                        borderColor: "var(--muted-600)",
+                        borderRadius: "50px",
+                        padding: "8px 24px",
+                      }}
+                    >
+                      <span style={{ color: "var(--text-300)" }}>
+                        Edit filename & transcript
+                      </span>
+                    </button>
+                    {/* hiding this for now. summary displayed screws up height of control panel */}
+                    {/*<button
+                      type="button"
+                      className="u-pill btn-primary"
+                      onClick={() => getSummary(sound.full_transcript)}
+                      style={{
+                        backgroundColor: "rgba(245,184,61,0.12)",
+                        borderColor: "var(--accent-400)",
+                        borderRadius: "50px",
+                        padding: "8px 24px",
+                      }}
+                    >
+                      <span style={{ color: "var(--accent-400)" }}>
+                        Summary
+                      </span>
+                    </button>*/}
+                  </div>
 
-          {isAudioSelected ? (
-            <>
-              <h3 style={{ marginTop: 12, marginBottom: 8, fontWeight: 800 }}>
-                {sound?.file_name}
-              </h3>
-              <div className="u-hr" />
-              <div
-                style={{
-                  whiteSpace: "pre-wrap",
-                  color: "var(--muted)",
-                  lineHeight: 1.7,
-                  marginTop: 12,
-                }}
-              >
-                {sound?.full_transcript || "No transcript available."}
-              </div>
-              <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
-                <button
-                  type="button"
-                  className="u-pill btn-muted"
-                  onClick={() => goEditFile(sound)}
-                >
-                  Edit filename & transcript
-                </button>
-                <button
-                  type="button"
-                  className="u-pill btn-primary"
-                  onClick={() => getSummary(sound.full_transcript)}
-                >
-                  Summary
-                </button>
-              </div>
-              {summary && (
-                <p style={{ color: "var(--text)", marginTop: 8 }}>
-                  Summary: {summary}
-                </p>
+                  <textarea
+                    readOnly
+                    value={sound?.full_transcript || "No transcript available."}
+                    style={{
+                      flex: 1,
+                      width: "100%",
+                      height: "800px",
+                      maxHeight: "800px",
+                      overflowY: "auto",
+                      whiteSpace: "pre-wrap",
+                      color: "var(--muted)",
+                      lineHeight: 1.7,
+                      marginTop: 12,
+                      padding: "15px",
+                      backgroundColor: "var(--muted-100)",
+                      borderRadius: "8px",
+                      border: "1px solid var(--muted-300)",
+                      resize: "none",
+                      fontFamily: "inherit",
+                      fontSize: "inherit",
+                    }}
+                  />
+
+                  {/* summary takes up the height space of control panel and shrinks transcript. messed up*/}
+                  {/*summary && (
+                    <p style={{ color: "var(--text)", marginTop: 8 }}>
+                      Summary: {summary}
+                    </p>
+                  )*/}
+
+                  <div
+                    className="audioplayer-body"
+                    style={{ marginTop: "auto", paddingTop: 16 }}
+                  >
+                    <div className="audioplayer-container">
+                      <Slider onChange={onChange} percentage={percentage} />
+                      <audio
+                        ref={audioRef}
+                        crossOrigin="anonymous"
+                        preload="metadata"
+                        src={audioUrl || undefined}
+                        onLoadedMetadata={(e) =>
+                          setDurationSeconds(e.currentTarget.duration || 0)
+                        }
+                        onTimeUpdate={(e) => {
+                          const t = e.currentTarget.currentTime || 0;
+                          const d =
+                            e.currentTarget.duration || durationSeconds || 1;
+                          setCurrentTime(t);
+                          setPercentage(Number(((t / d) * 100).toFixed(2)));
+                        }}
+                      />
+                      <ControlPanel
+                        play={play}
+                        isPlaying={isPlaying}
+                        duration={durationSeconds}
+                        currentTime={currentTime}
+                        audioRef={audioRef}
+                      />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <p className="muted">No audio selected</p>
               )}
-            </>
-          ) : (
-            <p className="muted">No audio selected</p>
-          )}
-        </section>
+            </section>
 
-        {/* Chat pane (embedded) */}
-        <section id="chatPane" className="u-card" style={{ padding: 16 }}>
-          <ChatPanel sound={sound} soundUrl={audioUrl} />
-        </section>
+            {/* Chat pane */}
+            <section
+              id="chatPane"
+              className="u-card"
+              style={{ padding: 16, height: "800px" }}
+            >
+              <ChatPanel sound={sound} soundUrl={audioUrl} />
+            </section>
+          </div>
+        ) : view === "chat" ? (
+          // Chat-only
+          <section
+            id="chatPane"
+            className="u-card"
+            style={{ padding: 16, height: "800px" }}
+          >
+            <ChatPanel sound={sound} soundUrl={audioUrl} />
+          </section>
+        ) : (
+          // Transcript-only
+          <section
+            id="transcriptPane"
+            className="u-card"
+            style={{
+              padding: 16,
+              display: "flex",
+              flexDirection: "column",
+              height: "800px",
+            }}
+          >
+            {isAudioSelected ? (
+              <>
+                <h3 style={{ marginBottom: 8, fontWeight: 800 }}>
+                  {sound?.file_name}
+                </h3>
+                <div className="u-hr" />
+                <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                  <button
+                    type="button"
+                    className="u-pill btn-muted"
+                    onClick={() => goEditFile(sound)}
+                    style={{
+                      backgroundColor: "transparent",
+                      borderColor: "var(--muted-600)",
+                      borderRadius: "50px",
+                      padding: "8px 24px",
+                    }}
+                  >
+                    <span style={{ color: "var(--text-300)" }}>
+                      Edit filename & transcript
+                    </span>
+                  </button>
+                  {/* again, hiding Summary button as the output messes up height of Control Panel*/}
+                  {/*<button
+                    type="button"
+                    className="u-pill btn-primary"
+                    onClick={() => getSummary(sound.full_transcript)}
+                    style={{
+                      backgroundColor: "rgba(245,184,61,0.12)",
+                      borderColor: "var(--accent-400)",
+                      borderRadius: "50px",
+                      padding: "8px 24px",
+                    }}
+                  >
+                    <span style={{ color: "var(--accent-400)" }}>Summary</span>
+                  </button>*/}
+                </div>
+
+                <textarea
+                  readOnly
+                  value={sound?.full_transcript || "No transcript available."}
+                  style={{
+                    flex: 1,
+                    width: "100%",
+                    height: "800px",
+                    maxHeight: "800px",
+                    overflowY: "auto",
+                    whiteSpace: "pre-wrap",
+                    color: "var(--muted)",
+                    lineHeight: 1.7,
+                    marginTop: 12,
+                    padding: "15px",
+                    backgroundColor: "var(--muted-100)",
+                    borderRadius: "8px",
+                    border: "1px solid var(--muted-300)",
+                    resize: "none",
+                    fontFamily: "inherit",
+                    fontSize: "inherit",
+                  }}
+                />
+
+                {/* messes up height of Control Panel. not needed for now*/}
+                {/*summary && (
+                  <p style={{ color: "var(--text)", marginTop: 8 }}>
+                    Summary: {summary}
+                  </p>
+                )*/}
+
+                <div
+                  className="audioplayer-body"
+                  style={{ marginTop: "auto", paddingTop: 16 }}
+                >
+                  <div className="audioplayer-container">
+                    <Slider onChange={onChange} percentage={percentage} />
+                    <audio
+                      ref={audioRef}
+                      crossOrigin="anonymous"
+                      preload="metadata"
+                      src={audioUrl || undefined}
+                      onLoadedMetadata={(e) =>
+                        setDurationSeconds(e.currentTarget.duration || 0)
+                      }
+                      onTimeUpdate={(e) => {
+                        const t = e.currentTarget.currentTime || 0;
+                        const d =
+                          e.currentTarget.duration || durationSeconds || 1;
+                        setCurrentTime(t);
+                        setPercentage(Number(((t / d) * 100).toFixed(2)));
+                      }}
+                    />
+                    <ControlPanel
+                      play={play}
+                      isPlaying={isPlaying}
+                      duration={durationSeconds}
+                      currentTime={currentTime}
+                      audioRef={audioRef}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="muted">No audio selected</p>
+            )}
+          </section>
+        )}
       </div>
 
       <style jsx>{audioPlayerStyles}</style>
       <style jsx>{`
+        /* Transcript view - hide chat */
+        .pair.transcript {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
         .pair.transcript #chatPane {
           display: none;
+        }
+
+        /* Chat view - hide transcript */
+        .pair.chat {
+          display: grid;
+          grid-template-columns: 1fr;
         }
         .pair.chat #transcriptPane {
           display: none;
         }
+
+        /* Split view - show both */
         .pair.split {
           display: grid;
           grid-template-columns: 1fr 1fr;
