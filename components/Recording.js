@@ -321,16 +321,17 @@ const Recording = () => {
     try {
       let { data: customerInfo, error: fetchError } = await supabase
         .from("customers")
-        .select("id")
+        .select("id") // id is now a UUID matching auth.user.id
         .eq("email_address", user.email)
         .single();
 
       if (fetchError) throw fetchError;
 
+      const customerUUID = customerInfo.id;
       const { error: updateError } = await supabase
         .from("customers")
         .update({ mic_tokens: newTokens })
-        .eq("id", customerInfo.id);
+        .eq("id", customerUUID);
 
       if (updateError) throw updateError;
 
@@ -680,19 +681,20 @@ const Recording = () => {
       // Get customer ID
       const { data: customer, error: custErr } = await supabase
         .from("customers")
-        .select("id")
+        .select("id") // id is now a UUID matching auth.user.id
         .eq("email_address", user.email)
         .single();
 
       if (custErr) throw custErr;
-      if (!customer?.id) {
+      const customerUUID = customer?.id;
+      if (!customerUUID) {
         throw new Error(
           "Customer ID not found. Please ensure you have an active subscription."
         );
       }
 
       const audioData = {
-        customer_id: customer.id,
+        customer_id: customerUUID, // UUID from auth.user.id
         file_name: filename,
         duration,
         full_transcript: transcript || liveTranscript, // Use either transcript or liveTranscript
