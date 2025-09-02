@@ -6,9 +6,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { id } = req.body;
-    if (!id) {
-      return res.status(400).json({ error: "id is required" });
+    const { id, email } = req.body;
+    if (!id || !email) {
+      return res.status(400).json({ error: "id and email are required" });
     }
 
     // First check if a customer record already exists
@@ -26,6 +26,7 @@ export default async function handler(req, res) {
     const { error } = await supabase.from("customers").insert([
       {
         id: id,
+        email_address: email,
         mic_tokens: 2000,
         call_tokens: 2000,
         num_calls: 2000,
