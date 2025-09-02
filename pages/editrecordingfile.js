@@ -34,9 +34,9 @@ const PageContainer = styled.div`
   max-width: 1100px;
   margin: 0 auto;
   padding: 24px 20px;
-  background: #f8fafc;
+  background: rgb(17, 24, 39);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-  color: #111827;
+  color: rgb(229, 231, 235);
   line-height: 1.45;
   font-size: 0.875rem;
 `;
@@ -63,41 +63,32 @@ const Notice = styled.h2`
 `;
 
 const BackButton = styled.button`
-  padding: 10px 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #ffffff;
-  color: #111827;
-  min-height: 40px;
+  background-color: transparent;
+  border: 1px solid var(--muted-600);
+  border-radius: 50px;
+  padding: 8px 24px;
   cursor: pointer;
+  color: var(--text-300);
   transition: all 180ms ease-out;
 
   &:hover {
-    background: #f9fafb;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.22);
   }
 `;
 
 const MainGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr;
   gap: 24px;
   margin-top: 12px;
-
-  @media (max-width: 960px) {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
 `;
 
 const Card = styled.div.attrs(({ delay, ...props }) => ({
-  ...props, // Only pass through valid HTML attributes
+  ...props,
 }))`
   background: #ffffff;
   border: 1px solid #eef0f2;
@@ -163,9 +154,9 @@ const TimeLabel = styled.span`
 const PlayButton = styled.button`
   width: 36px;
   height: 36px;
-  border-radius: 10px;
-  background: #111827;
-  color: #ffffff;
+  border-radius: 50px;
+  background: var(--text);
+  color: var(--background);
   border: none;
   cursor: pointer;
   display: flex;
@@ -174,7 +165,7 @@ const PlayButton = styled.button`
   transition: all 180ms ease-out;
 
   &:hover {
-    background: #0b1220;
+    background: var(--text-300);
     transform: translateY(-1px);
   }
 
@@ -183,8 +174,8 @@ const PlayButton = styled.button`
   }
 
   &:disabled {
-    background: #e5e7eb;
-    color: #9ca3af;
+    background: var(--muted-300);
+    color: var(--text-300);
     cursor: not-allowed;
   }
 `;
@@ -196,43 +187,52 @@ const EditorPanel = styled(Card)`
   box-sizing: border-box;
   padding: 24px;
   gap: 16px;
+  background: #1e1f26;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: Manrope-Medium, -apple-system, system-ui, sans-serif;
 `;
 
 const Label = styled.label`
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  color: #6b7280;
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  color: #ffffff;
+  font-family: Manrope-Medium, -apple-system, system-ui, sans-serif;
 `;
 
 const TextArea = styled.textarea.attrs(
   ({ isFileName, isTranscript, ...props }) => ({
-    ...props, // Only pass through valid HTML attributes
+    ...props,
   })
 )`
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
-  padding: 12px 14px;
-  background: #ffffff;
+  padding: 16px;
+  background: #2a2b36;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   transition: all 140ms ease;
-  font-size: 0.875rem;
-  caret-color: #2563eb;
+  font-family: Manrope-Medium, -apple-system, system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #ffffff;
+  caret-color: #ffa500;
   resize: vertical;
-  line-height: 1.5;
+  line-height: 1.6;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
 
   &::selection {
-    background: rgba(37, 99, 235, 0.18);
+    background: rgba(255, 165, 0, 0.3);
   }
 
   &:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    border-color: #ffa500;
+    box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.15);
   }
 
   ${({ isFileName }) =>
@@ -240,7 +240,8 @@ const TextArea = styled.textarea.attrs(
     `
     min-height: 60px;
     height: 60px;
-    font-weight: 600;
+    font-size: 1.75rem;
+    font-weight: 500;
     resize: none;
     padding: 16px;
   `}
@@ -249,7 +250,7 @@ const TextArea = styled.textarea.attrs(
     isTranscript &&
     `
     min-height: 360px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-family: Manrope-Medium, -apple-system, system-ui, sans-serif;
     padding: 16px;
   `}
 `;
@@ -267,32 +268,35 @@ const ActionRow = styled.div`
 `;
 
 const PrimaryButton = styled.button.attrs(({ isLoading, ...props }) => ({
-  ...props, // Only pass through valid HTML attributes
+  ...props,
 }))`
-  background: #2563eb;
-  color: #ffffff;
-  padding: 10px 14px;
+  background: #ffa500;
+  color: #000000;
+  padding: 12px 16px;
   border-radius: 12px;
   font-weight: 600;
+  font-size: 1rem;
   border: 0;
-  min-height: 40px;
+  min-height: 48px;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 6px 16px rgba(255, 165, 0, 0.25);
   transition: all 180ms ease-out;
+  width: 100%;
 
   &:hover {
+    background: #ff9000;
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 10px 24px rgba(255, 165, 0, 0.3);
   }
 
   &:active {
     transform: scale(0.98);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.22);
+    box-shadow: 0 4px 12px rgba(255, 165, 0, 0.22);
   }
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.32);
+    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.32);
   }
 
   ${({ isLoading }) =>
@@ -309,8 +313,8 @@ const PrimaryButton = styled.button.attrs(({ isLoading, ...props }) => ({
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        border: 2px solid rgba(255, 255, 255, 0.6);
-        border-top-color: #ffffff;
+        border: 2px solid rgba(0, 0, 0, 0.3);
+        border-top-color: #000000;
         border-radius: 50%;
         ${css`
           animation: ${spin} 0.7s linear infinite;
@@ -510,16 +514,6 @@ export default function EditRecordingFile() {
     }
   };
 
-  const getCurrDuration = (e) => {
-    const percent = (
-      (e.currentTarget.currentTime / durationSeconds) *
-      100
-    ).toFixed(2);
-    const time = e.currentTarget.currentTime;
-    setPercentage(+percent);
-    setCurrentTime(time.toFixed(2));
-  };
-
   const languages = [
     { value: "chinese", label: "Chinese" },
     { value: "german", label: "German" },
@@ -687,7 +681,7 @@ export default function EditRecordingFile() {
           <Notice>For best results, play the recording on Chrome</Notice>
         </div>
         <BackButton onClick={() => router.push("/dashboard")}>
-          Back to Dashboard
+          ← Back to Dashboard
         </BackButton>
       </TopBar>
 
@@ -760,13 +754,14 @@ export default function EditRecordingFile() {
                 <PrimaryButton
                   onClick={() => onSubmitRenameTranscript(editTranscript)}
                   isLoading={isLoading}
+                  disabled={isLoading}
                 >
                   Edit Transcript
                 </PrimaryButton>
               </ActionRow>
             </EditorPanel>
 
-            <EditorPanel delay="180ms">
+            {/*<EditorPanel delay="180ms">
               <Label>Translation</Label>
               <StyledSelect
                 placeholder="Select Language"
@@ -785,9 +780,9 @@ export default function EditRecordingFile() {
                   {translation && <p>{translation}</p>}
                 </div>
               )}
-            </EditorPanel>
+            </EditorPanel>*/}
 
-            <EditorPanel delay="240ms">
+            {/*<EditorPanel delay="240ms">
               <Label>Summary</Label>
               <ActionRow>
                 <PrimaryButton
@@ -800,7 +795,7 @@ export default function EditRecordingFile() {
                 </PrimaryButton>
               </ActionRow>
               {summary && <p style={{ marginTop: 12 }}>{summary}</p>}
-            </EditorPanel>
+            </EditorPanel>*/}
           </>
         ) : (
           <Card>
