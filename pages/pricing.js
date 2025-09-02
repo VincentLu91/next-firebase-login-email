@@ -2,6 +2,179 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import styled from "styled-components";
+
+const Section = styled.section`
+  background: #0e0e0f;
+  position: relative;
+  min-height: 100vh;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 40% 30%,
+      rgba(123, 92, 255, 0.05) 0%,
+      transparent 60%
+    );
+  }
+`;
+
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 5rem 1.5rem;
+  position: relative;
+`;
+
+const Title = styled.h1`
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  margin-bottom: 3rem;
+`;
+
+const CardsContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3rem;
+  grid-auto-flow: row;
+  grid-template-rows: auto;
+
+  & > * {
+    grid-column: auto;
+  }
+
+  & > *:last-child:nth-child(3n-1) {
+    grid-column: 2;
+  }
+
+  & > *:last-child:nth-child(3n-2) {
+    grid-column: 2;
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(2, 1fr);
+
+    & > *:last-child:nth-child(2n-1) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 750px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const Card = styled.div`
+  background: #1a1a1d;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: all 250ms cubic-bezier(0.25, 0.8, 0.25, 1);
+  width: 100%;
+
+  ${(props) =>
+    props.isCurrentPlan &&
+    `
+    box-shadow: 0 0 0 2px #7B5CFF;
+  `}
+
+  &:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(123, 92, 255, 0.25);
+  }
+`;
+
+const PlanName = styled.h2`
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.5rem;
+`;
+
+const Description = styled.p`
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2rem;
+`;
+
+const PriceContainer = styled.div`
+  margin: 2rem 0;
+`;
+
+const Price = styled.span`
+  font-size: 48px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+`;
+
+const PriceInterval = styled.span`
+  color: rgba(255, 255, 255, 0.85);
+  margin-left: 0.5rem;
+`;
+
+const FeatureList = styled.ul`
+  margin: 2rem 0;
+  space-between: 1rem;
+`;
+
+const Feature = styled.li`
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 1rem;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    color: #7b5cff;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+  }
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 0.875rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  position: relative;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.95);
+  border: none;
+  cursor: pointer;
+  transition: all 250ms cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 0.5rem;
+    padding: 1px;
+    background: linear-gradient(to right, #7b5cff, #985cff);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  &:hover {
+    background: linear-gradient(to right, #7b5cff, #985cff);
+    box-shadow: 0 0 12px rgba(123, 92, 255, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 const Pricing = () => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
@@ -88,35 +261,19 @@ const Pricing = () => {
 
   if (!products.length) {
     return (
-      <section className="bg-black relative">
-        <div className="max-w-[1000px] mx-auto py-8 sm:py-24 px-4 sm:px-6 lg:px-8">
-          <p className="text-4xl font-bold text-white text-center">
-            No subscription pricing plans found.
-          </p>
-        </div>
-      </section>
+      <Section>
+        <Container>
+          <Title>No subscription pricing plans found.</Title>
+        </Container>
+      </Section>
     );
   }
 
   return (
-    <section className="bg-black">
-      <div className="max-w-[1200px] mx-auto px-6 py-20">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-white sm:text-center">
-            Choose Your Plan
-          </h1>
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, minmax(300px, 1fr))",
-            gap: "0",
-            width: "100%",
-            maxWidth: "1200px",
-            margin: "40px auto 0",
-          }}
-        >
+    <Section>
+      <Container>
+        <Title>Choose Your Plan</Title>
+        <CardsContainer>
           {products.map((product) => {
             const price = product.prices?.[0];
             if (!price) return null;
@@ -127,142 +284,91 @@ const Pricing = () => {
               minimumFractionDigits: 0,
             }).format((price.unit_amount || 0) / 100);
 
+            const isCurrentPlan =
+              subscriptionInfo?.stripe_product_name &&
+              product.product_name
+                ?.toLowerCase()
+                .includes(subscriptionInfo?.stripe_product_name);
+
             return (
-              <div key={product.id} className="bg-gray-800 p-8">
-                <div>
-                  <h2 className="text-xl leading-6 font-semibold text-white">
-                    {product.product_name}
-                  </h2>
-                  <p className="mt-2 text-gray-300">{product.description}</p>
-                  <div className="mt-8 mb-8">
-                    <span className="text-4xl font-bold text-white">
-                      {priceString}
-                    </span>
-                    <span className="text-base font-medium text-gray-300">
-                      /month
-                    </span>
-                  </div>
+              <Card key={product.id} isCurrentPlan={isCurrentPlan}>
+                <PlanName>{product.product_name}</PlanName>
+                <Description>{product.description}</Description>
+                <PriceContainer>
+                  <Price>{priceString}</Price>
+                  <PriceInterval>/month</PriceInterval>
+                </PriceContainer>
 
-                  <ul className="space-y-4 mb-8">
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-4 h-4 text-green-500 flex-none"
-                          height="16"
-                          width="16"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                      <p className="ml-3 text-base text-gray-300">
-                        {price.mic_tokens} Microphone Minutes
-                      </p>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-4 h-4 text-green-500 flex-none"
-                          height="16"
-                          width="16"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                      <p className="ml-3 text-base text-gray-300">
-                        {price.call_tokens} Call Minutes
-                      </p>
-                    </li>
-                    <li className="flex items-start">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-4 h-4 text-green-500 flex-none"
-                          height="16"
-                          width="16"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      </div>
-                      <p className="ml-3 text-base text-gray-300">
-                        {price.num_calls} Number of Calls
-                      </p>
-                    </li>
-                  </ul>
+                <FeatureList>
+                  <Feature>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    {price.mic_tokens} Microphone Minutes
+                  </Feature>
+                  <Feature>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    {price.call_tokens} Call Minutes
+                  </Feature>
+                  <Feature>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    {price.num_calls} Number of Calls
+                  </Feature>
+                </FeatureList>
 
-                  <button
-                    onClick={() => {
-                      if (!user) {
-                        checkOut(price.stripe_price_id);
-                        return;
-                      }
-
-                      const isCurrentPlan = product.product_name
-                        ?.toLowerCase()
-                        .includes(subscriptionInfo?.stripe_product_name);
-
-                      if (subscriptionInfo) {
-                        if (!isCurrentPlan) {
-                          switchPlan(
-                            subscriptionInfo.stripe_subscription_id,
-                            price.stripe_price_id
-                          );
-                        }
-                      } else {
-                        checkOut(price.stripe_price_id);
-                      }
-                    }}
-                    disabled={
-                      loading ||
-                      (user &&
-                        subscriptionInfo?.stripe_product_name &&
-                        product.product_name
-                          ?.toLowerCase()
-                          .includes(subscriptionInfo?.stripe_product_name))
+                <Button
+                  onClick={() => {
+                    if (!user) {
+                      checkOut(price.stripe_price_id);
+                      return;
                     }
-                    className="block w-full bg-purple-600 border border-transparent rounded-lg py-3 text-sm font-semibold text-white text-center hover:bg-purple-700 disabled:opacity-50"
-                  >
-                    {loading
-                      ? "Loading..."
-                      : !user
-                      ? "Subscribe"
-                      : subscriptionInfo?.stripe_product_name
-                      ? product.product_name
-                          ?.toLowerCase()
-                          .includes(subscriptionInfo?.stripe_product_name)
-                        ? "Current Plan"
-                        : "Switch Plan"
-                      : "Subscribe"}
-                  </button>
-                </div>
-              </div>
+
+                    if (subscriptionInfo) {
+                      if (!isCurrentPlan) {
+                        switchPlan(
+                          subscriptionInfo.stripe_subscription_id,
+                          price.stripe_price_id
+                        );
+                      }
+                    } else {
+                      checkOut(price.stripe_price_id);
+                    }
+                  }}
+                  disabled={loading || isCurrentPlan}
+                >
+                  {loading
+                    ? "Loading..."
+                    : !user
+                    ? "Subscribe"
+                    : isCurrentPlan
+                    ? "Current Plan"
+                    : "Switch Plan"}
+                </Button>
+              </Card>
             );
           })}
-        </div>
-      </div>
-    </section>
+        </CardsContainer>
+      </Container>
+    </Section>
   );
 };
 
