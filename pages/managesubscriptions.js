@@ -6,18 +6,23 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import axios from "axios"; // NEW
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 
-function Button({ children, loading, disabled, onClick, variant = "slim" }) {
-  const base =
-    "inline-flex items-center justify-center rounded-md px-4 py-2 font-medium transition";
-  const slim =
-    "bg-white text-black hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed";
+function Button({ children, loading, disabled, onClick }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={`${base} ${variant === "slim" ? slim : ""}`}
+      className="u-pill btn-muted"
+      style={{
+        backgroundColor: "transparent",
+        borderColor: "var(--muted-600)",
+        borderRadius: "50px",
+        padding: "8px 24px",
+        fontFamily: "var(--font-family)",
+      }}
     >
-      {loading ? "Loading..." : children}
+      <span style={{ color: "var(--text-300)" }}>
+        {loading ? "Loading..." : children}
+      </span>
     </button>
   );
 }
@@ -36,8 +41,10 @@ function Card({ title, description, footer, children }) {
   return (
     <div className="border border-accents-1 max-w-3xl w-full rounded-lg m-auto my-8 overflow-hidden">
       <div className="px-5 py-4">
-        <h3 className="text-2xl mb-1 font-medium">{title}</h3>
-        {description && <p className="text-white/80">{description}</p>}
+        <h3 className="text-xl font-semibold mb-2">{title}</h3>
+        {description && (
+          <p className="text-base text-white/80">{description}</p>
+        )}
         {children}
       </div>
       <div className="border-t border-accents-1 bg-red-100-2 p-4 text-blue-300 rounded-b-lg">
@@ -213,13 +220,14 @@ export default function Account() {
   };
 
   return (
-    <section className="bg-[#0C0C0C] mb-32 min-h-screen">
+    <section
+      className="bg-[#0C0C0C] mb-32 min-h-screen"
+      style={{ fontFamily: "var(--font-family)" }}
+    >
       <div className="max-w-6xl mx-auto pt-8 sm:pt-24 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:flex-col sm:align-center">
-          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
-            Account
-          </h1>
-          <p className="mt-5 text-xl text-white sm:text-center sm:text-2xl max-w-2xl m-auto">
+          <h1 className="text-3xl font-semibold text-white mb-4">Account</h1>
+          <p className="text-lg text-white/80 mb-8">
             We partnered with Stripe for a simplified billing.
           </p>
         </div>
@@ -234,10 +242,10 @@ export default function Account() {
           }
           footer={
             <div className="flex items-start justify-between flex-col sm:flex-row sm:items-center gap-3">
-              <p className="text-white">
+              <p className="text-base text-white/80">
                 Manage or change your plan on Stripe.
               </p>
-              <p className="text-white">
+              <p className="text-base text-white/80">
                 Go to your <Link href="/dashboard">dashboard</Link>.
               </p>
               <Button
@@ -251,7 +259,7 @@ export default function Account() {
             </div>
           }
         >
-          <div className="text-xl mt-8 mb-4 font-semibold text-white">
+          <div className="text-lg mt-6 mb-4 text-white/80">
             {loadingMe ? (
               <div className="h-12 mb-6 flex items-center">
                 <LoadingDots />
@@ -273,9 +281,7 @@ export default function Account() {
             </p>
           }
         >
-          <p className="text-xl mt-8 mb-4 font-semibold text-white">
-            {user?.email ?? ""}
-          </p>
+          <p className="text-lg mt-6 mb-4 text-white/80">{user?.email ?? ""}</p>
         </Card>
       </div>
     </section>
