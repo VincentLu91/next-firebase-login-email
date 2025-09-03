@@ -25,13 +25,29 @@ const Sidebar = () => {
     (state) => state.recordingReducer.callControlID
   );
 
-  const handleSignOut = () => {
-    if (callControlID) {
-      axios.post(`/api/hangup?callControlID=${callControlID}`);
-      axios.post(`/api/calls-token?user=${user.id}`);
+  const handleSignOut = async () => {
+    try {
+      if (callControlID) {
+        // best-effort; don't block logout if these fail
+        try {
+          await axios.post("/api/hangup", { callControlID });
+        } catch {}
+        try {
+          await axios.post("/api/calls-token", { user: user?.id || null });
+        } catch {}
+      }
+
+      // Prefer local scope; avoids 403 if refresh token is already rotated/invalid
+      await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+
+      // Ensure Redux-persist doesn't instantly rehydrate old state
+      try {
+        localStorage.removeItem("persist:root");
+      } catch {}
+    } finally {
+      // Hard reload to kill any lingering auto-refresh listeners
+      window.location.href = "/signin";
     }
-    supabase.auth.signOut();
-    dispatch({ type: "SIGNED_OUT" });
   };
 
   return (
