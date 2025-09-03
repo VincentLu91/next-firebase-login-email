@@ -12,68 +12,27 @@ const InternalRecording = () => {
   const router = useRouter();
   const user = useUser();
   const supabase = useSupabaseClient();
-  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-
   const checkAuth = useCallback(
     async (user) => {
-      if (user) {
-        console.log("Supabase user is: ", user);
-        let customerInfo = await supabase
-          .from("customers")
-          .select("*")
-          .eq("email_address", user.email);
-        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
-        let subscriptionResponse = await supabase
-          .from("subscriptions")
-          .select()
-          .eq("customer_id", customerInfo.data[0].id);
-        if (!subscriptionResponse) {
-          setIsSubscribed(false);
-          setSubscriptionInfo(null);
-        } else {
-          if (!subscriptionResponse.data[0]) {
-            setIsSubscribed(false);
-            setSubscriptionInfo(null);
-          } else {
-            console.log(
-              "subscriptionResponse is: ",
-              subscriptionResponse.data[0].stripe_product_name
-            );
-            setIsSubscribed(true);
-            setSubscriptionInfo(
-              subscriptionResponse.data[0].stripe_product_name
-            );
-          }
-        }
-      } else {
-        // User is signed out
+      if (!user) {
         console.log(
           "The user is inauthenticated, redirecting back to signin page"
         );
         router.push("/signin");
       }
     },
-    [router, supabase]
+    [router]
   );
 
   useEffect(() => {
-    //console.log("Current user is: ", currentUser);
     checkAuth(user);
   }, [checkAuth, user]);
 
-  function isUserSubscribed() {
-    if (isSubscribed) {
-      return <ComponentWithNoSSR />;
-    } else {
-      return (
-        <>
-        <h1> You are not subscribed!!</h1>
-        </>
-      )
-    }
-  }
-  return <div>{isUserSubscribed()}</div>;
+  return (
+    <div>
+      <ComponentWithNoSSR />
+    </div>
+  );
 };
 
 export default InternalRecording;
