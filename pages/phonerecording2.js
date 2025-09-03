@@ -133,8 +133,6 @@ const PhoneRecording2 = () => {
   const [customer, setCustomer] = useState(null);
   const user = useUser();
   const router = useRouter();
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
   const dispatch = useDispatch();
   const recordingList = useSelector(
     (state) => state.recordingReducer.recordingList
@@ -155,28 +153,6 @@ const PhoneRecording2 = () => {
           .eq("email_address", user.email);
         console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
         setCustomer(customerInfo.data[0]);
-        let subscriptionResponse = await supabase
-          .from("subscriptions")
-          .select()
-          .eq("customer_id", customerInfo.data[0].id);
-        if (!subscriptionResponse) {
-          setIsSubscribed(false);
-          setSubscriptionInfo(null);
-        } else {
-          if (!subscriptionResponse.data[0]) {
-            setIsSubscribed(false);
-            setSubscriptionInfo(null);
-          } else {
-            console.log(
-              "subscriptionResponse is: ",
-              subscriptionResponse.data[0].stripe_product_name
-            );
-            setIsSubscribed(true);
-            setSubscriptionInfo(
-              subscriptionResponse.data[0].stripe_product_name
-            );
-          }
-        }
       } else {
         // User is signed out
         console.log(
@@ -421,9 +397,85 @@ const PhoneRecording2 = () => {
   }
 
   function renderView() {
-    if (isSubscribed) {
-      if (numCalls == 0) {
-        // ── No calls left
+    if (numCalls == 0) {
+      // ── No calls left
+      return (
+        <div className="rec-card">
+          <div className="rec-row">
+            <div className="status idle">
+              <span className="dot" /> Ready to dial
+            </div>
+            <div className="meta">
+              <span className="chip">Calls left: 0</span>
+            </div>
+          </div>
+
+          <h2 className="headline" style={{ marginTop: 12 }}>
+            You have no calls available!
+          </h2>
+        </div>
+      );
+    } else {
+      if (recordingStatus) {
+        // ── Status present (in-progress or completed)
+        const s = (recordingStatus || "").toLowerCase();
+        const tone = s === "completed" ? "completed" : "recording";
+
+        return (
+          <div className="rec-card">
+            <div className="rec-row">
+              <div className={`status ${tone}`}>
+                <span className="dot" />
+                <span>{recordingStatus?.toLocaleUpperCase()}</span>
+              </div>
+              <div className="meta">
+                <span className="chip">Calls left: {numCalls}</span>
+              </div>
+            </div>
+
+            {recordingStatus === "completed" && (
+              <div className="field" style={{ marginTop: 14 }}>
+                <div>
+                  <span className="chip" style={{ borderRadius: 10 }}>
+                    Recording Url:
+                  </span>
+                  <div style={{ marginTop: 8 }}>
+                    <a
+                      className="btn-ghost"
+                      href={callRecordingInfo.recordingUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Open Url
+                    </a>
+                  </div>
+                </div>
+
+                <input
+                  value={filename}
+                  name="filename"
+                  onChange={(e) => setFilename(e.target.value)}
+                  placeholder="Rename filename"
+                />
+                <button className="btn btn-primary" onClick={renameRecord}>
+                  Rename
+                </button>
+              </div>
+            )}
+
+            {transcriptionText && (
+              <div
+                className="transcript"
+                aria-live="polite"
+                style={{ whiteSpace: "pre-wrap" }}
+              >
+                {transcriptionText}
+              </div>
+            )}
+          </div>
+        );
+      } else {
+        // ── Ready to dial
         return (
           <div className="rec-card">
             <div className="rec-row">
@@ -431,115 +483,23 @@ const PhoneRecording2 = () => {
                 <span className="dot" /> Ready to dial
               </div>
               <div className="meta">
-                <span className="chip">Calls left: 0</span>
+                <span className="chip">Calls left: {numCalls}</span>
               </div>
+              <button className="btn btn-primary" onClick={dialNumber}>
+                Dial Number
+              </button>
             </div>
 
-            <h2 className="headline" style={{ marginTop: 12 }}>
-              You have no calls available!
-            </h2>
+            <div className="field">
+              <PhoneInput
+                placeholder="Enter phone number with country code"
+                value={phoneNumber}
+                onChange={setPhoneNumber}
+              />
+            </div>
           </div>
         );
-      } else {
-        if (recordingStatus) {
-          // ── Status present (in-progress or completed)
-          const s = (recordingStatus || "").toLowerCase();
-          const tone = s === "completed" ? "completed" : "recording";
-
-          return (
-            <div className="rec-card">
-              <div className="rec-row">
-                <div className={`status ${tone}`}>
-                  <span className="dot" />
-                  <span>{recordingStatus?.toLocaleUpperCase()}</span>
-                </div>
-                <div className="meta">
-                  <span className="chip">Calls left: {numCalls}</span>
-                </div>
-              </div>
-
-              {recordingStatus === "completed" && (
-                <div className="field" style={{ marginTop: 14 }}>
-                  <div>
-                    <span className="chip" style={{ borderRadius: 10 }}>
-                      Recording Url:
-                    </span>
-                    <div style={{ marginTop: 8 }}>
-                      <a
-                        className="btn-ghost"
-                        href={callRecordingInfo.recordingUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Open Url
-                      </a>
-                    </div>
-                  </div>
-
-                  <input
-                    value={filename}
-                    name="filename"
-                    onChange={(e) => setFilename(e.target.value)}
-                    placeholder="Rename filename"
-                  />
-                  <button className="btn btn-primary" onClick={renameRecord}>
-                    Rename
-                  </button>
-                </div>
-              )}
-
-              {transcriptionText && (
-                <div
-                  className="transcript"
-                  aria-live="polite"
-                  style={{ whiteSpace: "pre-wrap" }}
-                >
-                  {transcriptionText}
-                </div>
-              )}
-            </div>
-          );
-        } else {
-          // ── Ready to dial
-          return (
-            <div className="rec-card">
-              <div className="rec-row">
-                <div className="status idle">
-                  <span className="dot" /> Ready to dial
-                </div>
-                <div className="meta">
-                  <span className="chip">Calls left: {numCalls}</span>
-                </div>
-                <button className="btn btn-primary" onClick={dialNumber}>
-                  Dial Number
-                </button>
-              </div>
-
-              <div className="field">
-                <PhoneInput
-                  placeholder="Enter phone number with country code"
-                  value={phoneNumber}
-                  onChange={setPhoneNumber}
-                />
-              </div>
-            </div>
-          );
-        }
       }
-    } else {
-      // ── Not subscribed
-      return (
-        <div className="rec-card">
-          <div className="rec-row">
-            <div className="status idle">
-              <span className="dot" /> Locked
-            </div>
-          </div>
-          <h2 className="headline" style={{ marginTop: 12 }}>
-            You are not subscribed!!
-          </h2>
-        </div>
-      );
     }
   }
 
