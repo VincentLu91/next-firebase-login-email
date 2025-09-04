@@ -59,7 +59,14 @@ export default async function handler(req, res) {
         .from("customers")
         .select("*")
         .eq("stripe_customer_id", event.data.object.customer);
-      const customer_id = customerResponse.data[0].id;
+      console.log("customerResponse==", JSON.stringify(customerResponse));
+      if (!customerResponse) {
+        res.status(400).json({
+          message: "customer does not exit",
+          success: false,
+        });
+      }
+      const customer_id = customerResponse?.data[0]?.id;
       console.log("customerResponse is: ", customerResponse);
       console.log("customer_id is: ", customer_id);
       const subscriptionObj = event.data.object.id;
