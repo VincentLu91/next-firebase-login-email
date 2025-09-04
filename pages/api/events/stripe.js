@@ -60,14 +60,13 @@ export default async function handler(req, res) {
         .select("*")
         .eq("stripe_customer_id", event.data.object.customer);
       console.log("customerResponse==", JSON.stringify(customerResponse));
-
-      const customer_id = customerResponse?.data[0]?.id;
-      if (!customer_id) {
+      if (!customerResponse) {
         res.status(400).json({
+          message: "customer does not exit",
           success: false,
-          message: "customer does not exist on supabase",
         });
       }
+      const customer_id = customerResponse?.data[0]?.id;
       console.log("customerResponse is: ", customerResponse);
       console.log("customer_id is: ", customer_id);
       const subscriptionObj = event.data.object.id;
