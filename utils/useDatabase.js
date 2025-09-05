@@ -195,42 +195,78 @@ const createSubscription = async (subscriptionId, customerId) => {
   const supabaseUUID = stripeCustomer.metadata.supabaseUUID;
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-    expand: ["items.data.price.product"],
+    expand: ["items.data.price.product", "default_payment_method"],
   });
 
-  const { error } = await supabase.from("subscriptions").insert({
-    stripe_subscription_id: subscriptionId,
-    customer_id: supabaseUUID,
-    stripe_customer_id: customerId,
-    status: subscription.status,
-    price_id: subscription.items.data[0].price.id,
-    quantity: subscription.items.data[0].quantity,
-    cancel_at_period_end: subscription.cancel_at_period_end,
-    created: new Date(subscription.created * 1000).toISOString(),
-    current_period_start: new Date(
-      subscription.current_period_start * 1000
-    ).toISOString(),
-    current_period_end: new Date(
-      subscription.current_period_end * 1000
-    ).toISOString(),
-    ended_at: subscription.ended_at
-      ? new Date(subscription.ended_at * 1000).toISOString()
-      : null,
-    cancel_at: subscription.cancel_at
-      ? new Date(subscription.cancel_at * 1000).toISOString()
-      : null,
-    canceled_at: subscription.canceled_at
-      ? new Date(subscription.canceled_at * 1000).toISOString()
-      : null,
-    trial_start: subscription.trial_start
-      ? new Date(subscription.trial_start * 1000).toISOString()
-      : null,
-    trial_end: subscription.trial_end
-      ? new Date(subscription.trial_end * 1000).toISOString()
-      : null,
-  });
+  const stripePriceId = subscription.items.data[0].price.id;
+  const stripeProductId = subscription.items.data[0].price.product.id;
 
-  if (error) throw error;
+  // Get price and product from our database
+  const { data: priceData } = await supabase
+    .from("prices")
+    .select("id")
+    .eq("stripe_price_id", stripePriceId)
+    .single();
+
+  const { data: productData } = await supabase
+    .from("products")
+    .select("id")
+    .eq("stripe_product_id", stripeProductId)
+    .single();
+
+  const { error: subscriptionError } = await supabase
+    .from("subscriptions")
+    .insert({
+      stripe_subscription_id: subscriptionId,
+      customer_id: supabaseUUID,
+      price_id: priceData?.id,
+      product_id: productData?.id,
+      stripe_price_id: stripePriceId,
+      stripe_product_id: stripeProductId,
+      stripe_product_name: subscription.items.data[0].price.product.name,
+      cancel_at: subscription.cancel_at
+        ? new Date(subscription.cancel_at * 1000).toISOString()
+        : null,
+      cancel_at_period_end: subscription.cancel_at_period_end,
+      created: new Date(subscription.created * 1000).toISOString(),
+      current_period_start: new Date(
+        subscription.current_period_start * 1000
+      ).toISOString(),
+      current_period_end: new Date(
+        subscription.current_period_end * 1000
+      ).toISOString(),
+    });
+
+  if (subscriptionError) throw subscriptionError;
+
+  // If subscription is active, update customer tokens based on plan
+  if (subscription.status === "active" || subscription.status === "trialing") {
+    const { data: price } = await supabase
+      .from("prices")
+      .select("mic_tokens, call_tokens")
+      .eq("stripe_price_id", stripePriceId)
+      .single();
+
+    if (price) {
+      const { error: customerError } = await supabase.from("customers").upsert({
+        id: supabaseUUID,
+        mic_tokens: price.mic_tokens,
+        call_tokens: price.call_tokens,
+      });
+
+      if (customerError) throw customerError;
+    }
+  }
+
+  // Copy billing details to customer if available
+  if (subscription.default_payment_method) {
+    const { billing_details } = subscription.default_payment_method;
+    await stripe.customers.update(customerId, {
+      name: billing_details.name,
+      phone: billing_details.phone,
+      address: billing_details.address,
+    });
+  }
 };
 
 const manageSubscriptionStatusChange = async (
