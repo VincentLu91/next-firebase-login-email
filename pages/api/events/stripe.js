@@ -2,6 +2,7 @@ import Stripe from "stripe";
 import { buffer } from "micro";
 import {
   createOrRetrieveCustomer,
+  createSubscription,
   manageSubscriptionStatusChange,
 } from "../../../utils/useDatabase";
 
@@ -46,13 +47,17 @@ export default async function handler(req, res) {
     if (relevantEvents.has(event.type)) {
       try {
         switch (event.type) {
-          case "customer.subscription.created":
+          case "customer.subscription.created": {
+            const subscription = event.data.object;
+            await createSubscription(subscription.id, subscription.customer);
+            break;
+          }
           case "customer.subscription.updated": {
             const subscription = event.data.object;
             await manageSubscriptionStatusChange(
               subscription.id,
               subscription.customer,
-              event.type === "customer.subscription.created"
+              false
             );
             break;
           }

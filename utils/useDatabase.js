@@ -189,6 +189,50 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
   return data.stripe_customer_id;
 };
 
+const createSubscription = async (subscriptionId, customerId) => {
+  // Get customer's UUID from Stripe metadata
+  const stripeCustomer = await stripe.customers.retrieve(customerId);
+  const supabaseUUID = stripeCustomer.metadata.supabaseUUID;
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: ["items.data.price.product"],
+  });
+
+  const { error } = await supabase.from("subscriptions").insert({
+    stripe_subscription_id: subscriptionId,
+    customer_id: supabaseUUID,
+    stripe_customer_id: customerId,
+    status: subscription.status,
+    price_id: subscription.items.data[0].price.id,
+    quantity: subscription.items.data[0].quantity,
+    cancel_at_period_end: subscription.cancel_at_period_end,
+    created: new Date(subscription.created * 1000).toISOString(),
+    current_period_start: new Date(
+      subscription.current_period_start * 1000
+    ).toISOString(),
+    current_period_end: new Date(
+      subscription.current_period_end * 1000
+    ).toISOString(),
+    ended_at: subscription.ended_at
+      ? new Date(subscription.ended_at * 1000).toISOString()
+      : null,
+    cancel_at: subscription.cancel_at
+      ? new Date(subscription.cancel_at * 1000).toISOString()
+      : null,
+    canceled_at: subscription.canceled_at
+      ? new Date(subscription.canceled_at * 1000).toISOString()
+      : null,
+    trial_start: subscription.trial_start
+      ? new Date(subscription.trial_start * 1000).toISOString()
+      : null,
+    trial_end: subscription.trial_end
+      ? new Date(subscription.trial_end * 1000).toISOString()
+      : null,
+  });
+
+  if (error) throw error;
+};
+
 const manageSubscriptionStatusChange = async (
   subscriptionId,
   customerId,
@@ -299,5 +343,6 @@ export {
   deductUserCallToken,
   deductNumCallsToken,
   createOrRetrieveCustomer,
+  createSubscription,
   manageSubscriptionStatusChange,
 };
