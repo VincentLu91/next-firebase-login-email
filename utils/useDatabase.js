@@ -190,12 +190,18 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
 };
 
 const createSubscription = async (subscriptionId, customerId) => {
-  // Get customer's UUID from Stripe metadata and ensure customer exists in our database
-  const stripeCustomer = await stripe.customers.retrieve(customerId);
-  const supabaseUUID = stripeCustomer.metadata.supabaseUUID;
+  // Get customer's ID from our database using their Stripe customer ID
+  const { data: customer, error: customerError } = await supabase
+    .from("customers")
+    .select("id")
+    .eq("stripe_customer_id", customerId)
+    .single();
 
-  // Ensure customer exists in our database
-  await createOrRetrieveCustomer({ uuid: supabaseUUID });
+  if (customerError || !customer) {
+    throw new Error(
+      `Customer with Stripe ID ${customerId} not found in database`
+    );
+  }
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ["items.data.price.product", "default_payment_method"],
@@ -221,7 +227,7 @@ const createSubscription = async (subscriptionId, customerId) => {
     .from("subscriptions")
     .insert({
       stripe_subscription_id: subscriptionId,
-      customer_id: supabaseUUID,
+      customer_id: customer.id,
       price_id: priceData?.id,
       product_id: productData?.id,
       stripe_price_id: stripePriceId,
@@ -252,7 +258,7 @@ const createSubscription = async (subscriptionId, customerId) => {
 
     if (price) {
       const { error: customerError } = await supabase.from("customers").upsert({
-        id: supabaseUUID,
+        id: customer.id,
         mic_tokens: price.mic_tokens,
         call_tokens: price.call_tokens,
       });
@@ -278,9 +284,18 @@ const manageSubscriptionStatusChange = async (
   createAction = false,
   cancelAt = null
 ) => {
-  // Get customer's UUID from Stripe metadata
-  const stripeCustomer = await stripe.customers.retrieve(customerId);
-  const supabaseUUID = stripeCustomer.metadata.supabaseUUID;
+  // Get customer's ID from our database using their Stripe customer ID
+  const { data: customer, error: customerError } = await supabase
+    .from("customers")
+    .select("id")
+    .eq("stripe_customer_id", customerId)
+    .single();
+
+  if (customerError || !customer) {
+    throw new Error(
+      `Customer with Stripe ID ${customerId} not found in database`
+    );
+  }
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ["default_payment_method", "items.data.price.product"],
@@ -311,7 +326,7 @@ const manageSubscriptionStatusChange = async (
 
   const subscriptionData = {
     stripe_subscription_id: subscriptionId,
-    customer_id: supabaseUUID,
+    customer_id: customer.id,
     price_id: priceData?.id,
     product_id: productData?.id,
     stripe_price_id: priceId,
@@ -344,7 +359,7 @@ const manageSubscriptionStatusChange = async (
   if (error) throw error;
 
   console.log(
-    `Subscription [${subscription.id}] updated for user [${supabaseUUID}]`
+    `Subscription [${subscription.id}] updated for user [${customer.id}]`
   );
 
   // If subscription is active, update customer tokens based on plan
@@ -357,7 +372,7 @@ const manageSubscriptionStatusChange = async (
 
     if (price) {
       await supabase.from("customers").upsert({
-        id: supabaseUUID,
+        id: customer.id,
         mic_tokens: price.mic_tokens,
         call_tokens: price.call_tokens,
       });
