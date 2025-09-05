@@ -190,16 +190,24 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
 };
 
 const createSubscription = async (subscriptionId, customerId) => {
-  // Get customer's ID from our database using their Stripe customer ID
-  const { data: customer, error: customerError } = await supabase
+  // First verify we have a valid customer in our database
+  const { data: customer } = await supabase
     .from("customers")
-    .select("id")
+    .select("id, stripe_customer_id")
     .eq("stripe_customer_id", customerId)
     .single();
 
-  if (customerError || !customer) {
+  // Do not proceed without a valid customer_id
+  if (!customer?.id) {
     throw new Error(
-      `Customer with Stripe ID ${customerId} not found in database`
+      `Cannot create subscription: No customer found with Stripe ID ${customerId}`
+    );
+  }
+
+  // Double check this is the right customer
+  if (customer.stripe_customer_id !== customerId) {
+    throw new Error(
+      `Customer ID mismatch: ${customer.stripe_customer_id} !== ${customerId}`
     );
   }
 
@@ -284,16 +292,24 @@ const manageSubscriptionStatusChange = async (
   createAction = false,
   cancelAt = null
 ) => {
-  // Get customer's ID from our database using their Stripe customer ID
-  const { data: customer, error: customerError } = await supabase
+  // First verify we have a valid customer in our database
+  const { data: customer } = await supabase
     .from("customers")
-    .select("id")
+    .select("id, stripe_customer_id")
     .eq("stripe_customer_id", customerId)
     .single();
 
-  if (customerError || !customer) {
+  // Do not proceed without a valid customer_id
+  if (!customer?.id) {
     throw new Error(
-      `Customer with Stripe ID ${customerId} not found in database`
+      `Cannot update subscription: No customer found with Stripe ID ${customerId}`
+    );
+  }
+
+  // Double check this is the right customer
+  if (customer.stripe_customer_id !== customerId) {
+    throw new Error(
+      `Customer ID mismatch: ${customer.stripe_customer_id} !== ${customerId}`
     );
   }
 
