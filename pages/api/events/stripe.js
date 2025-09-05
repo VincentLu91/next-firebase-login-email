@@ -47,6 +47,23 @@ export default async function handler(req, res) {
     if (relevantEvents.has(event.type)) {
       try {
         switch (event.type) {
+          case "checkout.session.completed": {
+            const checkoutSession = event.data.object;
+            if (checkoutSession.mode === "subscription") {
+              // First create/setup the customer
+              await createOrRetrieveCustomer({
+                email: checkoutSession.customer_details.email,
+                uuid: checkoutSession.client_reference_id,
+              });
+              // Then handle the subscription
+              await manageSubscriptionStatusChange(
+                checkoutSession.subscription,
+                checkoutSession.customer,
+                true
+              );
+            }
+            break;
+          }
           case "customer.subscription.created": {
             const subscription = event.data.object;
             await createSubscription(subscription.id, subscription.customer);
@@ -72,17 +89,6 @@ export default async function handler(req, res) {
               false,
               cancelAt
             );
-            break;
-          }
-          case "checkout.session.completed": {
-            const checkoutSession = event.data.object;
-            if (checkoutSession.mode === "subscription") {
-              await manageSubscriptionStatusChange(
-                checkoutSession.subscription,
-                checkoutSession.customer,
-                true
-              );
-            }
             break;
           }
         }
