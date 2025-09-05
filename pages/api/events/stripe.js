@@ -49,12 +49,25 @@ export default async function handler(req, res) {
         switch (event.type) {
           case "checkout.session.completed": {
             const checkoutSession = event.data.object;
+            console.log("Checkout completed:", {
+              mode: checkoutSession.mode,
+              customer: checkoutSession.customer,
+              subscription: checkoutSession.subscription,
+              clientRef: checkoutSession.client_reference_id,
+              customerEmail: checkoutSession.customer_details?.email,
+            });
+
             if (checkoutSession.mode === "subscription") {
               // First create/setup the customer
-              await createOrRetrieveCustomer({
-                email: checkoutSession.customer_details.email,
+              const stripeCustomerId = await createOrRetrieveCustomer({
+                email: checkoutSession.customer_details?.email,
                 uuid: checkoutSession.client_reference_id,
               });
+              console.log("Customer created/retrieved:", {
+                stripeId: stripeCustomerId,
+                uuid: checkoutSession.client_reference_id,
+              });
+
               // Then handle the subscription
               await manageSubscriptionStatusChange(
                 checkoutSession.subscription,
