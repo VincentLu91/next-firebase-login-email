@@ -190,9 +190,12 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
 };
 
 const createSubscription = async (subscriptionId, customerId) => {
-  // Get customer's UUID from Stripe metadata
+  // Get customer's UUID from Stripe metadata and ensure customer exists in our database
   const stripeCustomer = await stripe.customers.retrieve(customerId);
   const supabaseUUID = stripeCustomer.metadata.supabaseUUID;
+
+  // Ensure customer exists in our database
+  await createOrRetrieveCustomer({ uuid: supabaseUUID });
 
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ["items.data.price.product", "default_payment_method"],
