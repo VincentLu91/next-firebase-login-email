@@ -79,9 +79,44 @@ export default async function handler(req, res) {
           }
           case "customer.subscription.created": {
             const subscription = event.data.object;
-            await createSubscription(subscription.id, subscription.customer);
+
+            // Try to find an existing customer row by stripe_customer_id
+            let { data: customerRow } = await supabase
+              .from("customers")
+              .select("id, stripe_customer_id")
+              .eq("stripe_customer_id", subscription.customer)
+              .single();
+
+            // If not found, try to patch stripe_customer_id using metadata
+            if (!customerRow) {
+              // The supabaseUUID should be in your Stripe metadata
+              const supabaseUUID = subscription.metadata?.supabaseUUID;
+              if (supabaseUUID) {
+                const { data, error } = await supabase
+                  .from("customers")
+                  .update({ stripe_customer_id: subscription.customer })
+                  .eq("id", supabaseUUID)
+                  .select("id, stripe_customer_id")
+                  .single();
+
+                if (error) throw error;
+                customerRow = data;
+                console.log("Patched customer:", customerRow);
+              }
+            }
+
+            // Now continue creating the subscription row
+            if (customerRow) {
+              await createSubscription(subscription.id, subscription.customer);
+            } else {
+              console.warn(
+                `⚠️ Could not find or patch customer for subscription ${subscription.id}`
+              );
+            }
+
             break;
           }
+
           case "customer.subscription.updated": {
             const subscription = event.data.object;
             await manageSubscriptionStatusChange(
