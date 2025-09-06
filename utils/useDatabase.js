@@ -288,42 +288,43 @@ const createSubscription = async (subscriptionId, customerId) => {
 
 const manageSubscriptionStatusChange = async (
   subscriptionId,
-  customerId,
+  stripeCustomerId,
+  userId,
   createAction = false,
   cancelAt = null
 ) => {
-  // First verify we have a valid customer in our database
-  const { data: customer } = await supabase
-    .from("customers")
-    .select("id, stripe_customer_id")
-    .eq("stripe_customer_id", customerId)
-    .single();
-
-  // Do not proceed without a valid customer_id
-  if (!customer?.id) {
-    throw new Error(
-      `Cannot update subscription: No customer found with Stripe ID ${customerId}`
-    );
-  }
-
-  // Double check this is the right customer
-  if (customer.stripe_customer_id !== customerId) {
-    throw new Error(
-      `Customer ID mismatch: ${customer.stripe_customer_id} !== ${customerId}`
-    );
-  }
-
+  // Get subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
     expand: ["default_payment_method", "items.data.price.product"],
   });
 
+  // Get customer by their ID (which matches user ID)
+  const { data: customer } = await supabase
+    .from("customers")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (!customer) {
+    console.log(`No customer found with ID ${userId}`);
+    return;
+  }
+
+  // Update stripe_customer_id if it's changed
+  if (customer.stripe_customer_id !== stripeCustomerId) {
+    await supabase
+      .from("customers")
+      .update({ stripe_customer_id: stripeCustomerId })
+      .eq("id", userId);
+  }
+
+  // Get price and product info
   const priceId = subscription.items.data[0].price.id;
   const productId = subscription.items.data[0].price.product.id;
 
-  // Get price and product from our database
   const { data: priceData } = await supabase
     .from("prices")
-    .select("id")
+    .select("id, mic_tokens, call_tokens")
     .eq("stripe_price_id", priceId)
     .single();
 
@@ -333,16 +334,10 @@ const manageSubscriptionStatusChange = async (
     .eq("stripe_product_id", productId)
     .single();
 
-  // First try to find existing subscription
-  const { data: existingSub } = await supabase
-    .from("subscriptions")
-    .select("id")
-    .eq("stripe_subscription_id", subscriptionId)
-    .single();
-
+  // Update or create subscription record
   const subscriptionData = {
     stripe_subscription_id: subscriptionId,
-    customer_id: customer.id,
+    customer_id: userId,
     price_id: priceData?.id,
     product_id: productData?.id,
     stripe_price_id: priceId,
@@ -363,47 +358,40 @@ const manageSubscriptionStatusChange = async (
     ).toISOString(),
   };
 
-  // If subscription exists, include its ID
-  if (existingSub?.id) {
-    subscriptionData.id = existingSub.id;
-  }
-
-  const { error } = await supabase
+  // Upsert subscription
+  const { error: subscriptionError } = await supabase
     .from("subscriptions")
     .upsert(subscriptionData);
 
-  if (error) throw error;
+  if (subscriptionError) {
+    console.log("Error upserting subscription:", subscriptionError);
+    return;
+  }
 
-  console.log(
-    `Subscription [${subscription.id}] updated for user [${customer.id}]`
-  );
-
-  // If subscription is active, update customer tokens based on plan
+  // Update customer tokens if subscription is active
   if (subscription.status === "active" || subscription.status === "trialing") {
-    const { data: price } = await supabase
-      .from("prices")
-      .select("mic_tokens, call_tokens")
-      .eq("stripe_price_id", priceId)
-      .single();
-
-    if (price) {
-      await supabase.from("customers").upsert({
-        id: customer.id,
-        mic_tokens: price.mic_tokens,
-        call_tokens: price.call_tokens,
-      });
+    if (priceData) {
+      await supabase
+        .from("customers")
+        .update({
+          mic_tokens: priceData.mic_tokens,
+          call_tokens: priceData.call_tokens,
+        })
+        .eq("id", userId);
     }
   }
 
-  // Copy billing details to customer
+  // Copy billing details to Stripe customer if needed
   if (createAction && subscription.default_payment_method) {
     const { billing_details } = subscription.default_payment_method;
-    await stripe.customers.update(customerId, {
+    await stripe.customers.update(stripeCustomerId, {
       name: billing_details.name,
       phone: billing_details.phone,
       address: billing_details.address,
     });
   }
+
+  console.log(`Subscription [${subscriptionId}] updated for user [${userId}]`);
 };
 
 export {
