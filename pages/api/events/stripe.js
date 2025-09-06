@@ -69,10 +69,11 @@ export default async function handler(req, res) {
                 uuid: checkoutSession.client_reference_id,
               });
 
-              // Then handle the subscription
+              // Then handle the subscription, passing the user ID
               await manageSubscriptionStatusChange(
                 checkoutSession.subscription,
                 checkoutSession.customer,
+                checkoutSession.client_reference_id,
                 true
               );
             }
@@ -80,49 +81,98 @@ export default async function handler(req, res) {
           }
           case "customer.subscription.created": {
             const subscription = event.data.object;
+            console.log("subscription is: ", subscription);
 
-            // Try to find an existing customer row by stripe_customer_id
-            let { data: customerRow } = await supabase
-              .from("customers")
-              .select("id, stripe_customer_id")
-              .eq("stripe_customer_id", subscription.customer)
-              .single();
+            try {
+              // First ensure we have a customer record
+              const stripeCustomer = await stripe.customers.retrieve(
+                subscription.customer
+              );
+              console.log("Retrieved Stripe customer:", stripeCustomer);
 
-            // If not found, try to patch stripe_customer_id using metadata
-            if (!customerRow) {
-              // The supabaseUUID should be in your Stripe metadata
-              const supabaseUUID = subscription.metadata?.supabaseUUID;
-              if (supabaseUUID) {
-                const { data, error } = await supabase
+              // Try to find an existing customer row by stripe_customer_id
+              let { data: customerRow } = await supabase
+                .from("customers")
+                .select("id, stripe_customer_id")
+                .eq("stripe_customer_id", subscription.customer)
+                .single();
+
+              if (!customerRow) {
+                // Try to find by email if available
+                if (stripeCustomer.email) {
+                  const { data } = await supabase
+                    .from("customers")
+                    .select("id")
+                    .eq("email_address", stripeCustomer.email)
+                    .single();
+
+                  if (data) {
+                    // Update existing customer with stripe_customer_id
+                    const { data: updated, error } = await supabase
+                      .from("customers")
+                      .update({ stripe_customer_id: subscription.customer })
+                      .eq("id", data.id)
+                      .select()
+                      .single();
+
+                    if (error) throw error;
+                    customerRow = updated;
+                    console.log(
+                      "Updated customer with Stripe ID:",
+                      customerRow
+                    );
+                  }
+                }
+              }
+
+              // If still no customer row, create one
+              if (!customerRow) {
+                // Generate a UUID for new customer
+                const newCustomerId = crypto.randomUUID();
+                const { data: created, error } = await supabase
                   .from("customers")
-                  .update({ stripe_customer_id: subscription.customer })
-                  .eq("id", supabaseUUID)
-                  .select("id, stripe_customer_id")
+                  .insert({
+                    id: newCustomerId,
+                    stripe_customer_id: subscription.customer,
+                    email_address: stripeCustomer.email,
+                    mic_tokens: 0,
+                    call_tokens: 0,
+                    num_calls: 0,
+                  })
+                  .select()
                   .single();
 
                 if (error) throw error;
-                customerRow = data;
-                console.log("Patched customer:", customerRow);
+                customerRow = created;
+                console.log("Created new customer:", customerRow);
               }
-            }
 
-            // Now continue creating the subscription row
-            if (customerRow) {
+              // Now create the subscription
               await createSubscription(subscription.id, subscription.customer);
-            } else {
-              console.warn(
-                `⚠️ Could not find or patch customer for subscription ${subscription.id}`
-              );
+            } catch (error) {
+              console.error("Error handling subscription creation:", error);
+              throw error;
             }
-
             break;
           }
 
           case "customer.subscription.updated": {
             const subscription = event.data.object;
+            // Get the user ID from metadata
+            const stripeCustomer = await stripe.customers.retrieve(
+              subscription.customer
+            );
+            const userId = stripeCustomer.metadata.supabaseUUID;
+
+            if (!userId) {
+              console.log("No user ID found in customer metadata");
+              return res.json({ received: true });
+            }
+
             await manageSubscriptionStatusChange(
               subscription.id,
               subscription.customer,
+              userId,
               false
             );
             break;
@@ -132,9 +182,21 @@ export default async function handler(req, res) {
             // For deleted subscriptions, set cancel_at to now if not already set
             const cancelAt =
               subscription.cancel_at || Math.floor(Date.now() / 1000);
+            // Get the user ID from metadata
+            const stripeCustomer = await stripe.customers.retrieve(
+              subscription.customer
+            );
+            const userId = stripeCustomer.metadata.supabaseUUID;
+
+            if (!userId) {
+              console.log("No user ID found in customer metadata");
+              return res.json({ received: true });
+            }
+
             await manageSubscriptionStatusChange(
               subscription.id,
               subscription.customer,
+              userId,
               false,
               cancelAt
             );
