@@ -269,6 +269,7 @@ const createSubscription = async (subscriptionId, customerId) => {
         id: customer.id,
         mic_tokens: price.mic_tokens,
         call_tokens: price.call_tokens,
+        num_calls: price.num_calls,
       });
 
       if (customerError) throw customerError;
@@ -324,7 +325,7 @@ const manageSubscriptionStatusChange = async (
 
   const { data: priceData } = await supabase
     .from("prices")
-    .select("id, mic_tokens, call_tokens")
+    .select("id, mic_tokens, call_tokens, num_calls")
     .eq("stripe_price_id", priceId)
     .single();
 
@@ -394,6 +395,7 @@ const manageSubscriptionStatusChange = async (
         .update({
           mic_tokens: priceData.mic_tokens,
           call_tokens: priceData.call_tokens,
+          num_calls: priceData.num_calls,
         })
         .eq("id", userId);
     }
