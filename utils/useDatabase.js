@@ -358,10 +358,28 @@ const manageSubscriptionStatusChange = async (
     ).toISOString(),
   };
 
-  // Upsert subscription
-  const { error: subscriptionError } = await supabase
+  // Check if subscription exists for this customer
+  const { data: existingSubscription } = await supabase
     .from("subscriptions")
-    .upsert(subscriptionData);
+    .select("id")
+    .eq("customer_id", userId)
+    .single();
+
+  let subscriptionError;
+  if (existingSubscription) {
+    // Update existing subscription
+    const { error } = await supabase
+      .from("subscriptions")
+      .update(subscriptionData)
+      .eq("customer_id", userId);
+    subscriptionError = error;
+  } else {
+    // Insert new subscription
+    const { error } = await supabase
+      .from("subscriptions")
+      .insert(subscriptionData);
+    subscriptionError = error;
+  }
 
   if (subscriptionError) {
     console.log("Error upserting subscription:", subscriptionError);
