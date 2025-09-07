@@ -162,10 +162,33 @@ export default async function handler(req, res) {
             const stripeCustomer = await stripe.customers.retrieve(
               subscription.customer
             );
-            const userId = stripeCustomer.metadata.supabaseUUID;
+            console.log("stripeCustomer is: ", stripeCustomer);
+            let userId = null;
+            if (stripeCustomer.email) {
+              const { data } = await supabase
+                .from("customers")
+                .select("id")
+                .eq("email_address", stripeCustomer.email)
+                .single();
 
+              if (data) {
+                userId = data.id;
+              }
+            }
             if (!userId) {
               console.log("No user ID found in customer metadata");
+              return res.json({ received: true });
+            }
+
+            // First check if subscription exists
+            const { data: existingSub } = await supabase
+              .from("subscriptions")
+              .select("id")
+              .eq("stripe_subscription_id", subscription.id)
+              .single();
+
+            if (!existingSub) {
+              console.log("No existing subscription found for update");
               return res.json({ received: true });
             }
 
