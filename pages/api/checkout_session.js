@@ -23,6 +23,14 @@ export default async function handler(req, res) {
         },
       ],
       mode: "subscription",
+      subscription_data: {
+        trial_settings: {
+          end_behavior: {
+            missing_payment_method: "pause",
+          },
+        },
+        trial_period_days: 15, //15 is usualy recommended but experiment if needed
+      },
       metadata: {
         supabaseUUID: user_id,
       },
