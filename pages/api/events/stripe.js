@@ -4,6 +4,7 @@ import {
   createOrRetrieveCustomer,
   createSubscription,
   manageSubscriptionStatusChange,
+  deleteSubscription,
 } from "../../../utils/useDatabase";
 import { supabase } from "../../../utils/initSupabase";
 
@@ -205,24 +206,41 @@ export default async function handler(req, res) {
             // For deleted subscriptions, set cancel_at to now if not already set
             const cancelAt =
               subscription.cancel_at || Math.floor(Date.now() / 1000);
-            // Get the user ID from metadata
+
+            // Get the user ID by looking up the customer's email
             const stripeCustomer = await stripe.customers.retrieve(
               subscription.customer
             );
-            const userId = stripeCustomer.metadata.supabaseUUID;
+            console.log("stripeCustomer is: ", stripeCustomer);
+
+            let userId = null;
+            if (stripeCustomer.email) {
+              const { data } = await supabase
+                .from("customers")
+                .select("id")
+                .eq("email_address", stripeCustomer.email)
+                .single();
+
+              if (data) {
+                userId = data.id;
+              }
+            }
 
             if (!userId) {
-              console.log("No user ID found in customer metadata");
+              console.log("No user ID found for customer email");
               return res.json({ received: true });
             }
 
-            await manageSubscriptionStatusChange(
+            // Delete the subscription from the database
+            await deleteSubscription(userId);
+
+            /*await manageSubscriptionStatusChange(
               subscription.id,
               subscription.customer,
               userId,
               false,
               cancelAt
-            );
+            );*/
             break;
           }
         }
