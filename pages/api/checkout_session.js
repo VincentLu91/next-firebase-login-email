@@ -15,8 +15,7 @@ export default async function handler(req, res) {
     const payload = {
       success_url,
       cancel_url,
-      client_reference_id: user_id, // Add Supabase user ID for webhook
-      customer_email: user_email, // Add user email for new customers
+      client_reference_id: user_id,
       line_items: [
         {
           price: price_id,
@@ -25,18 +24,23 @@ export default async function handler(req, res) {
       ],
       mode: "subscription",
       metadata: {
-        supabaseUUID: user_id, // Add user ID to metadata for customer linking
+        supabaseUUID: user_id,
       },
     };
 
-    // Only use existing customer if provided
+    // Use customer ID for existing customers, email for new ones
     if (stripe_customer_id) {
       payload.customer = stripe_customer_id;
+    } else {
+      payload.customer_email = user_email;
     }
     const response = await stripe.checkout.sessions.create(payload);
     console.log("response", response);
     res.json(response);
   } catch (error) {
-    res.status(500).json({ error });
+    console.error("Checkout session error:", error);
+    res.status(500).json({
+      message: error.message || "Failed to create checkout session",
+    });
   }
 }
