@@ -414,6 +414,19 @@ const manageSubscriptionStatusChange = async (
   console.log(`Subscription [${subscriptionId}] updated for user [${userId}]`);
 };
 
+const deleteSubscription = async (customerId) => {
+  const { error } = await supabase
+    .from("subscriptions")
+    .delete()
+    .eq("customer_id", customerId);
+
+  if (error) {
+    console.log("Error deleting subscription:", error);
+    return false;
+  }
+  return true;
+};
+
 export {
   getTokens,
   getTieredTokens,
@@ -423,4 +436,5 @@ export {
   createOrRetrieveCustomer,
   createSubscription,
   manageSubscriptionStatusChange,
+  deleteSubscription,
 };

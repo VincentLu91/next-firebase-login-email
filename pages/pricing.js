@@ -244,6 +244,14 @@ const Pricing = () => {
     }
 
     try {
+      console.log("Checkout payload:", {
+        success_url: `${window.location.origin}/subscription-checkout`,
+        cancel_url: window.location.href,
+        stripe_customer_id: customer?.stripe_customer_id,
+        price_id: priceId,
+        user_id: user.id,
+        user_email: user.email,
+      });
       const response = await axios.post("/api/checkout_session", {
         success_url: `${window.location.origin}/subscription-checkout`,
         cancel_url: window.location.href,
@@ -255,7 +263,7 @@ const Pricing = () => {
 
       window.location.href = response.data.url;
     } catch (error) {
-      console.error("Error during checkout:", error);
+      console.error("Error during checkout:", error.response?.data || error);
     } finally {
       setLoading(false);
     }
