@@ -5,6 +5,8 @@ import {
   createSubscription,
   manageSubscriptionStatusChange,
   deleteSubscription,
+  upsertProductRecord,
+  upsertPriceRecord,
 } from "../../../utils/useDatabase";
 import { supabase } from "../../../utils/initSupabase";
 
@@ -22,6 +24,10 @@ const relevantEvents = new Set([
   "customer.subscription.created",
   "customer.subscription.updated",
   "customer.subscription.deleted",
+  "product.created",
+  "product.updated",
+  "price.created",
+  "price.updated",
 ]);
 
 export default async function handler(req, res) {

@@ -428,6 +428,8 @@ const deleteSubscription = async (customerId) => {
 };
 
 const upsertProductRecord = async (product) => {
+  console.log("Stripe product data:", product);
+
   const productData = {
     stripe_product_id: product.id,
     product_name: product.name,
@@ -437,16 +439,27 @@ const upsertProductRecord = async (product) => {
     tax_code: product.tax_code ?? null,
   };
 
-  const { error } = await supabaseAdmin.from("products").upsert([productData], {
-    onConflict: "stripe_product_id",
-  });
-  if (error) throw error;
+  console.log("Product data to upsert:", productData);
+
+  const { data, error } = await supabase
+    .from("products")
+    .upsert([productData], {
+      onConflict: "stripe_product_id",
+      returning: true,
+    });
+
+  if (error) {
+    console.error("Error upserting product:", error);
+    throw error;
+  }
+
+  console.log("Upserted product result:", data);
   console.log(`Product inserted/updated: ${product.id}`);
 };
 
 const upsertPriceRecord = async (price) => {
   // First get the product record to establish foreign key relationship
-  const { data: productData } = await supabaseAdmin
+  const { data: productData } = await supabase
     .from("products")
     .select("id")
     .eq("stripe_product_id", price.product)
@@ -480,7 +493,7 @@ const upsertPriceRecord = async (price) => {
       : null,*/
   };
 
-  const { error } = await supabaseAdmin.from("prices").upsert([priceData], {
+  const { error } = await supabase.from("prices").upsert([priceData], {
     onConflict: "stripe_price_id",
   });
   if (error) throw error;
