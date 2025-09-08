@@ -427,6 +427,66 @@ const deleteSubscription = async (customerId) => {
   return true;
 };
 
+const upsertProductRecord = async (product) => {
+  const productData = {
+    stripe_product_id: product.id,
+    product_name: product.name,
+    description: product.description,
+    active: product.active,
+    product_role: product.metadata?.role ?? null,
+    tax_code: product.tax_code ?? null,
+  };
+
+  const { error } = await supabaseAdmin.from("products").upsert([productData], {
+    onConflict: "stripe_product_id",
+  });
+  if (error) throw error;
+  console.log(`Product inserted/updated: ${product.id}`);
+};
+
+const upsertPriceRecord = async (price) => {
+  // First get the product record to establish foreign key relationship
+  const { data: productData } = await supabaseAdmin
+    .from("products")
+    .select("id")
+    .eq("stripe_product_id", price.product)
+    .single();
+
+  if (!productData) {
+    throw new Error(`No product found for Stripe product ID: ${price.product}`);
+  }
+
+  const priceData = {
+    stripe_price_id: price.id,
+    product_id: productData.id,
+    stripe_product_id: price.product,
+    active: price.active,
+    billing_scheme: price.billing_scheme,
+    currency: price.currency,
+    description: price.nickname,
+    type: price.type,
+    unit_amount: price.unit_amount,
+    interval: price.recurring?.interval ?? null,
+    interval_count: price.recurring?.interval_count ?? null,
+    trial_period_days: price.recurring?.trial_period_days ?? null,
+    /*mic_tokens: price.metadata?.mic_tokens
+      ? parseInt(price.metadata.mic_tokens)
+      : null,
+    call_tokens: price.metadata?.call_tokens
+      ? parseInt(price.metadata.call_tokens)
+      : null,
+    num_calls: price.metadata?.num_calls
+      ? parseInt(price.metadata.num_calls)
+      : null,*/
+  };
+
+  const { error } = await supabaseAdmin.from("prices").upsert([priceData], {
+    onConflict: "stripe_price_id",
+  });
+  if (error) throw error;
+  console.log(`Price inserted/updated: ${price.id}`);
+};
+
 export {
   getTokens,
   getTieredTokens,
@@ -437,4 +497,6 @@ export {
   createSubscription,
   manageSubscriptionStatusChange,
   deleteSubscription,
+  upsertProductRecord,
+  upsertPriceRecord,
 };
