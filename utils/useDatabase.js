@@ -504,7 +504,7 @@ const upsertPriceRecord = async (price) => {
     unit_amount: price.unit_amount,
     interval: price.recurring?.interval ?? null,
     interval_count: price.recurring?.interval_count ?? null,
-    trial_period_days: price.recurring?.trial_period_days ?? null,
+    //trial_period_days: price.recurring?.trial_period_days ?? null, just see pages/api/checkout_session.js
     /*mic_tokens: price.metadata?.mic_tokens
       ? parseInt(price.metadata.mic_tokens)
       : null,
