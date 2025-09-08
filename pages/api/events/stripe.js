@@ -243,6 +243,14 @@ export default async function handler(req, res) {
             );*/
             break;
           }
+          case "product.created":
+          case "product.updated":
+            await upsertProductRecord(event.data.object);
+            break;
+          case "price.created":
+          case "price.updated":
+            await upsertPriceRecord(event.data.object);
+            break;
         }
       } catch (error) {
         console.error(`Error handling ${event.type}:`, error);
