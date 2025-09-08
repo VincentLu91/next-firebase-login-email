@@ -100,22 +100,20 @@ const SubscriptionCheckout = () => {
 
   useEffect(() => {
     if (session_id) {
-      axios
-        .post("http://localhost:3001/api/complete_checkout", { session_id })
-        .then((res) => {
-          console.log("res", res);
-          axios
-            .post("/api/retrieve-stripe-invoice", {
-              invoice_id: res.data.invoice,
-            })
-            .then((invoice_res) =>
-              checkAuth(user, res, invoice_res.data.lines.data[0].price)
-            )
-            .catch((err) => console.error("Error is: ", err));
-          // add stripe customer id to supabase customer record
-          //checkAuth(user, res);
-          router.push("/dashboard");
-        });
+      axios.post("/api/complete_checkout", { session_id }).then((res) => {
+        console.log("res", res);
+        axios
+          .post("/api/retrieve-stripe-invoice", {
+            invoice_id: res.data.invoice,
+          })
+          .then((invoice_res) =>
+            checkAuth(user, res, invoice_res.data.lines.data[0].price)
+          )
+          .catch((err) => console.error("Error is: ", err));
+        // add stripe customer id to supabase customer record
+        //checkAuth(user, res);
+        router.push("/dashboard");
+      });
     }
   }, [session_id, router, supabase, user, checkAuth, response]);
 
