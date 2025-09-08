@@ -441,19 +441,40 @@ const upsertProductRecord = async (product) => {
 
   console.log("Product data to upsert:", productData);
 
-  const { data, error } = await supabase
+  // First check if product exists
+  const { data: existingProduct } = await supabase
     .from("products")
-    .upsert([productData], {
-      onConflict: "stripe_product_id",
-      returning: true,
-    });
+    .select("id")
+    .eq("stripe_product_id", product.id)
+    .single();
 
-  if (error) {
-    console.error("Error upserting product:", error);
-    throw error;
+  if (existingProduct) {
+    // Update existing product
+    const { data, error } = await supabase
+      .from("products")
+      .update(productData)
+      .eq("id", existingProduct.id)
+      .select();
+
+    if (error) {
+      console.error("Error updating product:", error);
+      throw error;
+    }
+    console.log("Updated product result:", data);
+  } else {
+    // Insert new product
+    const { data, error } = await supabase
+      .from("products")
+      .insert([productData])
+      .select();
+
+    if (error) {
+      console.error("Error inserting product:", error);
+      throw error;
+    }
+    console.log("Inserted product result:", data);
   }
 
-  console.log("Upserted product result:", data);
   console.log(`Product inserted/updated: ${product.id}`);
 };
 
