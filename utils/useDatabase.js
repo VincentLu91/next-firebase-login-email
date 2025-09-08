@@ -479,6 +479,8 @@ const upsertProductRecord = async (product) => {
 };
 
 const upsertPriceRecord = async (price) => {
+  console.log("Stripe price data:", price);
+
   // First get the product record to establish foreign key relationship
   const { data: productData } = await supabase
     .from("products")
@@ -514,10 +516,40 @@ const upsertPriceRecord = async (price) => {
       : null,*/
   };
 
-  const { error } = await supabase.from("prices").upsert([priceData], {
-    onConflict: "stripe_price_id",
-  });
-  if (error) throw error;
+  // First check if price exists
+  const { data: existingPrice } = await supabase
+    .from("prices")
+    .select("id")
+    .eq("stripe_price_id", price.id)
+    .single();
+
+  if (existingPrice) {
+    // Update existing price
+    const { data, error } = await supabase
+      .from("prices")
+      .update(priceData)
+      .eq("id", existingPrice.id)
+      .select();
+
+    if (error) {
+      console.error("Error updating price:", error);
+      throw error;
+    }
+    console.log("Updated price result:", data);
+  } else {
+    // Insert new price
+    const { data, error } = await supabase
+      .from("prices")
+      .insert([priceData])
+      .select();
+
+    if (error) {
+      console.error("Error inserting price:", error);
+      throw error;
+    }
+    console.log("Inserted price result:", data);
+  }
+
   console.log(`Price inserted/updated: ${price.id}`);
 };
 
