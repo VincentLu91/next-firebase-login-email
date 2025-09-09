@@ -381,10 +381,7 @@ const Pricing = () => {
             }).format((price.unit_amount || 0) / 100);
 
             const isCurrentPlan =
-              subscriptionInfo?.stripe_product_name &&
-              product.product_name
-                ?.toLowerCase()
-                .includes(subscriptionInfo?.stripe_product_name);
+              subscriptionInfo?.stripe_price_id === price.stripe_price_id;
 
             return (
               <Card key={product.id} isCurrentPlan={isCurrentPlan}>
