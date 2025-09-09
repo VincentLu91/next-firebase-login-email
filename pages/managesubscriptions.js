@@ -207,16 +207,15 @@ export default function Account() {
       router.push("/signin");
       return;
     }
+    // If subscription exists, use switchPlan for "Manage/Switch Plan" button
     if (subscription?.stripe_subscription_id) {
-      // Manage/upgrade via your /api/switch-plan flow
       return switchPlan(
         subscription.stripe_subscription_id,
         priceRow?.stripe_price_id
       );
     }
-    // No sub yet → start checkout
-    if (firstActivePriceId) return checkOut(firstActivePriceId);
-    alert("No active prices found. Please try again later.");
+    // If no subscription, go to pricing page for "Subscribe" button
+    router.push("/pricing");
   };
 
   return (
