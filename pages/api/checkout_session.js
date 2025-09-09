@@ -23,6 +23,7 @@ export default async function handler(req, res) {
         },
       ],
       mode: "subscription",
+      allow_promotion_codes: true,
       subscription_data: {
         trial_settings: {
           end_behavior: {
