@@ -32,6 +32,7 @@ export default async function handler(req, res) {
         },
         trial_period_days: 15, //15 is usualy recommended but experiment if needed
       },
+      payment_method_collection: "if_required",
       metadata: {
         supabaseUUID: user_id,
       },
