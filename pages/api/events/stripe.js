@@ -155,7 +155,13 @@ export default async function handler(req, res) {
               }
 
               // Now create the subscription
-              await createSubscription(subscription.id, subscription.customer);
+              // await createSubscription(subscription.id, subscription.customer);
+              await manageSubscriptionStatusChange(
+                subscription.id,
+                subscription.customer,
+                customerRow.id,
+                true
+              );
             } catch (error) {
               console.error("Error handling subscription creation:", error);
               throw error;

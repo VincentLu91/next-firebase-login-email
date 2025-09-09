@@ -34,7 +34,64 @@ const Title = styled.h1`
   letter-spacing: -0.2px;
   color: rgba(255, 255, 255, 0.95);
   text-align: center;
+  margin-bottom: 2rem;
+`;
+
+const IntervalToggle = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 3rem;
+`;
+
+const ToggleContainer = styled.div`
+  position: relative;
+  height: 2rem;
+  background: #1a1a1d;
+  border-radius: 9999px;
+  width: 14rem;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem;
+`;
+
+const ToggleButton = styled.button`
+  position: relative;
+  width: 50%;
+  height: 1.5rem;
+  border-radius: 9999px;
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  background: ${(props) =>
+    props.selected
+      ? "linear-gradient(to right, #7B5CFF, #985CFF)"
+      : "transparent"};
+  box-shadow: ${(props) =>
+    props.selected ? "0 0 12px rgba(123,92,255,0.35)" : "none"};
+  border: none;
+  cursor: pointer;
+
+  span {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: ${(props) => (props.selected ? "white" : "rgba(255,255,255,0.85)")};
+  }
+`;
+
+const SaveBadge = styled.span`
+  margin-left: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #7b5cff;
+  background: rgba(123, 92, 255, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  opacity: ${(props) => (props.visible ? 1 : 0)};
+  transition: opacity 150ms;
 `;
 
 const CardsContainer = styled.div`
@@ -180,6 +237,8 @@ const Pricing = () => {
   const [products, setProducts] = useState([]);
   const [customer, setCustomer] = useState(null);
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
+  const [interval, setInterval] = useState("month");
+  const [showAnnualSavings, setShowAnnualSavings] = useState(false);
   const router = useRouter();
   const supabase = useSupabaseClient();
   const user = useUser();
@@ -196,6 +255,13 @@ const Pricing = () => {
   useEffect(() => {
     getProductsDisplay();
   }, [getProductsDisplay]);
+
+  useEffect(() => {
+    setShowAnnualSavings(false);
+    if (interval === "year") {
+      setTimeout(() => setShowAnnualSavings(true), 50);
+    }
+  }, [interval]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -283,9 +349,29 @@ const Pricing = () => {
     <Section>
       <Container>
         <Title>Choose Your Plan</Title>
+
+        <IntervalToggle>
+          <ToggleContainer>
+            <ToggleButton
+              selected={interval === "month"}
+              onClick={() => setInterval("month")}
+            >
+              <span>Monthly</span>
+            </ToggleButton>
+            <ToggleButton
+              selected={interval === "year"}
+              onClick={() => setInterval("year")}
+            >
+              <span>Yearly</span>
+            </ToggleButton>
+          </ToggleContainer>
+          {interval === "year" && (
+            <SaveBadge visible={showAnnualSavings}>Save 18% yearly</SaveBadge>
+          )}
+        </IntervalToggle>
         <CardsContainer>
           {products.map((product) => {
-            const price = product.prices?.[0];
+            const price = product.prices?.find((p) => p.interval === interval);
             if (!price) return null;
 
             const priceString = new Intl.NumberFormat("en-US", {
@@ -306,7 +392,7 @@ const Pricing = () => {
                 <Description>{product.description}</Description>
                 <PriceContainer>
                   <Price>{priceString}</Price>
-                  <PriceInterval>/month</PriceInterval>
+                  <PriceInterval>/{interval}</PriceInterval>
                 </PriceContainer>
 
                 <FeatureList>
