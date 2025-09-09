@@ -187,6 +187,7 @@ export default function Account() {
         cancel_url: window.location.href,
         stripe_customer_id: customer?.stripe_customer_id,
         price_id: priceId,
+        user_id: user.id,
       });
       window.location.href = response.data.url;
     } catch (error) {
