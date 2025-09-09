@@ -12,6 +12,7 @@ export default async function handler(req, res) {
     user_email,
   } = req.body;
   try {
+    const idemKey = `chk_${user_id || user_email}_${price_id}`;
     const payload = {
       success_url,
       cancel_url,
@@ -44,7 +45,9 @@ export default async function handler(req, res) {
     } else {
       payload.customer_email = user_email;
     }
-    const response = await stripe.checkout.sessions.create(payload);
+    const response = await stripe.checkout.sessions.create(payload, {
+      idempotencyKey: idemKey,
+    });
     console.log("response", response);
     res.json(response);
   } catch (error) {
