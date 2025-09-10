@@ -371,7 +371,9 @@ const Pricing = () => {
         </IntervalToggle>
         <CardsContainer>
           {products.map((product) => {
-            const price = product.prices?.find((p) => p.interval === interval);
+            const price = product.prices?.find(
+              (p) => p.interval === interval && p.active === true
+            );
             if (!price) return null;
 
             const priceString = new Intl.NumberFormat("en-US", {
