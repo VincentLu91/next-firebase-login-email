@@ -376,11 +376,41 @@ const Pricing = () => {
             );
             if (!price) return null;
 
+            const zeroDecimalCurrencies = new Set([
+              "BIF",
+              "CLP",
+              "DJF",
+              "GNF",
+              "JPY",
+              "KMF",
+              "KRW",
+              "MGA",
+              "PYG",
+              "RWF",
+              "UGX",
+              "VND",
+              "VUV",
+              "XAF",
+              "XOF",
+              "XPF",
+            ]);
+
+            const currency = (price.currency || "USD").toUpperCase();
+            const isZeroDecimal = zeroDecimalCurrencies.has(currency);
+            const unitAmount = price.unit_amount || 0;
+
+            // Stripe amounts are in the smallest unit; divide by 100 unless zero-decimal
+            const amount = isZeroDecimal ? unitAmount : unitAmount / 100;
+
+            // Show 2 decimals only if there are nonzero cents (and not zero-decimal)
+            const hasCents = !isZeroDecimal && unitAmount % 100 !== 0;
+
             const priceString = new Intl.NumberFormat("en-US", {
               style: "currency",
-              currency: price.currency || "USD",
-              minimumFractionDigits: 0,
-            }).format((price.unit_amount || 0) / 100);
+              currency,
+              minimumFractionDigits: hasCents ? 2 : 0,
+              maximumFractionDigits: hasCents ? 2 : 0,
+            }).format(amount);
 
             const isCurrentPlan =
               subscriptionInfo?.stripe_price_id === price.stripe_price_id;
