@@ -53,8 +53,8 @@ const Header = ({ onUtilityToggle }) => {
       {user && (!subscription || subscription?.cancel_at_period_end) && (
         <div className="header-cta">
           <span className="cta-text">
-            Unlock More with a Free Trial! Start your 15-day free trial to
-            transcribe longer convos — no card required.
+            Unlock More with a 15-day free trial to transcribe longer chats — no
+            card required.
           </span>
           <button
             onClick={() => router.push("/pricing")}
