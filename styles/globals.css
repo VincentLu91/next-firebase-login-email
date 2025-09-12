@@ -137,6 +137,37 @@ body {
 }
 
 /* Layout */
+.simple-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.simple-layout .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-800);
+  border-bottom: 1px solid var(--muted-600);
+  padding: 0 var(--space-4);
+}
+
+.simple-layout .simple-content {
+  flex: 1;
+  padding: var(--space-5);
+  background: var(--bg-900);
+}
+
+.simple-layout .footerstyle {
+  background: var(--bg-800);
+  padding: var(--space-4);
+  border-top: 1px solid var(--muted-600);
+  display: flex;
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+/* Original app container */
 .app-container {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
