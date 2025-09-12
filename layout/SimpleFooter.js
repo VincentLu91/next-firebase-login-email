@@ -1,8 +1,15 @@
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SimpleFooter = () => {
   const footerRef = useRef(null);
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    // Handle subscription logic here
+    setEmail("");
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -38,7 +45,7 @@ const SimpleFooter = () => {
           margin: "0 auto",
           padding: "48px 24px 40px",
           borderTop: "1px solid rgba(255,255,255,0.06)",
-          color: "rgba(229,231,235,0.88)",
+          color: "var(--text-300)",
           fontFamily: 'Inter, "SF Pro Text", system-ui',
           letterSpacing: "0.01em",
           lineHeight: 1.5,
@@ -102,19 +109,20 @@ const SimpleFooter = () => {
               Terms of Use
             </Link>
           </div>
-          <div className="footer-links">
-            <Link href="/about" className="footer-link">
-              About
-            </Link>
-            <Link href="/blog" className="footer-link">
-              Blog
-            </Link>
-            <Link href="/privacypolicy" className="footer-link">
-              Privacy Policy
-            </Link>
-            <Link href="/termsofuse" className="footer-link">
-              Terms of Use
-            </Link>
+          <div className="newsletter">
+            <h4 className="newsletter-title">Stay in Touch</h4>
+            <form onSubmit={handleSubscribe} className="newsletter-form">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="newsletter-input"
+              />
+              <button type="submit" className="newsletter-button">
+                Subscribe
+              </button>
+            </form>
           </div>
         </div>
         <div
@@ -123,7 +131,7 @@ const SimpleFooter = () => {
             marginTop: "32px",
             paddingTop: "24px",
             borderTop: "1px solid rgba(255,255,255,0.06)",
-            color: "rgba(156,163,175,0.9)",
+            color: "var(--text-300)",
             fontSize: "0.875rem",
           }}
         >
@@ -161,10 +169,12 @@ const SimpleFooter = () => {
           height: 24px;
           opacity: 0.6;
           transition: opacity 150ms ease-out;
+          color: var(--text-300);
         }
 
         .social-link:hover {
           opacity: 1;
+          color: var(--text-100);
         }
 
         .social-link svg {
@@ -178,26 +188,79 @@ const SimpleFooter = () => {
           gap: 16px;
         }
 
-        .footer-link {
-          color: rgba(229, 231, 235, 0.92);
+        .footer-links :global(a) {
+          color: var(--text-300) !important;
           text-decoration: none;
           transition: color 200ms ease, transform 200ms ease,
             text-decoration-color 200ms ease;
         }
 
-        .footer-link:hover {
-          color: #a78bfa;
+        .footer-links :global(a:hover) {
+          color: var(--text-100) !important;
           transform: translateY(-1px);
           text-decoration: underline;
           text-underline-offset: 3px;
           text-decoration-thickness: 1px;
         }
 
-        .footer-link:focus {
-          color: #c084fc;
+        .footer-links :global(a:focus) {
+          color: var(--text-100) !important;
           outline: none;
           box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.35);
           border-radius: 6px;
+        }
+
+        .newsletter {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .newsletter-title {
+          color: var(--text-300);
+          text-transform: uppercase;
+          font-size: 0.75rem;
+          letter-spacing: 0.05em;
+        }
+
+        .newsletter-form {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .newsletter-input {
+          width: 100%;
+          max-width: 200px;
+          padding: 8px 12px;
+          background-color: #171717;
+          color: white;
+          border: 1px solid #262626;
+          border-radius: 6px;
+          font-size: 0.875rem;
+        }
+
+        .newsletter-input::placeholder {
+          color: #6b7280;
+        }
+
+        .newsletter-input:focus {
+          outline: none;
+          border-color: #8b5cf6;
+        }
+
+        .newsletter-button {
+          background-color: #8b5cf6;
+          color: white;
+          font-weight: 500;
+          padding: 8px 24px;
+          border-radius: 6px;
+          transition: background-color 200ms ease;
+          width: fit-content;
+        }
+
+        .newsletter-button:hover {
+          background-color: #7c3aed;
         }
 
         .footer-visible {
