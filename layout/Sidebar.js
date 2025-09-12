@@ -7,14 +7,16 @@ import Footer from "./Footer";
 const NavSection = ({ title, children }) => (
   <div className="nav-section">
     <h2 className="nav-section-title">{title}</h2>
-    {children}
+    <div className="nav-items">{children}</div>
   </div>
 );
 
 const NavItem = ({ href, children, active }) => (
-  <Link href={href} className={`nav-item ${active ? "active" : ""}`}>
-    {children}
-  </Link>
+  <div style={{ width: "100%" }}>
+    <Link href={href} className={`nav-item ${active ? "active" : ""}`}>
+      {children}
+    </Link>
+  </div>
 );
 
 const Sidebar = () => {
@@ -96,6 +98,12 @@ const Sidebar = () => {
           padding: var(--space-4) 0;
         }
 
+        .nav-items {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+        }
+
         .nav-section-title {
           font-size: 12px;
           font-weight: 600;
@@ -109,11 +117,12 @@ const Sidebar = () => {
         .nav-item {
           height: 40px;
           padding: 0 var(--space-4);
-          display: flex;
-          align-items: center;
+          display: block;
           color: var(--text-300);
           font-weight: 500;
           transition: var(--transition-base);
+          width: 100%;
+          line-height: 40px;
         }
 
         .nav-item:hover {
@@ -151,6 +160,11 @@ const Sidebar = () => {
         @media (max-width: 768px) {
           .nav-section-title {
             display: none;
+          }
+
+          .nav-section {
+            display: flex;
+            flex-direction: column;
           }
 
           .nav-item {
