@@ -88,6 +88,34 @@ const SimpleFooter = () => {
               Terms of Use
             </Link>
           </div>
+          <div className="footer-links">
+            <Link href="/about" className="footer-link">
+              About
+            </Link>
+            <Link href="/blog" className="footer-link">
+              Blog
+            </Link>
+            <Link href="/privacypolicy" className="footer-link">
+              Privacy Policy
+            </Link>
+            <Link href="/termsofuse" className="footer-link">
+              Terms of Use
+            </Link>
+          </div>
+          <div className="footer-links">
+            <Link href="/about" className="footer-link">
+              About
+            </Link>
+            <Link href="/blog" className="footer-link">
+              Blog
+            </Link>
+            <Link href="/privacypolicy" className="footer-link">
+              Privacy Policy
+            </Link>
+            <Link href="/termsofuse" className="footer-link">
+              Terms of Use
+            </Link>
+          </div>
         </div>
         <div
           className="footer-copyright"
@@ -111,7 +139,7 @@ const SimpleFooter = () => {
         .footer-grid {
           display: flex;
           align-items: flex-start;
-          gap: 120px;
+          gap: 160px;
           margin-bottom: 32px;
         }
 
