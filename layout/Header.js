@@ -35,6 +35,21 @@ const Header = ({ onUtilityToggle }) => {
         </Link>
       </div>
 
+      <nav className="flex items-center space-x-6 mx-6">
+        <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
+          Pricing
+        </Link>
+        <Link href="/signin" className="text-gray-600 hover:text-gray-900">
+          Signin
+        </Link>
+        <Link href="/contact" className="text-gray-600 hover:text-gray-900">
+          Contact
+        </Link>
+        <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+          Dashboard
+        </Link>
+      </nav>
+
       {/*<div className="header-search">
         <input
           type="search"
@@ -60,9 +75,9 @@ const Header = ({ onUtilityToggle }) => {
 
       <div className="header-right">
         {!user && (
-          <Link href="/signin">
-            <button className="btn-muted">Sign In</button>
-          </Link>
+          <button onClick={() => router.push("/signin")} className="btn-muted">
+            Sign In
+          </button>
         )}
       </div>
     </header>

@@ -32,6 +32,7 @@ function MyApp({ Component, pageProps }) {
       "/privacypolicy",
       "/termsofuse",
       "/request-reset",
+      "/contact",
     ].includes(router.pathname) || router.pathname.startsWith("/post/");
   return (
     <div className={`app-shell ${manrope.className}`}>
