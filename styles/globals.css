@@ -258,6 +258,112 @@ body {
   color: var(--text-100);
 }
 
+/* ===== Header spacing & colors (no Tailwind dependency) ===== */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5); /* global 24px */
+  height: var(--header-height); /* 56px */
+  padding: 0 var(--space-4); /* 16px sides */
+  background: var(--bg-800);
+  border-bottom: 1px solid var(--muted-600);
+}
+
+/* Logo */
+.header-logo h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: var(--text-100);
+}
+
+/* Center nav */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px; /* space between links */
+  margin: 0 24px; /* breathing room around the group */
+  flex: 0 1 auto;
+}
+.app-header a {
+  color: var(--text-300);
+  text-decoration: none;
+  font-weight: 700;
+  line-height: var(--header-height);
+}
+.app-header a:hover {
+  color: var(--text-100);
+}
+.nav-link {
+  padding: 0 2px;
+} /* subtle hit-area without shifting layout */
+
+/* Trial CTA (only shows for eligible users) */
+.header-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto; /* keep right of nav */
+  max-width: 680px;
+}
+.header-cta .cta-text {
+  color: var(--text-300);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.btn-primary-compact {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--accent-400);
+  background: rgba(245, 184, 61, 0.12);
+  color: var(--accent-400);
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-primary-compact:hover {
+  background: rgba(245, 184, 61, 0.16);
+}
+
+/* Right-side auth button */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.btn-muted-compact {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--muted-600);
+  background: var(--bg-700);
+  color: var(--text-300);
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-muted-compact:hover {
+  color: var(--text-100);
+}
+
+/* Mobile: stack nav and tighten gaps */
+@media (max-width: 768px) {
+  .app-header {
+    gap: var(--space-3);
+    padding: 0 var(--space-3);
+  }
+  .header-nav {
+    gap: 16px;
+    margin: 0 8px;
+  }
+  .header-cta .cta-text {
+    display: none;
+  } /* keep just the button on small screens */
+}
+
 /* Resizers */
 .resizer {
   position: absolute;
