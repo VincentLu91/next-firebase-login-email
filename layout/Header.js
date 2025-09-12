@@ -28,45 +28,37 @@ const Header = ({ onUtilityToggle }) => {
   }, [user]);
 
   return (
-    <header className="app-header flex items-center justify-between">
+    <header className="app-header">
       <div className="header-left">
         <Link href="/" className="header-logo">
           <h1>EchoAlly</h1>
         </Link>
       </div>
 
-      <nav className="flex items-center space-x-6 mx-6">
-        <Link href="/pricing" className="text-gray-600 hover:text-gray-900">
+      <nav className="header-nav">
+        <Link href="/pricing" className="nav-link">
           Pricing
         </Link>
-        <Link href="/signin" className="text-gray-600 hover:text-gray-900">
-          Signin
+        <Link href="/about" className="nav-link">
+          About
         </Link>
-        <Link href="/contact" className="text-gray-600 hover:text-gray-900">
+        <Link href="/contact" className="nav-link">
           Contact
         </Link>
-        <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+        <Link href="/dashboard" className="nav-link">
           Dashboard
         </Link>
       </nav>
 
-      {/*<div className="header-search">
-        <input
-          type="search"
-          placeholder="Search for recordings, transcripts..."
-          aria-label="Search"
-        />
-      </div>*/}
-
       {user && (!subscription || subscription?.cancel_at_period_end) && (
-        <div className="flex-1 flex items-center justify-center mx-4">
-          <span className="text-blue-800 mr-4">
+        <div className="header-cta">
+          <span className="cta-text">
             Unlock More with a Free Trial! Start your 15-day free trial to
             transcribe longer convos — no card required.
           </span>
           <button
             onClick={() => router.push("/pricing")}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors whitespace-nowrap flex-shrink-0"
+            className="btn-primary-compact"
           >
             Start Free Trial
           </button>
@@ -75,7 +67,10 @@ const Header = ({ onUtilityToggle }) => {
 
       <div className="header-right">
         {!user && (
-          <button onClick={() => router.push("/signin")} className="btn-muted">
+          <button
+            onClick={() => router.push("/signin")}
+            className="btn-muted-compact"
+          >
             Sign In
           </button>
         )}
