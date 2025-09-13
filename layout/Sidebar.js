@@ -55,90 +55,142 @@ const Sidebar = () => {
   return (
     <nav
       className="sidebar-nav"
+      aria-label="Primary"
       style={{ display: "flex", flexDirection: "column", height: "100%" }}
     >
-      <NavSection title="LIBRARY">
-        <NavItem href="/dashboard">Dashboard</NavItem>
-        <NavItem href="/audioplayer">Recordings</NavItem>
-        <NavItem href="/internalrecording">Voice Notes</NavItem>
-      </NavSection>
-
-      <NavSection title="WORKSPACE">
-        <NavItem href="/phonerecording2">Phone Calls</NavItem>
-      </NavSection>
-
-      {user && (
-        <NavSection title="ACCOUNT">
-          <NavItem href="/managesubscriptions">Settings</NavItem>
-          <NavItem href="/pricing">Subscription</NavItem>
-          <button
-            className="nav-item sign-out-btn"
-            onClick={handleSignOut}
-            style={{
-              width: "100%",
-              border: "none",
-              background: "none",
-              cursor: "pointer",
-              textAlign: "left",
-              fontFamily: "inherit",
-              fontSize: "inherit",
-            }}
-          >
-            Sign Out
-          </button>
+      <div className="sidebar-inner">
+        <NavSection title="LIBRARY">
+          <ul className="nav-list">
+            <li className="nav-li">
+              <Link href="/dashboard" legacyBehavior>
+                <a className="nav-item">Dashboard</a>
+              </Link>
+            </li>
+            <li className="nav-li">
+              <Link href="/audioplayer" legacyBehavior>
+                <a className="nav-item">Recordings</a>
+              </Link>
+            </li>
+            <li className="nav-li">
+              <Link href="/internalrecording" legacyBehavior>
+                <a className="nav-item">Voice Notes</a>
+              </Link>
+            </li>
+          </ul>
         </NavSection>
-      )}
+
+        <NavSection title="WORKSPACE">
+          <ul className="nav-list">
+            <li className="nav-li">
+              <Link href="/phonerecording2" legacyBehavior>
+                <a className="nav-item">Phone Calls</a>
+              </Link>
+            </li>
+          </ul>
+        </NavSection>
+
+        {user && (
+          <NavSection title="ACCOUNT">
+            <ul className="nav-list">
+              <li className="nav-li">
+                <Link href="/managesubscriptions" legacyBehavior>
+                  <a className="nav-item">Settings</a>
+                </Link>
+              </li>
+              <li className="nav-li">
+                <Link href="/pricing" legacyBehavior>
+                  <a className="nav-item">Subscription</a>
+                </Link>
+              </li>
+              <li className="nav-li">
+                <button className="nav-item nav-button" onClick={handleSignOut}>
+                  Sign Out
+                </button>
+              </li>
+            </ul>
+          </NavSection>
+        )}
+      </div>
 
       <div className="footer-container">
         <Footer />
       </div>
 
+      {/* STYLES BELOW */}
       <style jsx>{`
-        .nav-section {
-          padding: var(--space-4) 0;
+        .sidebar-inner {
+          padding: var(--space-4) var(--space-3);
         }
 
-        .nav-items {
-          display: flex;
-          flex-direction: column;
-          width: 100%;
+        .nav-section {
+          margin-bottom: var(--space-5);
         }
 
         .nav-section-title {
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--text-300);
-          padding: 0 var(--space-4);
+          font-size: 11px;
+          line-height: 1;
+          font-weight: 700;
+          color: var(--text-400);
+          padding: 0 var(--space-3);
           margin: 0 0 var(--space-2);
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.08em;
+          opacity: 0.9;
+        }
+
+        /* Solid list model = guaranteed stacking + indent */
+        .nav-list {
+          list-style: none;
+          margin: 0;
+          padding: 0 0 0 var(--space-3); /* indent under the title */
+          display: grid;
+          grid-auto-rows: minmax(44px, auto); /* touch target */
+          row-gap: 6px; /* breathing room between items */
+        }
+
+        .nav-li {
+          width: 100%;
         }
 
         .nav-item {
-          height: 40px;
-          padding: 0 var(--space-4);
           display: block;
-          color: var(--text-300);
-          font-weight: 500;
-          transition: var(--transition-base);
           width: 100%;
-          line-height: 40px;
+          padding: 0 var(--space-3);
+          border-radius: 10px;
+          color: var(--text-300);
+          font-weight: 520;
+          line-height: 44px; /* center text within 44px row */
+          text-align: left;
+          transition: background 160ms ease, color 160ms ease,
+            box-shadow 160ms ease;
+          outline: none;
         }
 
-        .nav-item:hover {
+        /* Uniform button look for Sign Out */
+        .nav-button {
+          background: transparent;
+          border: 0;
+          cursor: pointer;
+          font: inherit;
+          color: inherit;
+        }
+
+        .nav-item:hover,
+        .nav-item:focus-visible {
           background: var(--bg-700);
           color: var(--text-100);
         }
 
+        /* Slim left accent for active state (cleaner than thick border) */
         .nav-item.active {
+          box-shadow: inset 3px 0 0 0 var(--accent-500);
           background: var(--bg-700);
           color: var(--text-100);
-          border-left: 3px solid var(--accent-500);
         }
 
         .footer-container {
           margin-top: auto;
-          padding: var(--space-4);
+          padding: var(--space-4) var(--space-4) var(--space-5);
         }
 
         .footer-container :global(.footerstyle) {
@@ -150,7 +202,7 @@ const Sidebar = () => {
         .footer-container :global(.footerstyle a) {
           color: var(--text-300);
           font-size: 14px;
-          transition: var(--transition-base);
+          transition: color 160ms ease;
         }
 
         .footer-container :global(.footerstyle a:hover) {
@@ -158,23 +210,53 @@ const Sidebar = () => {
         }
 
         @media (max-width: 768px) {
+          .sidebar-inner {
+            padding: var(--space-2);
+          }
           .nav-section-title {
             display: none;
           }
-
-          .nav-section {
-            display: flex;
-            flex-direction: column;
+          .nav-list {
+            padding-left: 0;
+            row-gap: 4px;
           }
-
           .nav-item {
-            justify-content: center;
-            padding: 0;
+            text-align: center;
           }
+        }
+        /* DENSITY CONTROLS — add near the top of your sidebar styles */
+        .sidebar-nav {
+          --nav-row-height: 34px; /* was 44px */
+          --nav-row-gap: 2px; /* was 6px */
+          --nav-section-gap: var(--space-3); /* space between sections */
+        }
 
-          .sign-out-btn {
-            justify-content: center;
-          }
+        /* Make sections a bit closer together */
+        .nav-section {
+          margin-bottom: var(--nav-section-gap);
+        }
+
+        /* Keep titles readable but tighter */
+        .nav-section-title {
+          margin: 0 0 var(--space-1); /* was var(--space-2) */
+        }
+
+        /* Tighter list rhythm */
+        .nav-list {
+          grid-auto-rows: var(--nav-row-height);
+          row-gap: var(--nav-row-gap);
+        }
+
+        /* Ensure links/buttons match the new row height */
+        .nav-item {
+          line-height: var(--nav-row-height);
+          padding: 0 var(--space-3);
+          border-radius: 8px; /* optional, looks nicer when rows are smaller */
+        }
+
+        /* Button version (Sign Out) stays same height */
+        .nav-button {
+          line-height: var(--nav-row-height);
         }
       `}</style>
     </nav>
