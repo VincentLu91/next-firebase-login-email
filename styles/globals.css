@@ -73,7 +73,7 @@ a {
 
 :root {
   /* Color tokens - Updated to match reference app */
-  --bg-900: #1e1f26; /* page background */
+  --bg-900: #25262d; /* page background */
   --bg-800: #212327; /* elevated panels */
   --bg-700: #383b44; /* cards/rows */
   --text-100: #ffffff; /* primary text */
@@ -156,6 +156,12 @@ body {
   flex: 1;
   padding: var(--space-5);
   background: var(--bg-900);
+}
+
+/* Override background for pricing page */
+.simple-layout .simple-content:has(> section) {
+  background: transparent;
+  padding: 0;
 }
 
 .simple-layout .footerstyle {
@@ -241,8 +247,6 @@ body {
 /* Interactive states */
 .nav-item {
   height: 44px;
-  padding: 0 var(--space-4);
-  display: flex;
   align-items: center;
   color: var(--text-300);
   font-size: 14px;
