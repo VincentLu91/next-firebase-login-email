@@ -105,10 +105,7 @@ const SignIn = () => {
             <div className="text-center text-sm">
               <span className="text-gray-600">Don&apos;t have an account?</span>
               {` `}
-              <Link
-                href="/signup"
-                className="text-blue-600 font-bold hover:underline cursor-pointer"
-              >
+              <Link href="/signup" style={{ color: "var(--accent-400)" }}>
                 Sign up.
               </Link>
             </div>
@@ -118,7 +115,7 @@ const SignIn = () => {
               {` `}
               <Link
                 href="/request-reset"
-                className="text-blue-600 font-bold hover:underline cursor-pointer"
+                style={{ color: "var(--accent-400)" }}
               >
                 Request a reset.
               </Link>

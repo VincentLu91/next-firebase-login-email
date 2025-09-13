@@ -246,7 +246,11 @@ export default function Account() {
                 Manage or change your plan on Stripe.
               </p>
               <p className="text-base text-white/80">
-                Go to your <Link href="/dashboard">dashboard</Link>.
+                Go to your{" "}
+                <Link href="/dashboard" style={{ color: "var(--accent-400)" }}>
+                  dashboard
+                </Link>
+                .
               </p>
               <Button
                 variant="slim"
