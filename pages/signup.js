@@ -161,10 +161,7 @@ const SignUp = () => {
             <div className="text-center text-sm">
               <span className="text-gray-600">Already have an account?</span>
               {` `}
-              <Link
-                href="/signin"
-                className="text-blue-600 font-bold hover:underline cursor-pointer"
-              >
+              <Link href="/signin" style={{ color: "var(--accent-400)" }}>
                 Sign in.
               </Link>
             </div>
