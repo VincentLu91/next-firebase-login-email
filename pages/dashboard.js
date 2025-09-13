@@ -337,9 +337,19 @@ const Dashboard = () => {
           <p>No recordings found.</p>
           <p className="sub">Try another search, or start a new recording:</p>
           <div className="ctaRow">
-            <Link href="/internalrecording">Recording</Link>
+            <Link
+              href="/internalrecording"
+              style={{ color: "var(--accent-400)" }}
+            >
+              Recording
+            </Link>
             <br />
-            <Link href="/phonerecording2">Phone Recording</Link>
+            <Link
+              href="/phonerecording2"
+              style={{ color: "var(--accent-400)" }}
+            >
+              Phone Recording
+            </Link>
           </div>
         </div>
       ) : (

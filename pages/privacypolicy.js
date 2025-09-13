@@ -1,3 +1,4 @@
+import Link from "next/link";
 const privacypolicy = () => {
   return (
     <div>
@@ -14,13 +15,12 @@ const privacypolicy = () => {
         the Service, You agree to the collection and use of information in
         accordance with this Privacy Policy. This Privacy Policy has been
         created with the help of the{" "}
-        <a
+        <Link
           href="https://www.termsfeed.com/privacy-policy-generator/"
-          rel="noreferrer"
-          target="_blank"
+          style={{ color: "var(--accent-400)" }}
         >
           Privacy Policy Generator
-        </a>
+        </Link>
         .
       </p>
       <h1>Interpretation and Definitions</h1>
@@ -103,10 +103,10 @@ const privacypolicy = () => {
         </li>
         <li>
           <p>
-            <strong>Website</strong> refers to aperture ai, accessible from{" "}
-            <a href="http://apertureai.com." rel="noreferrer" target="_blank">
-              http://apertureai.com.
-            </a>
+            <strong>Website</strong> refers to TBA, accessible from{" "}
+            <Link href="#" style={{ color: "var(--accent-400)" }}>
+              website tba
+            </Link>
           </p>
         </li>
         <li>
@@ -206,13 +206,12 @@ const privacypolicy = () => {
         Persistent Cookies remain on Your personal computer or mobile device
         when You go offline, while Session Cookies are deleted as soon as You
         close Your web browser. You can learn more about cookies here:{" "}
-        <a
+        <Link
           href="https://www.termsfeed.com/blog/cookies/"
-          target="_blank"
-          rel="noreferrer"
+          style={{ color: "var(--accent-400)" }}
         >
           All About Cookies by TermsFeed
-        </a>
+        </Link>
         .
       </p>
       <p>
