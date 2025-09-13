@@ -337,12 +337,9 @@ const Dashboard = () => {
           <p>No recordings found.</p>
           <p className="sub">Try another search, or start a new recording:</p>
           <div className="ctaRow">
-            <Link href="/internalrecording" className="u-pill btn-primary">
-              Recording
-            </Link>
-            <Link href="/phonerecording2" className="u-pill btn-muted">
-              Phone Recording
-            </Link>
+            <Link href="/internalrecording">Recording</Link>
+            <br />
+            <Link href="/phonerecording2">Phone Recording</Link>
           </div>
         </div>
       ) : (
@@ -800,6 +797,36 @@ const Dashboard = () => {
           justify-content: flex-end;
           gap: 8px;
           margin-top: 16px;
+        }
+
+        /* Empty state styling */
+        .empty {
+          text-align: center;
+          padding: 40px 20px;
+        }
+        .empty .sub {
+          color: var(--text-300);
+          margin-bottom: 20px;
+        }
+        .ctaRow {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          align-items: center;
+        }
+        .ctaRow a {
+          display: inline-block;
+          padding: 10px 20px;
+          background: var(--bg-700);
+          border: 1px solid var(--muted-600);
+          border-radius: var(--radius-pill);
+          color: var(--text-300);
+          font-weight: 600;
+          transition: all 0.2s ease;
+        }
+        .ctaRow a:hover {
+          background: var(--bg-800);
+          color: var(--text-100);
         }
       `}</style>
     </div>
