@@ -308,7 +308,7 @@ const Dashboard = () => {
   return (
     <div className="page">
       <header className="header">
-        <h2 className="title">Recordings</h2>
+        <h2 className="title">Audio List and Transcript</h2>
         <div className="searchWrap">
           <input
             ref={searchInputRef}
