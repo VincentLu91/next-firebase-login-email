@@ -43,7 +43,7 @@ export default function Home() {
 
         <h2>
           Sign Up For Free{" "}
-          <Link href="/signin" className="register">
+          <Link href="/signin" style={{ color: "var(--accent-400)" }}>
             Today
           </Link>
         </h2>
@@ -105,7 +105,7 @@ export default function Home() {
         </h2>
         <h2>
           Try for free{" "}
-          <Link href="/signin" className="register">
+          <Link href="/signin" style={{ color: "var(--accent-400)" }}>
             Today
           </Link>
         </h2>
