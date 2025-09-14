@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../redux/user/actions";
 import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { signinStyles } from "../styles/signinStyles";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
@@ -97,10 +98,8 @@ const SignUp = () => {
   if (!session)
     return (
       <div className="w-80 flex flex-col justify-between p-3 max-w-lg m-auto my-64">
-        <div className="flex justify-center pb-12">
-          <h1 className="text-3xl font-bold text-gray-700">Sign Up</h1>
-        </div>
-        <div className="flex flex-col space-y-4">
+        <div className="signin-form">
+          <h1 className="text-3xl font-bold">Sign Up</h1>
           {message.content && (
             <div
               className={`${
@@ -115,39 +114,33 @@ const SignUp = () => {
             </div>
           )}
 
-          <form onSubmit={handleSignup} className="block w-full">
-            <div className="mb-4">
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="block w-full rounded-md px-4 py-2 border focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="block w-full rounded-md px-4 py-2 border focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-6">
-              <input
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="block w-full rounded-md px-4 py-2 border focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          <form onSubmit={handleSignup} className="signin-form">
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="signin-input"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="signin-input"
+            />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="signin-input"
+            />
             <button
-              className={`block w-full bg-[#943bdc] text-white hover:bg-[#7c32b8] border-[#943bdc] hover:border-[#7c32b8] hover:opacity-90 py-2 px-4 rounded-md ${
+              className={`btn-ghost w-[260px] ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
               type="submit"
@@ -167,6 +160,7 @@ const SignUp = () => {
             </div>
           </div>
         </div>
+        <style jsx>{signinStyles}</style>
       </div>
     );
 
@@ -177,6 +171,7 @@ const SignUp = () => {
         <div className="rounded-full bg-slate-200 h-10 w-10"></div>
         <div className="rounded-full bg-slate-200 h-10 w-10"></div>
       </div>
+      <style jsx>{signinStyles}</style>
     </div>
   );
 };
