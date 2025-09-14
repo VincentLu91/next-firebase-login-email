@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../utils/initSupabase";
 import { useSession } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
+import { signinStyles } from "../styles/signinStyles";
 
 const PasswordReset = () => {
   const [hash, setHash] = useState(() => {
@@ -87,17 +88,23 @@ const PasswordReset = () => {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="Password"
-          name="password"
-          type="password"
-          onChange={handleChange}
-        />
-
-        <button type="submit">Submit</button>
-      </form>
+    <div className="w-80 flex flex-col justify-between p-3 max-w-lg m-auto my-64">
+      <div className="signin-form">
+        <h1 className="text-3xl font-bold">Confirm new Password</h1>
+        <form onSubmit={handleSubmit} className="signin-form">
+          <input
+            placeholder="Password"
+            name="password"
+            type="password"
+            onChange={handleChange}
+            className="signin-input"
+          />
+          <button type="submit" className="btn-ghost w-[260px]">
+            Submit
+          </button>
+        </form>
+      </div>
+      <style jsx>{signinStyles}</style>
     </div>
   );
 };
