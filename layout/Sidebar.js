@@ -6,7 +6,7 @@ import Footer from "./Footer";
 
 const NavSection = ({ title, children }) => (
   <div className="nav-section">
-    <h2 className="nav-section-title">{title}</h2>
+    <p className="nav-section-title">{title}</p>
     <div className="nav-items">{children}</div>
   </div>
 );
@@ -59,31 +59,31 @@ const Sidebar = () => {
       style={{ display: "flex", flexDirection: "column", height: "100%" }}
     >
       <div className="sidebar-inner">
-        <NavSection title="LIBRARY">
+        <NavSection title="DASHBOARD">
           <ul className="nav-list">
             <li className="nav-li">
               <Link href="/dashboard" legacyBehavior>
-                <a className="nav-item">Dashboard</a>
+                <a className="nav-item">Audio List and Transcript</a>
               </Link>
             </li>
             <li className="nav-li">
               <Link href="/audioplayer" legacyBehavior>
-                <a className="nav-item">Recordings</a>
-              </Link>
-            </li>
-            <li className="nav-li">
-              <Link href="/internalrecording" legacyBehavior>
-                <a className="nav-item">Voice Notes</a>
+                <a className="nav-item">Chat with your Audio</a>
               </Link>
             </li>
           </ul>
         </NavSection>
 
-        <NavSection title="WORKSPACE">
+        <NavSection title="RECORDING AND TRANSCRIBE">
           <ul className="nav-list">
             <li className="nav-li">
+              <Link href="/internalrecording" legacyBehavior>
+                <a className="nav-item">Mic Recording</a>
+              </Link>
+            </li>
+            <li className="nav-li">
               <Link href="/phonerecording2" legacyBehavior>
-                <a className="nav-item">Phone Calls</a>
+                <a className="nav-item">Phone Call Recording</a>
               </Link>
             </li>
           </ul>
