@@ -16,99 +16,113 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <div className={styles["hero-image"]}>
-          <h1 className={styles.title}>
-            Let AI Recreate Communication For You
-          </h1>
-
-          {/*<h2>
-          <Link href="/signin">Sign in</Link>
-        </h2>*/}
-
-          <p className={styles.description}>
-            So you won&apos;t lose sight of important information
-          </p>
-        </div>
-
-        <h2>Ever forgotten what you have to do for your shopping list?</h2>
-        <h2>
-          Ever feeling bored in meetings and not paying attention to what topics
-          your colleagues are talking about?
-        </h2>
-        <h2>Ever misinterpreted what your loved ones are telling you?</h2>
-        <h3>
-          Transform any communication in real time into visible information so
-          you can always respond on the go or when you are ready.
-        </h3>
-
-        <h2>
-          Sign Up For Free{" "}
-          <Link href="/signin" style={{ color: "var(--accent-400)" }}>
-            Today
-          </Link>
-        </h2>
-        <br />
-        <div className="landing-page-container">
-          <div className="vertical-align-image-left">
+        <section className={styles.heroSection}>
+          <div className={styles.heroContent}>
+            <h1 className={styles.title}>
+              Be present now. Remember everything later.
+            </h1>
+            <p className={styles.description}>
+              A simple app that records your mic or phone calls, transcribes in
+              real time, and lets an AI answer questions about what was
+              said&mdash;so you can listen without fear of missing anything.
+            </p>
+            <div className={styles.ctaGroup}>
+              <Link href="/signin" className={styles.primaryCta}>
+                Sign up free
+              </Link>
+              <Link href="#how-it-works" className={styles.secondaryCta}>
+                See how it works
+              </Link>
+            </div>
+          </div>
+          <div className={styles.heroImage}>
             <Image
               src="/transcriptBrowser.png"
-              alt=""
+              alt="App interface showing transcription"
               width={500}
               height={400}
+              style={{
+                width: "100%",
+                height: "auto",
+                objectFit: "cover",
+              }}
             />
           </div>
-          <div className="vertical-align-text">
-            <h1>Start transcribing whenever you want.</h1>
-          </div>
-        </div>
+        </section>
 
-        <div className="landing-page-container">
-          <div className="vertical-align-image-right">
-            <Image
-              src="/transcriptMobileAndSummary.png"
-              alt=""
-              width={300}
-              height={400}
-            />
+        <section className={styles.featuresGrid}>
+          <div className={styles.featureCard}>
+            <h2>Focus on people, not notes</h2>
+            <p>We capture the words so you can keep eye contact.</p>
           </div>
-          <div className="vertical-align-text">
-            <h1>Easily translate and summarize saved transcripts.</h1>
+          <div className={styles.featureCard}>
+            <h2>Replay or skim</h2>
+            <p>Listen back or scan clean transcripts on any device.</p>
           </div>
-        </div>
-
-        <br />
-        <h2>Communicate efficiently. Minimize communication breakdowns.</h2>
-        <div className={styles["alt-grid"]}>
-          <div className={styles["alt-card"]}>
-            <h2>Real Time Transcription</h2>
-            <p>All spoken words are transcribed while recording</p>
-          </div>
-          <div className={styles["alt-card"]}>
-            <h2>Save Texts and Recordings</h2>
+          <div className={styles.featureCard}>
+            <h2>Ask the AI</h2>
             <p>
-              All recordings and transcriptions will be saved for your
-              reference.
+              &quot;What did we agree?&quot; &quot;What are my next steps?&quot;
+              Get answers instantly.
             </p>
           </div>
-          <div className={styles["alt-card"]}>
-            <h2>Access your saved comms anytime</h2>
+          <div className={styles.featureCard}>
+            <h2>Works anywhere</h2>
+            <p>Mic recording and phone call recording.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <h2>Your data, your control</h2>
+            <p>Private by default, delete anytime.</p>
+          </div>
+        </section>
+
+        <section className={styles.splitSection}>
+          <div className={styles.splitContent}>
             <p>
-              Just like email, you could easily find your recording and
-              transcriptions.
+              If you&apos;re busy, you drift. You nod, but details blur. Later
+              you need to respond, and you&apos;re not 100% sure what was said.
             </p>
           </div>
-        </div>
+          <div className={styles.splitDivider} />
+          <div className={styles.splitContent}>
+            <p>
+              This app is your safety net. It records, transcribes, and gives
+              you an AI you can ask&mdash;so you can be present now and still
+              have perfect recall later.
+            </p>
+          </div>
+        </section>
 
-        <h2 style={{ textAlign: "center" }}>
-          Transform your communication with anyone using AI. <br />
-          Foster healthy relationships.
-        </h2>
-        <h2>
-          Try for free{" "}
-          <Link href="/signin" style={{ color: "var(--accent-400)" }}>
-            Today
+        <section id="how-it-works" className={styles.useCases}>
+          <div className={styles.useCase}>
+            <h2>Work calls</h2>
+            <p>Leave the note-taking to us; leave with clear next steps.</p>
+          </div>
+          <div className={styles.useCase}>
+            <h2>Personal life</h2>
+            <p>Remember details loved ones share, from dates to to-dos.</p>
+          </div>
+          <div className={styles.useCase}>
+            <h2>Learning</h2>
+            <p>
+              Interview, lecture, or podcast&mdash;capture and extract key
+              ideas.
+            </p>
+          </div>
+          <div className={styles.useCase}>
+            <h2>Errands &amp; planning</h2>
+            <p>Turn shopping lists and chores into actionable tasks.</p>
+          </div>
+        </section>
+
+        <section className={styles.closingCta}>
+          <h2 className={styles.title}>
+            Ready to feel present and still remember it all?
+          </h2>
+          <Link href="/signin" className={styles.primaryCta}>
+            Sign up free (no credit card needed)
           </Link>
-        </h2>
+        </section>
       </main>
     </div>
   );
