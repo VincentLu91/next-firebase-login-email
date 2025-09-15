@@ -34,6 +34,7 @@ export default function Home() {
                 See how it works
               </Link>
             </div>
+            <p>iOS and Android TBA</p>
           </div>
           <div className={styles.heroImage}>
             <Image
@@ -52,27 +53,86 @@ export default function Home() {
 
         <section className={styles.featuresGrid}>
           <div className={styles.featureCard}>
-            <h2>Focus on people, not notes</h2>
-            <p>We capture the words so you can keep eye contact.</p>
+            <div className={styles.featureContent}>
+              <h2>Focus on people, not notes</h2>
+              <p>We capture the words so you can keep eye contact.</p>
+            </div>
+            <div className={styles.featureImage}>
+              <Image
+                src="/random.png"
+                alt="People having a conversation"
+                width={500}
+                height={300}
+                style={{ objectFit: "cover" }}
+              />
+            </div>
           </div>
+
           <div className={styles.featureCard}>
-            <h2>Replay or skim</h2>
-            <p>Listen back or scan clean transcripts on any device.</p>
+            <div className={styles.featureContent}>
+              <h2>Replay or skim</h2>
+              <p>Listen back or scan clean transcripts on any device.</p>
+            </div>
+            <div className={styles.featureImage}>
+              <Image
+                src="/transcriptMobileAndSummary.png"
+                alt="Transcript interface on mobile"
+                width={500}
+                height={300}
+                style={{ objectFit: "cover" }}
+              />
+            </div>
           </div>
+
           <div className={styles.featureCard}>
-            <h2>Ask the AI</h2>
-            <p>
-              &quot;What did we agree?&quot; &quot;What are my next steps?&quot;
-              Get answers instantly.
-            </p>
+            <div className={styles.featureContent}>
+              <h2>Ask the AI</h2>
+              <p>
+                &quot;What did we agree?&quot; &quot;What are my next
+                steps?&quot; Get answers instantly.
+              </p>
+            </div>
+            <div className={styles.featureImage}>
+              <Image
+                src="/transcriptBrowser.png"
+                alt="AI answering questions about the transcript"
+                width={500}
+                height={300}
+                style={{ objectFit: "cover" }}
+              />
+            </div>
           </div>
+
           <div className={styles.featureCard}>
-            <h2>Works anywhere</h2>
-            <p>Mic recording and phone call recording.</p>
+            <div className={styles.featureContent}>
+              <h2>Works anywhere</h2>
+              <p>Mic recording and phone call recording.</p>
+            </div>
+            <div className={styles.featureImage}>
+              <Image
+                src="/random.png"
+                alt="Recording interface showing different options"
+                width={500}
+                height={300}
+                style={{ objectFit: "cover" }}
+              />
+            </div>
           </div>
+
           <div className={styles.featureCard}>
-            <h2>Your data, your control</h2>
-            <p>Private by default, delete anytime.</p>
+            <div className={styles.featureContent}>
+              <h2>Your data, your control</h2>
+              <p>Private by default, delete anytime.</p>
+            </div>
+            <div className={styles.featureImage}>
+              <Image
+                src="/random.png"
+                alt="Privacy and security settings interface"
+                width={500}
+                height={300}
+                style={{ objectFit: "cover" }}
+              />
+            </div>
           </div>
         </section>
 
