@@ -39,7 +39,7 @@ export default function Home() {
           </div>
           <div className={styles.heroImage}>
             <Image
-              src="/transcriptBrowser.png"
+              src="/transcriptSept2025.png"
               alt="App interface showing transcription"
               width={500}
               height={400}
@@ -65,7 +65,7 @@ export default function Home() {
               <h2>Works anywhere</h2>
               <p>Mic recording and phone call recording. Phone and Desktop.</p>
               <Image
-                src="/transcriptMobileAndSummary.png"
+                src="/mic_call.png"
                 alt="Transcript interface on mobile"
                 width={500}
                 height={300}
@@ -76,7 +76,7 @@ export default function Home() {
               <h2>Your data, your control</h2>
               <p>Private by default, delete anytime</p>
               <Image
-                src="/transcriptMobileAndSummary.png"
+                src="/deleteanytime.png"
                 alt="Transcript interface on mobile"
                 width={500}
                 height={300}
@@ -95,7 +95,7 @@ export default function Home() {
             </div>
             <div className={styles.featureImage}>
               <Image
-                src="/random.png"
+                src="/people_not_notes.png"
                 alt="People having a conversation"
                 width={500}
                 height={300}
@@ -111,7 +111,7 @@ export default function Home() {
             </div>
             <div className={styles.featureImage}>
               <Image
-                src="/transcriptMobileAndSummary.png"
+                src="/view_transcript_mobile.png"
                 alt="Transcript interface on mobile"
                 width={500}
                 height={300}
@@ -130,7 +130,7 @@ export default function Home() {
             </div>
             <div className={styles.featureImage}>
               <Image
-                src="/transcriptBrowser.png"
+                src="/askAI.png"
                 alt="AI answering questions about the transcript"
                 width={500}
                 height={300}
