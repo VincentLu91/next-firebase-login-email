@@ -2,6 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import Link from "next/link";
+import FAQ from "../components/FAQ";
 
 export default function Home() {
   return (
@@ -136,7 +137,11 @@ export default function Home() {
             </div>
           </section>
         </section>
+      </main>
 
+      <FAQ />
+
+      <main className={styles.main}>
         <h1 className={styles.sectionTitle}>Your day-to-day. Remembered</h1>
         <section className={styles.splitSection}>
           <div className={styles.splitContent}>
