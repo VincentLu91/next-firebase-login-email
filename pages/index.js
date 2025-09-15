@@ -138,6 +138,7 @@ export default function Home() {
         </section>
 
         <h1 className={styles.sectionTitle}>Why EchoAlly?</h1>
+        <p>Privacy-first: your audio stays yours</p>
         <section className={styles.splitSection}>
           <div className={styles.splitContent}>
             <p>
