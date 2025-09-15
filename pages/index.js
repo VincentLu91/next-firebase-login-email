@@ -51,7 +51,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section className={styles.featuresGrid}>
+        <section id="how-it-works" className={styles.featuresGrid}>
+          <h1 className={styles.sectionTitle}>How it works</h1>
           <div className={styles.featureCard}>
             <div className={styles.featureContent}>
               <h2>Focus on people, not notes</h2>
@@ -136,6 +137,7 @@ export default function Home() {
           </div>
         </section>
 
+        <h1 className={styles.sectionTitle}>Why EchoAlly?</h1>
         <section className={styles.splitSection}>
           <div className={styles.splitContent}>
             <p>
@@ -153,7 +155,8 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="how-it-works" className={styles.useCases}>
+        <h1 className={styles.sectionTitle}>Use Cases</h1>
+        <section id="use-cases" className={styles.useCases}>
           <div className={styles.useCase}>
             <h2>Work calls</h2>
             <p>Leave the note-taking to us; leave with clear next steps.</p>

@@ -93,6 +93,15 @@
   animation: slideIn 360ms ease-out;
 }
 
+.sectionTitle {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.2;
+  margin: var(--space-6) 0;
+  color: var(--text-100);
+  width: 100%;
+  text-align: center;
+}
+
 .featuresGrid {
   width: 100%;
   display: flex;
