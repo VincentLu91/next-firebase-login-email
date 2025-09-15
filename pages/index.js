@@ -23,8 +23,8 @@ export default function Home() {
             </h1>
             <p className={styles.description}>
               A simple app that records your mic or phone calls, transcribes in
-              real time, and lets an AI answer questions about what was said—so
-              you can listen without fear of missing anything.
+              real time, and lets an AI answer questions about what was
+              said&mdash;so you can listen without fear of missing anything.
             </p>
             <div className={styles.ctaGroup}>
               <Link href="/signin" className={styles.primaryCta}>
@@ -62,8 +62,8 @@ export default function Home() {
           <div className={styles.featureCard}>
             <h2>Ask the AI</h2>
             <p>
-              "What did we agree?" "What are my next steps?" Get answers
-              instantly.
+              &quot;What did we agree?&quot; &quot;What are my next steps?&quot;
+              Get answers instantly.
             </p>
           </div>
           <div className={styles.featureCard}>
@@ -79,16 +79,16 @@ export default function Home() {
         <section className={styles.splitSection}>
           <div className={styles.splitContent}>
             <p>
-              If you're busy, you drift. You nod, but details blur. Later you
-              need to respond, and you're not 100% sure what was said.
+              If you&apos;re busy, you drift. You nod, but details blur. Later
+              you need to respond, and you&apos;re not 100% sure what was said.
             </p>
           </div>
           <div className={styles.splitDivider} />
           <div className={styles.splitContent}>
             <p>
               This app is your safety net. It records, transcribes, and gives
-              you an AI you can ask—so you can be present now and still have
-              perfect recall later.
+              you an AI you can ask&mdash;so you can be present now and still
+              have perfect recall later.
             </p>
           </div>
         </section>
@@ -104,10 +104,13 @@ export default function Home() {
           </div>
           <div className={styles.useCase}>
             <h2>Learning</h2>
-            <p>Interview, lecture, or podcast—capture and extract key ideas.</p>
+            <p>
+              Interview, lecture, or podcast&mdash;capture and extract key
+              ideas.
+            </p>
           </div>
           <div className={styles.useCase}>
-            <h2>Errands & planning</h2>
+            <h2>Errands &amp; planning</h2>
             <p>Turn shopping lists and chores into actionable tasks.</p>
           </div>
         </section>
