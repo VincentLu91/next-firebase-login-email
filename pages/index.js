@@ -52,6 +52,40 @@ export default function Home() {
           </div>
         </section>
 
+        <section className={styles.featuresGrid}>
+          <h1 className={styles.sectionTitle}>
+            A Personal AI that travels with you.
+          </h1>
+          <p className={styles.description} style={{ textAlign: "center" }}>
+            Have your personal assistant follow any convo, like a second brain
+            that never forgets.
+          </p>
+          <section id="use-cases" className={styles.useCases}>
+            <div className={styles.useCase}>
+              <h2>Works anywhere</h2>
+              <p>Mic recording and phone call recording. Phone and Desktop.</p>
+              <Image
+                src="/transcriptMobileAndSummary.png"
+                alt="Transcript interface on mobile"
+                width={500}
+                height={300}
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+            <div className={styles.useCase}>
+              <h2>Your data, your control</h2>
+              <p>Private by default, delete anytime</p>
+              <Image
+                src="/transcriptMobileAndSummary.png"
+                alt="Transcript interface on mobile"
+                width={500}
+                height={300}
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+          </section>
+        </section>
+
         <section id="how-it-works" className={styles.featuresGrid}>
           <h1 className={styles.sectionTitle}>How it works</h1>
           <div className={styles.featureCard}>
@@ -104,83 +138,56 @@ export default function Home() {
               />
             </div>
           </div>
+        </section>
 
-          <h1 className={styles.sectionTitle}>
-            A Personal AI that travels with you.
-          </h1>
-          <p className={styles.description} style={{ textAlign: "center" }}>
-            Have your personal assistant follow any convo, like a second brain
-            that never forgets.
-          </p>
-          <section id="use-cases" className={styles.useCases}>
-            <div className={styles.useCase}>
-              <h2>Works anywhere</h2>
-              <p>Mic recording and phone call recording. Phone and Desktop.</p>
-              <Image
-                src="/transcriptMobileAndSummary.png"
-                alt="Transcript interface on mobile"
-                width={500}
-                height={300}
-                style={{ objectFit: "cover" }}
-              />
+        <section className={styles.featuresGrid}>
+          <h1 className={styles.sectionTitle}>Your day-to-day. Remembered</h1>
+          <section className={styles.splitSection}>
+            <div className={styles.splitContent}>
+              <p>
+                If you&apos;re busy, you drift. You nod, but details blur. Later
+                you need to respond, and you&apos;re not 100% sure what was
+                said.
+              </p>
             </div>
-            <div className={styles.useCase}>
-              <h2>Your data, your control</h2>
-              <p>Private by default, delete anytime</p>
-              <Image
-                src="/transcriptMobileAndSummary.png"
-                alt="Transcript interface on mobile"
-                width={500}
-                height={300}
-                style={{ objectFit: "cover" }}
-              />
+            <div className={styles.splitDivider} />
+            <div className={styles.splitContent}>
+              <p>
+                This app is your safety net. It records, transcribes, and gives
+                you an AI you can ask&mdash;so you can be present now and still
+                have perfect recall later.
+              </p>
             </div>
           </section>
         </section>
-      </main>
 
-      <FAQ />
-
-      <main className={styles.main}>
-        <h1 className={styles.sectionTitle}>Your day-to-day. Remembered</h1>
-        <section className={styles.splitSection}>
-          <div className={styles.splitContent}>
-            <p>
-              If you&apos;re busy, you drift. You nod, but details blur. Later
-              you need to respond, and you&apos;re not 100% sure what was said.
-            </p>
-          </div>
-          <div className={styles.splitDivider} />
-          <div className={styles.splitContent}>
-            <p>
-              This app is your safety net. It records, transcribes, and gives
-              you an AI you can ask&mdash;so you can be present now and still
-              have perfect recall later.
-            </p>
-          </div>
+        <section className={styles.featuresGrid}>
+          <h1 className={styles.sectionTitle}>Use Cases</h1>
+          <section id="use-cases" className={styles.useCases}>
+            <div className={styles.useCase}>
+              <h2>Work calls</h2>
+              <p>Leave the note-taking to us; leave with clear next steps.</p>
+            </div>
+            <div className={styles.useCase}>
+              <h2>Personal life</h2>
+              <p>Remember details loved ones share, from dates to to-dos.</p>
+            </div>
+            <div className={styles.useCase}>
+              <h2>Learning</h2>
+              <p>
+                Interview, lecture, or podcast&mdash;capture and extract key
+                ideas.
+              </p>
+            </div>
+            <div className={styles.useCase}>
+              <h2>Errands &amp; planning</h2>
+              <p>Turn shopping lists and chores into actionable tasks.</p>
+            </div>
+          </section>
         </section>
 
-        <h1 className={styles.sectionTitle}>Use Cases</h1>
-        <section id="use-cases" className={styles.useCases}>
-          <div className={styles.useCase}>
-            <h2>Work calls</h2>
-            <p>Leave the note-taking to us; leave with clear next steps.</p>
-          </div>
-          <div className={styles.useCase}>
-            <h2>Personal life</h2>
-            <p>Remember details loved ones share, from dates to to-dos.</p>
-          </div>
-          <div className={styles.useCase}>
-            <h2>Learning</h2>
-            <p>
-              Interview, lecture, or podcast&mdash;capture and extract key
-              ideas.
-            </p>
-          </div>
-          <div className={styles.useCase}>
-            <h2>Errands &amp; planning</h2>
-            <p>Turn shopping lists and chores into actionable tasks.</p>
-          </div>
+        <section className={styles.featuresGrid}>
+          <FAQ />
         </section>
 
         <section className={styles.closingCta}>
