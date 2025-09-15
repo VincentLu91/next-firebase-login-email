@@ -43,10 +43,11 @@ export default function Home() {
               alt="App interface showing transcription"
               width={500}
               height={400}
+              priority
               style={{
                 width: "100%",
-                height: "auto",
-                objectFit: "cover",
+                height: "100%",
+                objectFit: "contain",
               }}
             />
           </div>
