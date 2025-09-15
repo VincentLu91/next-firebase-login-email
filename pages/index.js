@@ -7,10 +7,10 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>Recreate AI</title>
+        <title>EchoAlly</title>
         <meta
           name="description"
-          content="Let AI Recreate  Communication for you"
+          content="Be present now. Remember everything later"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -104,41 +104,40 @@ export default function Home() {
             </div>
           </div>
 
-          <div className={styles.featureCard}>
-            <div className={styles.featureContent}>
+          <h1 className={styles.sectionTitle}>
+            A Personal AI that travels with you.
+          </h1>
+          <p className={styles.description} style={{ textAlign: "center" }}>
+            Have your personal assistant follow any convo, like a second brain
+            that never forgets.
+          </p>
+          <section id="use-cases" className={styles.useCases}>
+            <div className={styles.useCase}>
               <h2>Works anywhere</h2>
-              <p>Mic recording and phone call recording.</p>
-            </div>
-            <div className={styles.featureImage}>
+              <p>Mic recording and phone call recording. Phone and Desktop.</p>
               <Image
-                src="/random.png"
-                alt="Recording interface showing different options"
+                src="/transcriptMobileAndSummary.png"
+                alt="Transcript interface on mobile"
                 width={500}
                 height={300}
                 style={{ objectFit: "cover" }}
               />
             </div>
-          </div>
-
-          <div className={styles.featureCard}>
-            <div className={styles.featureContent}>
+            <div className={styles.useCase}>
               <h2>Your data, your control</h2>
-              <p>Private by default, delete anytime.</p>
-            </div>
-            <div className={styles.featureImage}>
+              <p>Private by default, delete anytime</p>
               <Image
-                src="/random.png"
-                alt="Privacy and security settings interface"
+                src="/transcriptMobileAndSummary.png"
+                alt="Transcript interface on mobile"
                 width={500}
                 height={300}
                 style={{ objectFit: "cover" }}
               />
             </div>
-          </div>
+          </section>
         </section>
 
-        <h1 className={styles.sectionTitle}>Why EchoAlly?</h1>
-        <p>Privacy-first: your audio stays yours</p>
+        <h1 className={styles.sectionTitle}>Your day-to-day. Remembered</h1>
         <section className={styles.splitSection}>
           <div className={styles.splitContent}>
             <p>
