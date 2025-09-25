@@ -19,7 +19,7 @@
     "@stripe/stripe-js": "^7.9.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/auth-helpers-react": "^0.5.0",
-    "@supabase/supabase-js": "^2.57.4",
+    "@supabase/supabase-js": "^2.58.0",
     "axios": "^1.12.2",
     "cohere-ai": "^7.19.0",
     "cors": "^2.8.5",
@@ -49,7 +49,7 @@
     "styled-components": "^6.1.19",
     "styled-jsx": "^5.1.7",
     "telnyx": "^3.0.0",
-    "twilio": "^5.10.0",
+    "twilio": "^5.10.1",
     "ws": "^8.18.3"
   },
   "overrides": {
