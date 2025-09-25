@@ -31,7 +31,7 @@ export default async function handler(req, res) {
             missing_payment_method: "pause",
           },
         },
-        trial_period_days: 15, //15 is usualy recommended but experiment if needed
+        //trial_period_days: 15 //15 days of free trial, or comment this line if no trial
       },
       payment_method_collection: "if_required",
       metadata: {

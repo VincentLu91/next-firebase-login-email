@@ -52,15 +52,18 @@ const Header = ({ onUtilityToggle }) => {
 
       {user && (!subscription || subscription?.cancel_at_period_end) && (
         <div className="header-cta">
-          <span className="cta-text">
-            Unlock More with a 15-day free trial to transcribe longer chats — no
-            card required.
+          <span className="cta-text" style={{ color: "var(--accent-400)" }}>
+            Recording and transcribing conversations is available only on paid
+            plans.
+            {/*Unlock More with a 15-day free trial to transcribe longer chats — no
+            card required.*/}
           </span>
           <button
             onClick={() => router.push("/pricing")}
             className="btn-primary-compact"
           >
-            Start Free Trial
+            Choose a Plan
+            {/*Start Free Trial*/}
           </button>
         </div>
       )}
