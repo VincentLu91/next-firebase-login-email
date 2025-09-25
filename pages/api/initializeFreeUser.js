@@ -27,9 +27,9 @@ export default async function handler(req, res) {
       {
         id: id,
         email_address: email,
-        mic_tokens: 2000,
-        call_tokens: 2000,
-        num_calls: 2000,
+        mic_tokens: 0, // otherwise 2000, but should be no credits - indie hacking
+        call_tokens: 0, // otherwise 2000, but should be no credits - indie hacking
+        num_calls: 0, // otherwise 2000, but should be no credits - indie hacking
         created_at: new Date().toISOString(),
       },
     ]);
