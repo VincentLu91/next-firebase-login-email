@@ -4,6 +4,8 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { signinStyles } from "../styles/signinStyles";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, ""); // strip trailing slash
+
 function RequestReset() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,7 +17,7 @@ function RequestReset() {
 
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/password-reset`,
+        redirectTo: `${SITE_URL}/password-reset`,
       });
 
       if (error) {
