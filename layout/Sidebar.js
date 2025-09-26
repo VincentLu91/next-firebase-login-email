@@ -3,6 +3,8 @@ import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import Footer from "./Footer";
+import { signOut } from "../redux/user/actions";
+import { persistor } from "../redux";
 
 const NavSection = ({ title, children }) => (
   <div className="nav-section">
@@ -39,16 +41,28 @@ const Sidebar = () => {
         } catch {}
       }
 
-      // Prefer local scope; avoids 403 if refresh token is already rotated/invalid
-      await supabase.auth.signOut({ scope: "local" }).catch(() => {});
+      // Sign out with global scope to clear all sessions
+      await supabase.auth.signOut({ scope: "global" }).catch(() => {});
 
-      // Ensure Redux-persist doesn't instantly rehydrate old state
+      // Clear all storage and state
       try {
-        localStorage.removeItem("persist:root");
+        // Clear Supabase session storage
+        window.sessionStorage.removeItem("supabase.auth.token");
+        window.localStorage.removeItem("supabase.auth.token");
+
+        // Clear Redux persist storage
+        await persistor.purge();
+
+        // Clear any other auth-related storage
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+
+        // Dispatch Redux action to clear store
+        dispatch(signOut());
       } catch {}
     } finally {
-      // Hard reload to kill any lingering auto-refresh listeners
-      window.location.href = "/signin";
+      // Force reload to ensure clean state
+      window.location.replace("/signin");
     }
   };
 
