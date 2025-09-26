@@ -1,8 +1,8 @@
 import Stripe from "stripe";
 import { buffer } from "micro";
 import {
-  createOrRetrieveCustomer,
-  createSubscription,
+  // createOrRetrieveCustomer, // ❌ not used anymore
+  // createSubscription,       // (still unused here, keep if you need elsewhere)
   manageSubscriptionStatusChange,
   deleteSubscription,
   upsertProductRecord,
@@ -13,11 +13,7 @@ import { supabase } from "../../../utils/initSupabase";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export const config = { api: { bodyParser: false } };
 
 const relevantEvents = new Set([
   "checkout.session.completed",
@@ -36,245 +32,215 @@ export default async function handler(req, res) {
     return res.status(405).end("Method Not Allowed");
   }
 
-  let event;
   try {
     const rawBody = await buffer(req);
     const signature = req.headers["stripe-signature"];
 
+    let event;
     try {
       event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
     } catch (err) {
-      console.error(`⚠️ Webhook signature verification failed:`, err.message);
-      return res.status(400).json({
-        error: `Webhook Error: ${err.message}`,
-      });
+      console.error("⚠️ Webhook signature verification failed:", err.message);
+      return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
 
     console.log(`✅ Received webhook: ${event.type}`);
 
-    if (relevantEvents.has(event.type)) {
-      try {
-        switch (event.type) {
-          case "checkout.session.completed": {
-            const checkoutSession = event.data.object;
-            console.log("Checkout completed:", {
-              mode: checkoutSession.mode,
-              customer: checkoutSession.customer,
-              subscription: checkoutSession.subscription,
-              clientRef: checkoutSession.client_reference_id,
-              customerEmail: checkoutSession.customer_details?.email,
-            });
+    if (!relevantEvents.has(event.type)) {
+      return res.json({ received: true });
+    }
 
-            if (checkoutSession.mode === "subscription") {
-              // First create/setup the customer
-              const stripeCustomerId = await createOrRetrieveCustomer({
-                email: checkoutSession.customer_details?.email,
-                uuid: checkoutSession.client_reference_id,
-              });
-              console.log("Customer created/retrieved:", {
-                stripeId: stripeCustomerId,
-                uuid: checkoutSession.client_reference_id,
-              });
+    try {
+      switch (event.type) {
+        case "checkout.session.completed": {
+          const s = event.data.object;
+          console.log("Checkout completed:", {
+            mode: s.mode,
+            customer: s.customer,
+            subscription: s.subscription,
+            clientRef: s.client_reference_id,
+            customerEmail: s.customer_details?.email,
+          });
 
-              // Then handle the subscription, passing the user ID
-              await manageSubscriptionStatusChange(
-                checkoutSession.subscription,
-                checkoutSession.customer,
-                checkoutSession.client_reference_id,
-                true
-              );
-            }
-            break;
-          }
-          case "customer.subscription.created": {
-            const subscription = event.data.object;
-            console.log("subscription is: ", subscription);
+          if (s.mode === "subscription") {
+            const userId = s.client_reference_id;
+            const stripeCustomerId = s.customer;
 
-            try {
-              // First ensure we have a customer record
-              const stripeCustomer = await stripe.customers.retrieve(
-                subscription.customer
-              );
-              console.log("Retrieved Stripe customer:", stripeCustomer);
-
-              // Try to find an existing customer row by stripe_customer_id
-              let { data: customerRow } = await supabase
-                .from("customers")
-                .select("id, stripe_customer_id")
-                .eq("stripe_customer_id", subscription.customer)
-                .single();
-
-              if (!customerRow) {
-                // Try to find by email if available
-                if (stripeCustomer.email) {
-                  const { data } = await supabase
-                    .from("customers")
-                    .select("id")
-                    .eq("email_address", stripeCustomer.email)
-                    .single();
-
-                  if (data) {
-                    // Update existing customer with stripe_customer_id
-                    const { data: updated, error } = await supabase
-                      .from("customers")
-                      .update({ stripe_customer_id: subscription.customer })
-                      .eq("id", data.id)
-                      .select()
-                      .single();
-
-                    if (error) throw error;
-                    customerRow = updated;
-                    console.log(
-                      "Updated customer with Stripe ID:",
-                      customerRow
-                    );
-                  }
-                }
-              }
-
-              // If still no customer row, create one
-              if (!customerRow) {
-                // Generate a UUID for new customer
-                const newCustomerId = crypto.randomUUID();
-                const { data: created, error } = await supabase
-                  .from("customers")
-                  .insert({
-                    id: newCustomerId,
-                    stripe_customer_id: subscription.customer,
-                    email_address: stripeCustomer.email,
-                    mic_tokens: 0,
-                    call_tokens: 0,
-                    num_calls: 0,
-                  })
-                  .select()
-                  .single();
-
-                if (error) throw error;
-                customerRow = created;
-                console.log("Created new customer:", customerRow);
-              }
-
-              // Now create the subscription
-              // await createSubscription(subscription.id, subscription.customer);
-              await manageSubscriptionStatusChange(
-                subscription.id,
-                subscription.customer,
-                customerRow.id,
-                true
-              );
-            } catch (error) {
-              console.error("Error handling subscription creation:", error);
-              throw error;
-            }
-            break;
-          }
-
-          case "customer.subscription.updated": {
-            const subscription = event.data.object;
-            // Get the user ID from metadata
-            const stripeCustomer = await stripe.customers.retrieve(
-              subscription.customer
-            );
-            console.log("stripeCustomer is: ", stripeCustomer);
-            let userId = null;
-            if (stripeCustomer.email) {
-              const { data } = await supabase
-                .from("customers")
-                .select("id")
-                .eq("email_address", stripeCustomer.email)
-                .single();
-
-              if (data) {
-                userId = data.id;
-              }
-            }
-            if (!userId) {
-              console.log("No user ID found in customer metadata");
-              return res.json({ received: true });
-            }
-
-            // First check if subscription exists
-            const { data: existingSub } = await supabase
-              .from("subscriptions")
-              .select("id")
-              .eq("stripe_subscription_id", subscription.id)
+            const { data: existing } = await supabase
+              .from("customers")
+              .select("stripe_customer_id, email_address")
+              .eq("id", userId)
               .single();
 
-            if (!existingSub) {
-              console.log("No existing subscription found for update");
-              return res.json({ received: true });
+            if (
+              !existing?.stripe_customer_id ||
+              existing.stripe_customer_id === stripeCustomerId
+            ) {
+              await supabase.from("customers").upsert({
+                id: userId,
+                stripe_customer_id: stripeCustomerId,
+                email_address:
+                  s.customer_details?.email ?? existing?.email_address ?? null,
+              });
+            } else {
+              // Log and keep canonical to avoid flip-flopping IDs
+              console.log(
+                "Skip overwrite: canonical customer already set:",
+                existing.stripe_customer_id
+              );
             }
 
             await manageSubscriptionStatusChange(
-              subscription.id,
-              subscription.customer,
+              s.subscription,
+              stripeCustomerId,
               userId,
-              false
+              true
             );
-            break;
           }
-          case "customer.subscription.deleted": {
-            const subscription = event.data.object;
-            // For deleted subscriptions, set cancel_at to now if not already set
-            const cancelAt =
-              subscription.cancel_at || Math.floor(Date.now() / 1000);
-
-            // Get the user ID by looking up the customer's email
-            const stripeCustomer = await stripe.customers.retrieve(
-              subscription.customer
-            );
-            console.log("stripeCustomer is: ", stripeCustomer);
-
-            let userId = null;
-            if (stripeCustomer.email) {
-              const { data } = await supabase
-                .from("customers")
-                .select("id")
-                .eq("email_address", stripeCustomer.email)
-                .single();
-
-              if (data) {
-                userId = data.id;
-              }
-            }
-
-            if (!userId) {
-              console.log("No user ID found for customer email");
-              return res.json({ received: true });
-            }
-
-            // Delete the subscription from the database
-            await deleteSubscription(userId);
-
-            /*await manageSubscriptionStatusChange(
-              subscription.id,
-              subscription.customer,
-              userId,
-              false,
-              cancelAt
-            );*/
-            break;
-          }
-          case "product.created":
-          case "product.updated":
-            await upsertProductRecord(event.data.object);
-            break;
-          case "price.created":
-          case "price.updated":
-            await upsertPriceRecord(event.data.object);
-            break;
+          break;
         }
-      } catch (error) {
-        console.error(`Error handling ${event.type}:`, error);
-        return res.status(500).json({
-          error: "Webhook handler failed",
-          message: error.message,
-          type: event.type,
-        });
-      }
-    }
 
-    return res.json({ received: true });
+        case "customer.subscription.created": {
+          const subscription = event.data.object;
+
+          // Prefer binding via checkout.session.completed; avoid creating random local users
+          const stripeCustomer = await stripe.customers.retrieve(
+            subscription.customer
+          );
+
+          // Try to find an existing local customer by stripe_customer_id
+          let { data: customerRow } = await supabase
+            .from("customers")
+            .select("id, stripe_customer_id")
+            .eq("stripe_customer_id", subscription.customer)
+            .single();
+
+          // Fallback: try by email and attach stripe_customer_id
+          if (!customerRow && stripeCustomer.email) {
+            const { data: byEmail } = await supabase
+              .from("customers")
+              .select("id")
+              .eq("email_address", stripeCustomer.email)
+              .single();
+
+            if (byEmail) {
+              const { data: updated, error } = await supabase
+                .from("customers")
+                .update({ stripe_customer_id: subscription.customer })
+                .eq("id", byEmail.id)
+                .select()
+                .single();
+              if (error) throw error;
+              customerRow = updated;
+            }
+          }
+
+          // If we still don't have a local row, no-op.
+          if (!customerRow) {
+            console.log(
+              "No local customer yet; checkout.session.completed will upsert shortly."
+            );
+            break;
+          }
+
+          await manageSubscriptionStatusChange(
+            subscription.id,
+            subscription.customer,
+            customerRow.id,
+            true
+          );
+          break;
+        }
+
+        case "customer.subscription.updated": {
+          const subscription = event.data.object;
+          // Resolve userId from local DB using email (best-effort)
+          const stripeCustomer = await stripe.customers.retrieve(
+            subscription.customer
+          );
+
+          let userId = null;
+          if (stripeCustomer.email) {
+            const { data } = await supabase
+              .from("customers")
+              .select("id")
+              .eq("email_address", stripeCustomer.email)
+              .single();
+            if (data) userId = data.id;
+          }
+
+          if (!userId) {
+            console.log("No user ID found; skipping update sync.");
+            return res.json({ received: true });
+          }
+
+          // Ensure subscription exists locally; if not, let completed handler create it.
+          const { data: existingSub } = await supabase
+            .from("subscriptions")
+            .select("id")
+            .eq("stripe_subscription_id", subscription.id)
+            .single();
+
+          if (!existingSub) {
+            console.log("No existing subscription found for update; skipping.");
+            return res.json({ received: true });
+          }
+
+          await manageSubscriptionStatusChange(
+            subscription.id,
+            subscription.customer,
+            userId,
+            false
+          );
+          break;
+        }
+
+        case "customer.subscription.deleted": {
+          const subscription = event.data.object;
+
+          const stripeCustomer = await stripe.customers.retrieve(
+            subscription.customer
+          );
+
+          let userId = null;
+          if (stripeCustomer.email) {
+            const { data } = await supabase
+              .from("customers")
+              .select("id")
+              .eq("email_address", stripeCustomer.email)
+              .single();
+            if (data) userId = data.id;
+          }
+
+          if (!userId) {
+            console.log("No user ID found for deleted subscription; skipping.");
+            return res.json({ received: true });
+          }
+
+          await deleteSubscription(userId);
+          break;
+        }
+
+        case "product.created":
+        case "product.updated":
+          await upsertProductRecord(event.data.object);
+          break;
+
+        case "price.created":
+        case "price.updated":
+          await upsertPriceRecord(event.data.object);
+          break;
+      }
+
+      return res.json({ received: true });
+    } catch (error) {
+      console.error(`Error handling ${event.type}:`, error);
+      return res.status(500).json({
+        error: "Webhook handler failed",
+        message: error.message,
+        type: event.type,
+      });
+    }
   } catch (error) {
     console.error("Webhook error:", error);
     return res.status(500).json({
