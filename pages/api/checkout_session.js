@@ -25,6 +25,9 @@ export default async function handler(req, res) {
       ],
       mode: "subscription",
       allow_promotion_codes: true,
+      payment_method_types: ["card"],
+      billing_address_collection: "auto",
+      payment_method_collection: "always", // This ensures payment method is attached to existing customer
       subscription_data: {
         trial_settings: {
           end_behavior: {
@@ -33,18 +36,16 @@ export default async function handler(req, res) {
         },
         //trial_period_days: 15 //15 days of free trial, or comment this line if no trial
       },
-      payment_method_collection: "if_required",
       metadata: {
         supabaseUUID: user_id,
       },
     };
 
-    // Use customer ID for existing customers, email for new ones
-    if (stripe_customer_id) {
-      payload.customer = stripe_customer_id;
-    } else {
+    // Only show email in checkout, don't create customer yet
+    if (user_email) {
       payload.customer_email = user_email;
     }
+
     const response = await stripe.checkout.sessions.create(payload, {
       idempotencyKey: idemKey,
     });
