@@ -33,7 +33,7 @@
     "next": "^15.5.4",
     "nodemailer": "^7.0.6",
     "npm-check-updates": "^19.0.0",
-    "pubnub": "^10.0.0",
+    "pubnub": "^10.1.0",
     "raw-body": "^3.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -48,8 +48,8 @@
     "stripe": "^18.5.0",
     "styled-components": "^6.1.19",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^3.0.0",
-    "twilio": "^5.10.1",
+    "telnyx": "^3.1.0",
+    "twilio": "^5.10.2",
     "ws": "^8.18.3"
   },
   "overrides": {
