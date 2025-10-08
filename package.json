@@ -48,7 +48,7 @@
     "stripe": "^19.1.0",
     "styled-components": "^6.1.19",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^3.4.2",
+    "telnyx": "^3.5.0",
     "twilio": "^5.10.2",
     "ws": "^8.18.3"
   },
