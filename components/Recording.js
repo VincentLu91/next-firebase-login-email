@@ -4,7 +4,11 @@ import { useReactMediaRecorder } from "react-media-recorder";
 import * as React from "react";
 import { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateRecordingList, setRecordURI } from "../redux/recording/actions";
+import {
+  updateRecordingList,
+  setRecordURI,
+  setSound,
+} from "../redux/recording/actions";
 import moment from "moment";
 import getBlobDuration from "get-blob-duration";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc"; // only run on the browser
@@ -705,11 +709,16 @@ const Recording = () => {
 
       if (typeof reset === "function") reset();
 
-      await uploadAudio(audioData);
+      const savedRecording = await uploadAudio(audioData);
+
+      // Set the saved recording in Redux so audioplayer can access it
+      dispatch(setSound(savedRecording));
 
       setFilename("");
       dispatch(setRecordURI(null));
-      router.push("/dashboard");
+
+      // Navigate to audioplayer instead of dashboard
+      router.push("/audioplayer");
     } catch (error) {
       console.error("Error processing recording:", error);
       alert("Failed to process recording: " + (error?.message || error));

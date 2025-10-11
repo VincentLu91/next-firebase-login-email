@@ -10,6 +10,7 @@ import { supabase } from "../utils/initSupabase";
 import {
   updateRecordingList,
   setCallControlID,
+  setSound,
 } from "../redux/recording/actions";
 import moment from "moment";
 
@@ -381,15 +382,21 @@ const PhoneRecording2 = () => {
             react_native_event: callRecordingInfo.recordingStatus,
           },
         ])
-        .select();
+        .select()
+        .single();
 
       if (insertCallResponse.error) {
         console.log(insertCallResponse.error);
         throw new Error("Failed to save recording information");
       }
 
+      // Set the saved recording in Redux so audioplayer can access it
+      dispatch(setSound(insertCallResponse.data));
+
       setFilename("");
-      router.push("/dashboard");
+
+      // Navigate to audioplayer instead of dashboard
+      router.push("/audioplayer");
     } catch (error) {
       console.error("Error processing recording:", error);
       alert("Failed to process recording: " + error.message);
