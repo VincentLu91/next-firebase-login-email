@@ -125,6 +125,15 @@ export default function ChatPanel({ sound, soundUrl }) {
     }
   };
 
+  const copyToClipboard = async (text) => {
+    const textToCopy = `${text}\n\n- Made with placeholder app`;
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
   if (!soundUrl) {
     return <p className="muted">Select a recording to start chatting.</p>;
   }
@@ -250,21 +259,43 @@ export default function ChatPanel({ sound, soundUrl }) {
             <div
               style={{
                 maxWidth: "86%",
-                padding: "var(--space-4)",
-                borderRadius: "var(--radius-card)",
-                background:
-                  m.sender === "user"
-                    ? "rgba(245, 184, 61, 0.16)"
-                    : "var(--bg-700)",
-                color: "var(--text-100)",
-                fontFamily: "var(--font-family)",
-                fontSize: "16px",
-                lineHeight: "24px",
-                fontWeight: 500,
-                letterSpacing: "-0.1px",
               }}
             >
-              {m.message}
+              <div
+                style={{
+                  padding: "var(--space-4)",
+                  borderRadius: "var(--radius-card)",
+                  background:
+                    m.sender === "user"
+                      ? "rgba(245, 184, 61, 0.16)"
+                      : "var(--bg-700)",
+                  color: "var(--text-100)",
+                  fontFamily: "var(--font-family)",
+                  fontSize: "16px",
+                  lineHeight: "24px",
+                  fontWeight: 500,
+                  letterSpacing: "-0.1px",
+                }}
+              >
+                {m.message}
+              </div>
+              {m.sender === "ChatGPT" && (
+                <a
+                  onClick={() => copyToClipboard(m.message)}
+                  style={{
+                    display: "inline-block",
+                    marginTop: "var(--space-2)",
+                    marginLeft: "var(--space-4)",
+                    fontSize: "11px",
+                    color: "var(--text-400)",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    fontFamily: "var(--font-family)",
+                  }}
+                >
+                  copy
+                </a>
+              )}
             </div>
           </div>
         ))}
