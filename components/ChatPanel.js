@@ -138,6 +138,106 @@ export default function ChatPanel({ sound, soundUrl }) {
       }}
     >
       <div style={{ overflowY: "auto", padding: "var(--space-4)" }}>
+        {messages.length === 0 && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "200px",
+              gap: "var(--space-3)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                gap: "var(--space-3)",
+              }}
+            >
+              <button
+                onClick={() => setInputValue("Summarize this document")}
+                style={{
+                  padding: "var(--space-3) var(--space-4)",
+                  borderRadius: "var(--radius-full, 24px)",
+                  border: "1px dotted var(--muted-600)",
+                  background: "var(--bg-700)",
+                  color: "var(--text-100)",
+                  fontFamily: "var(--font-family)",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  transition: "var(--transition-base)",
+                  letterSpacing: "-0.1px",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = "var(--bg-600)";
+                  e.target.style.borderColor = "var(--muted-500)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = "var(--bg-700)";
+                  e.target.style.borderColor = "var(--muted-600)";
+                }}
+              >
+                Summarize this document
+              </button>
+              <button
+                onClick={() => setInputValue("To do items")}
+                style={{
+                  padding: "var(--space-3) var(--space-4)",
+                  borderRadius: "var(--radius-full, 24px)",
+                  border: "1px dotted var(--muted-600)",
+                  background: "var(--bg-700)",
+                  color: "var(--text-100)",
+                  fontFamily: "var(--font-family)",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  transition: "var(--transition-base)",
+                  letterSpacing: "-0.1px",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = "var(--bg-600)";
+                  e.target.style.borderColor = "var(--muted-500)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = "var(--bg-700)";
+                  e.target.style.borderColor = "var(--muted-600)";
+                }}
+              >
+                To do items
+              </button>
+            </div>
+            <div>
+              <button
+                onClick={() => setInputValue("last thing speaker said")}
+                style={{
+                  padding: "var(--space-3) var(--space-4)",
+                  borderRadius: "var(--radius-full, 24px)",
+                  border: "1px dotted var(--muted-600)",
+                  background: "var(--bg-700)",
+                  color: "var(--text-100)",
+                  fontFamily: "var(--font-family)",
+                  fontSize: "12px",
+                  fontWeight: 500,
+                  cursor: "pointer",
+                  transition: "var(--transition-base)",
+                  letterSpacing: "-0.1px",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = "var(--bg-600)";
+                  e.target.style.borderColor = "var(--muted-500)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = "var(--bg-700)";
+                  e.target.style.borderColor = "var(--muted-600)";
+                }}
+              >
+                last thing speaker said
+              </button>
+            </div>
+          </div>
+        )}
         {messages.map((m, i) => (
           <div
             key={i}
