@@ -26,6 +26,16 @@ export default function AudioPlayer() {
   const [language, setLanguage] = useState(null);
   const [view, setView] = useState("split"); // 'transcript' | 'chat' | 'split'
 
+  const copyTranscript = async () => {
+    const transcript = sound?.full_transcript || "No transcript available.";
+    const textToCopy = `${transcript}\n\n- Made with placeholder app`;
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
   const audioRef = useRef();
   const router = useRouter();
   const dispatch = useDispatch();
@@ -349,6 +359,21 @@ export default function AudioPlayer() {
                       fontSize: "inherit",
                     }}
                   />
+                  <a
+                    onClick={copyTranscript}
+                    style={{
+                      display: "inline-block",
+                      marginTop: "var(--space-2)",
+                      marginLeft: "var(--space-2)",
+                      fontSize: "11px",
+                      color: "var(--text-400)",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      fontFamily: "var(--font-family)",
+                    }}
+                  >
+                    copy transcript
+                  </a>
 
                   {/* summary takes up the height space of control panel and shrinks transcript. messed up*/}
                   {/*summary && (
@@ -484,6 +509,21 @@ export default function AudioPlayer() {
                     fontSize: "inherit",
                   }}
                 />
+                <a
+                  onClick={copyTranscript}
+                  style={{
+                    display: "inline-block",
+                    marginTop: "var(--space-2)",
+                    marginLeft: "var(--space-2)",
+                    fontSize: "11px",
+                    color: "var(--text-400)",
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                    fontFamily: "var(--font-family)",
+                  }}
+                >
+                  copy transcript
+                </a>
 
                 {/* messes up height of Control Panel. not needed for now*/}
                 {/*summary && (
