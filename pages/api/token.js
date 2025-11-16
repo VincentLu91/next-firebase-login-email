@@ -15,8 +15,14 @@ export default async function handler(req, res) {
     url.searchParams.set("expires_in_seconds", String(ttl));
     url.searchParams.set("max_session_duration_seconds", String(maxSession));
 
+    console.log(
+      "[Token API] Requesting token from AssemblyAI with key:",
+      apiKey.substring(0, 8) + "..."
+    );
     const r = await fetch(url, { headers: { Authorization: apiKey } });
+    console.log("[Token API] AssemblyAI response status:", r.status);
     const data = await r.json();
+    console.log("[Token API] AssemblyAI response data:", data);
     return res.status(r.ok ? 200 : r.status).json(data);
   } catch (err) {
     console.error("Token mint failed:", err);

@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  turbopack: {}, // <- add this line
+  //turbopack: {}, // <- add this line
   webpack: (config, { isServer }) => {
     if (!isServer) config.resolve.fallback = { fs: false };
     return config;
