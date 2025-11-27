@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import BlockContent from "@sanity/block-content-to-react";
-import imageUrlBuilder from "@sanity/image-url";
+import { createImageUrlBuilder } from "@sanity/image-url";
 import { Toolbar } from "../../components/toolbar";
 import styles from "../../styles/Post.module.css";
 
@@ -13,7 +13,7 @@ const serializers = {
     image: (props) => (
       <div className={styles.imageWrapper}>
         <Image
-          src={imageUrlBuilder({
+          src={createImageUrlBuilder({
             projectId: "u6uw5l6m",
             dataset: "production",
           })
@@ -35,7 +35,7 @@ const Post = ({ title, body, image }) => {
 
   useEffect(() => {
     if (image) {
-      const imgBuilder = imageUrlBuilder({
+      const imgBuilder = createImageUrlBuilder({
         projectId: "u6uw5l6m",
         dataset: "production",
       });
