@@ -13,7 +13,7 @@ import moment from "moment";
 import getBlobDuration from "get-blob-duration";
 import RecordRTC, { StereoAudioRecorder } from "recordrtc"; // only run on the browser
 import { useRouter } from "next/router";
-import { useUser } from "@supabase/auth-helpers-react";
+import { useUser } from "../utils/supabase-hooks";
 import fileToArrayBuffer from "file2arraybuffer";
 import axios from "axios";
 import { supabase } from "../utils/initSupabase";

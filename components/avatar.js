@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSupabaseClient } from "../utils/supabase-hooks";
 
 const Avatar = ({ uid, url, size, onUpload }) => {
   const supabase = useSupabaseClient();

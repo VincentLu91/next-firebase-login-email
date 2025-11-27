@@ -6,9 +6,6 @@ import Layout from "../layout/Layout";
 import SimpleLayout from "../layout/SimpleLayout";
 import { useRouter } from "next/router";
 import PubnubProvider from "../contexts/pubnub";
-import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { useState } from "react";
 import { Manrope } from "next/font/google";
 const manrope = Manrope({
   subsets: ["latin"],
@@ -17,7 +14,6 @@ const manrope = Manrope({
 });
 
 function MyApp({ Component, pageProps }) {
-  const [supabase] = useState(() => createPagesBrowserClient());
   const router = useRouter();
 
   // Use SimpleLayout for public pages
@@ -36,26 +32,21 @@ function MyApp({ Component, pageProps }) {
     ].includes(router.pathname) || router.pathname.startsWith("/post/");
   return (
     <div className={`app-shell ${manrope.className}`}>
-      <SessionContextProvider
-        supabaseClient={supabase}
-        initialSession={pageProps.initialSession}
-      >
-        <Provider store={store}>
-          <PersistGate loading={null} persistor={persistor}>
-            <PubnubProvider>
-              {useSimpleLayout ? (
-                <SimpleLayout>
-                  <Component {...pageProps} />
-                </SimpleLayout>
-              ) : (
-                <Layout>
-                  <Component {...pageProps} />
-                </Layout>
-              )}
-            </PubnubProvider>
-          </PersistGate>
-        </Provider>
-      </SessionContextProvider>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <PubnubProvider>
+            {useSimpleLayout ? (
+              <SimpleLayout>
+                <Component {...pageProps} />
+              </SimpleLayout>
+            ) : (
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            )}
+          </PubnubProvider>
+        </PersistGate>
+      </Provider>
     </div>
   );
 }

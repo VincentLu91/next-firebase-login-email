@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser, useSupabaseClient } from "../utils/supabase-hooks";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useCallback, useState, useEffect } from "react";
