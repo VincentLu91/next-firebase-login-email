@@ -14,14 +14,18 @@ import signInStyles from "../styles/signinStyles";
 import dynamic from "next/dynamic";
 import axios from "axios";
 import { usePubnub } from "../contexts/pubnub";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useProtectedPage } from "../utils/auth-helpers";
 import PhoneInput from "react-phone-number-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { supabase } from "../utils/initSupabase";
 
 const PhoneRecording = () => {
-  //const supabase = useSupabaseClient();
-  const user = useUser();
+  const {
+    user,
+    customer: authCustomer,
+    loading: authLoading,
+    supabase: supabaseClient,
+  } = useProtectedPage();
   const {
     subscribe,
     unSubscribeAll,
@@ -54,7 +58,7 @@ const PhoneRecording = () => {
   const [callStatus, setCallStatus] = React.useState();
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
-  const [customer, setCustomer] = useState(null);
+  const customer = authCustomer; // Use customer from auth helper
   const [phoneNumber, setPhoneNumber] = React.useState(null);
   const [time, setTime] = React.useState(0);
   // state to check stopwatch running or not
@@ -77,55 +81,29 @@ const PhoneRecording = () => {
     (state) => state.recordingReducer.callControlID
   );
 
-  // newly added supabase code...to check user authentication state for now.
-  const checkAuth = useCallback(
-    async (user) => {
-      if (user) {
-        console.log("Supabase user is: ", user);
-        let customerInfo = await supabase
-          .from("customers")
-          .select("*")
-          .eq("email_address", user.email);
-        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
-        setCustomer(customerInfo.data[0]);
+  // Fetch subscription info when customer is available
+  useEffect(() => {
+    const fetchSubscription = async () => {
+      if (customer) {
         let subscriptionResponse = await supabase
           .from("subscriptions")
           .select()
-          .eq("customer_id", customerInfo.data[0].id);
-        if (!subscriptionResponse) {
+          .eq("customer_id", customer.id);
+        if (!subscriptionResponse || !subscriptionResponse.data[0]) {
           setIsSubscribed(false);
           setSubscriptionInfo(null);
         } else {
-          if (!subscriptionResponse.data[0]) {
-            setIsSubscribed(false);
-            setSubscriptionInfo(null);
-          } else {
-            console.log(
-              "subscriptionResponse is: ",
-              subscriptionResponse.data[0].stripe_product_name
-            );
-            setIsSubscribed(true);
-            setSubscriptionInfo(
-              subscriptionResponse.data[0].stripe_product_name
-            );
-          }
+          console.log(
+            "subscriptionResponse is: ",
+            subscriptionResponse.data[0].stripe_product_name
+          );
+          setIsSubscribed(true);
+          setSubscriptionInfo(subscriptionResponse.data[0].stripe_product_name);
         }
-      } else {
-        // User is signed out
-        console.log(
-          "The user is inauthenticated, redirecting back to signin page"
-        );
-        router.push("/signin");
       }
-    },
-    [router]
-  );
-
-  useEffect(() => {
-    //console.log("Current user is: ", currentUser);
-    checkAuth(user);
-    //getSubscriptionsInfo();
-  }, [checkAuth, user]);
+    };
+    fetchSubscription();
+  }, [customer]);
 
   const getEventType = useCallback(
     async (callId) => {

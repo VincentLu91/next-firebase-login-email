@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import axios from "axios"; // NEW
-import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useUser } from "../utils/supabase-hooks";
 
 function Button({ children, loading, disabled, onClick }) {
   return (

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../utils/initSupabase";
-import { useSession } from "@supabase/auth-helpers-react";
+import { useSession } from "../utils/supabase-hooks";
 import { useRouter } from "next/router";
 import { signinStyles } from "../styles/signinStyles";
 

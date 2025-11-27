@@ -6,19 +6,17 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 //import { printTranscription } from "../../../redux/language/actions";
 import libraryStyles from "../styles/libraryStyles";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useProtectedPage } from "../utils/auth-helpers";
 import { useMemo, useRef } from "react";
 
 const Dashboard = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const supabase = useSupabaseClient();
-  const user = useUser();
+  const { user, customer, loading: authLoading, supabase } = useProtectedPage();
   const [subscriptionInfo, setSubscriptionInfo] = useState(null);
 
   const [cloudRecordingList, setCloudRecordingList] = React.useState([]);
   const [search, setNewSearch] = React.useState("");
-  const [customer, setCustomer] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,27 +30,16 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const checkAuth = useCallback(
-    async (user) => {
+  const fetchRecordings = useCallback(
+    async (customer) => {
+      if (!customer) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
-        if (!user) {
-          router.push("/signin");
-          return;
-        }
-
-        const customerInfo = await supabase
-          .from("customers")
-          .select("*")
-          .eq("email_address", user.email)
-          .single();
-
-        setCustomer(customerInfo.data);
-
-        // (Optional) You can keep subscription lookups here if needed
-        // const subscriptionResponse = await supabase
-        //   .from("subscriptions").select().eq("customer_id", customerInfo.data.id);
 
         const [micRecordingInfo, callRecordingInfo] = await Promise.all([
           supabase
@@ -60,13 +47,13 @@ const Dashboard = () => {
             .select(
               "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at"
             )
-            .eq("customer_id", customerInfo.data.id),
+            .eq("customer_id", customer.id),
           supabase
             .from("call_recordings")
             .select(
               "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at"
             )
-            .eq("customer_id", customerInfo.data.id),
+            .eq("customer_id", customer.id),
         ]);
 
         const combined = [
@@ -82,13 +69,15 @@ const Dashboard = () => {
         setLoading(false);
       }
     },
-    [router, supabase]
+    [supabase]
   );
 
-  // this is to check for the user status and subscriptions before loading all recording objects
+  // Fetch recordings once customer is available
   useEffect(() => {
-    checkAuth(user);
-  }, [checkAuth, user]);
+    if (customer) {
+      fetchRecordings(customer);
+    }
+  }, [customer, fetchRecordings]);
 
   useEffect(() => {
     console.log("Cloud Recording List is: ", cloudRecordingList);

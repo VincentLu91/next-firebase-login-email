@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useProtectedPage } from "../utils/auth-helpers";
 import { setSound, setDocID, setTableName } from "../redux/recording/actions";
 import Select from "react-select";
 import axios from "axios";
@@ -14,12 +14,12 @@ import ViewBar from "../components/ViewBar";
 import ChatPanel from "../components/ChatPanel";
 
 export default function AudioPlayer() {
+  const { user, customer, loading, supabase } = useProtectedPage();
   const [isPlaying, setIsPlaying] = useState(false);
   const [durationSeconds, setDurationSeconds] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [audioUrl, setAudioUrl] = useState("");
   const [isAudioSelected, setIsAudioSelected] = useState(false);
-  const [customer, setCustomer] = useState(null);
   const [percentage, setPercentage] = useState(0);
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
@@ -39,25 +39,7 @@ export default function AudioPlayer() {
   const audioRef = useRef();
   const router = useRouter();
   const dispatch = useDispatch();
-  const user = useUser();
-  const supabase = useSupabaseClient();
   const sound = useSelector((state) => state.recordingReducer.sound);
-
-  useEffect(() => {
-    const checkAuth = async (user) => {
-      if (user) {
-        let customerInfo = await supabase
-          .from("customers")
-          .select("*")
-          .eq("email_address", user.email);
-        setCustomer(customerInfo.data[0]);
-      } else {
-        router.push("/signin");
-      }
-    };
-
-    checkAuth(user);
-  }, [user, router, supabase]);
 
   useEffect(() => {
     if (customer && sound) {

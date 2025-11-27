@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useEffect, useState, useCallback } from "react";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser, useSupabaseClient } from "../utils/supabase-hooks";
 import e from "cors";
 
 const SubscriptionCheckout = () => {

@@ -1,7 +1,7 @@
 // blog 1 is available in plan 2 and onwards
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser, useSupabaseClient } from "../utils/supabase-hooks";
 
 const BlogPage = (props) => {
   const router = useRouter();
