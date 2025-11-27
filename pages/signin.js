@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "../redux/user/actions";
-import { useSupabaseClient, useSession } from "@supabase/auth-helpers-react";
+import { useSupabaseClient, useSession } from "../utils/supabase-hooks";
 import { signinStyles } from "../styles/signinStyles";
 
 const SignIn = () => {
@@ -44,11 +44,41 @@ const SignIn = () => {
   };
 
   useEffect(() => {
-    if (session) {
+    // Only redirect if session is truly established (not null or undefined)
+    if (session && session !== null) {
       router.replace("/dashboard");
     }
   }, [session, router]);
 
+  // Show loading while auth state is being determined
+  if (session === undefined) {
+    return (
+      <div className="m-6">
+        <div className="animate-pulse flex space-x-4 justify-center">
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+        </div>
+        <style jsx>{signinStyles}</style>
+      </div>
+    );
+  }
+
+  // Redirect is happening
+  if (session) {
+    return (
+      <div className="m-6">
+        <div className="animate-pulse flex space-x-4 justify-center">
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+          <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+        </div>
+        <style jsx>{signinStyles}</style>
+      </div>
+    );
+  }
+
+  // User is not logged in, show signin form
   if (!session)
     return (
       <div className="w-80 flex flex-col justify-between p-3 max-w-lg m-auto my-64">

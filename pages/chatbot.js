@@ -3,7 +3,7 @@ import styles from "../styles/Chat.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser, useSupabaseClient } from "../utils/supabase-hooks";
 
 function ChatBot() {
   const router = useRouter();

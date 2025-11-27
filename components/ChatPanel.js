@@ -1,6 +1,6 @@
 // components/ChatPanel.jsx
 import { useEffect, useState, useRef } from "react";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useUser, useSupabaseClient } from "../utils/supabase-hooks";
 import axios from "axios";
 
 export default function ChatPanel({ sound, soundUrl }) {

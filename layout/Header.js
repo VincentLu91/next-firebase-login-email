@@ -1,13 +1,30 @@
 import Link from "next/link";
-import { useUser } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/initSupabase";
 
 const Header = ({ onUtilityToggle }) => {
   const router = useRouter();
-  const user = useUser();
+  const [user, setUser] = useState(null);
   const [subscription, setSubscription] = useState(null);
+
+  useEffect(() => {
+    // Get initial user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription: authSubscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      authSubscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const checkSubscription = async () => {

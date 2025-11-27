@@ -4,7 +4,7 @@ import axios from "axios";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { isValidPhoneNumber } from "react-phone-number-input";
-import { useUser, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useProtectedPage } from "../utils/auth-helpers";
 import { useRouter } from "next/router";
 import { supabase } from "../utils/initSupabase";
 import {
@@ -129,10 +129,15 @@ const ASSEMBLY_AI_KEY =
   process.env.ASSEMBLY_AI_KEY || "8acedd22ef7542259df0f36dc8bf18ac";
 
 const PhoneRecording2 = () => {
+  const {
+    user,
+    customer: authCustomer,
+    loading,
+    supabase: supabaseClient,
+  } = useProtectedPage();
   const [transcriptionText, setTranscriptionText] = useState("");
   const [phoneNumber, setPhoneNumber] = React.useState(null);
-  const [customer, setCustomer] = useState(null);
-  const user = useUser();
+  const customer = authCustomer; // Use customer from auth helper
   const router = useRouter();
   const dispatch = useDispatch();
   const recordingList = useSelector(
@@ -143,33 +148,6 @@ const PhoneRecording2 = () => {
   const [recordingStatus, setRecordingStatus] = useState("");
   const [filename, setFilename] = React.useState("");
   const [numCalls, setNumCalls] = React.useState(0);
-
-  const checkAuth = useCallback(
-    async (user) => {
-      if (user) {
-        console.log("Supabase user is: ", user);
-        let customerInfo = await supabase
-          .from("customers")
-          .select("*")
-          .eq("email_address", user.email);
-        console.log("customerInfo is: ", customerInfo.data[0]); //customerInfo.data[0].id
-        setCustomer(customerInfo.data[0]);
-      } else {
-        // User is signed out
-        console.log(
-          "The user is inauthenticated, redirecting back to signin page"
-        );
-        router.push("/signin");
-      }
-    },
-    [router]
-  );
-
-  useEffect(() => {
-    //console.log("Current user is: ", currentUser);
-    checkAuth(user);
-    //getSubscriptionsInfo();
-  }, [checkAuth, user]);
 
   const getNumCalls = useCallback(
     async (user) => {
