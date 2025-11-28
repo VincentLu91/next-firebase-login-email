@@ -15,7 +15,7 @@
     "@ffmpeg/util": "^0.12.2",
     "@reduxjs/toolkit": "^2.11.0",
     "@sanity/block-content-to-react": "^3.0.0",
-    "@sanity/image-url": "^2.0.0",
+    "@sanity/image-url": "^2.0.1",
     "@stripe/stripe-js": "^8.5.3",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.0",
