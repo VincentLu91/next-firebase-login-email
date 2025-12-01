@@ -29,7 +29,7 @@
     "get-blob-duration": "^1.2.0",
     "micro": "^10.0.1",
     "moment": "^2.30.1",
-    "next": "^16.0.5",
+    "next": "^16.0.6",
     "nodemailer": "^7.0.11",
     "npm-check-updates": "^19.1.2",
     "pubnub": "^10.2.3",
@@ -58,6 +58,6 @@
   },
   "devDependencies": {
     "eslint": "9.39.1",
-    "eslint-config-next": "^16.0.5"
+    "eslint-config-next": "^16.0.6"
   }
 }
