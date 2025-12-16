@@ -1,4 +1,10 @@
 export default async function handler(req, res) {
+  // 🔒 CRITICAL SECURITY: Require authentication to prevent unauthorized phone calls
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized - Login required" });
+  }
+
   try {
     console.log("dialTwilio called with query params:", req.query);
     const { to } = req.query;

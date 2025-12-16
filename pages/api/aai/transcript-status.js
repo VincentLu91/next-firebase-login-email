@@ -1,4 +1,10 @@
 export default async function handler(req, res) {
+  // 🔒 SECURITY: Require authentication
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Unauthorized - Login required" });
+  }
+
   const { id } = req.query;
   if (!id) return res.status(400).json({ error: "Missing ?id" });
 
