@@ -1,16 +1,26 @@
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  Suspense,
-} from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
+import dynamic from "next/dynamic";
 import { useProtectedPage } from "../utils/auth-helpers";
 
-// Use React.lazy instead of next/dynamic for better Turbopack compatibility
-const Recording = React.lazy(() => import("../components/Recording"));
+// Use Next.js dynamic import with ssr: false for client-only components
+const Recording = dynamic(() => import("../components/Recording"), {
+  ssr: false,
+  loading: () => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "70vh",
+        background: "#0b0d12",
+        color: "#e6e8ef",
+      }}
+    >
+      Loading recording interface...
+    </div>
+  ),
+});
 
 const InternalRecording = () => {
   const router = useRouter();
@@ -23,14 +33,25 @@ const InternalRecording = () => {
   }, []);
 
   if (!isMounted) {
-    return <div>Loading...</div>;
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "70vh",
+          background: "#0b0d12",
+          color: "#e6e8ef",
+        }}
+      >
+        Loading...
+      </div>
+    );
   }
 
   return (
     <div>
-      <Suspense fallback={<div>Loading recording interface...</div>}>
-        <Recording />
-      </Suspense>
+      <Recording />
     </div>
   );
 };
