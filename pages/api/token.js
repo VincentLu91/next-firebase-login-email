@@ -1,5 +1,11 @@
 export default async function handler(req, res) {
   try {
+    // 🔒 SECURITY: Require authentication
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ error: "Unauthorized - Login required" });
+    }
+
     const apiKey = process.env.ASSEMBLYAI_API_KEY;
     if (!apiKey)
       return res.status(500).json({ error: "Missing ASSEMBLYAI_API_KEY" });

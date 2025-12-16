@@ -495,7 +495,22 @@ const Recording = () => {
     setInterim("");
     startRecording();
     setIsTranscribing(true);
-    const response = await fetch("/api/token");
+
+    // 🔒 Get auth token from Supabase session
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      alert("Please login to use recording features");
+      setIsTranscribing(false);
+      return;
+    }
+
+    const response = await fetch("/api/token", {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
     const data = await response.json();
     if (data.error) {
       alert(data.error);
