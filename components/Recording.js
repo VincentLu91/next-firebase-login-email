@@ -300,6 +300,7 @@ overflow: auto;
 line-height: 1.6;
 font-size: 18px;
 scrollbar-width: thin;
+white-space: pre-line;
 }
 
 /* Inputs (rename, etc.) */
@@ -561,7 +562,7 @@ const Recording = () => {
               .map((k) => Number(k))
               .sort((a, b) => a - b)
               .map((k) => next[k].text)
-              .join(" ")
+              .join("\n")
               .trim();
             setLiveTranscript(joined);
             return next;
@@ -777,7 +778,11 @@ const Recording = () => {
                 Stop Recording
               </button>
             </div>
-            <div className="transcript" aria-live="polite">
+            <div
+              className="transcript"
+              aria-live="polite"
+              style={{ whiteSpace: "pre-wrap" }}
+            >
               <p>
                 {liveTranscript}{" "}
                 <span style={{ opacity: 0.55 }}>{interim}</span>
@@ -817,7 +822,9 @@ const Recording = () => {
               Rename
             </button>
           </div>
-          <div className="transcript">{transcript}</div>
+          <div className="transcript" style={{ whiteSpace: "pre-wrap" }}>
+            {transcript}
+          </div>
         </div>
       );
     }
