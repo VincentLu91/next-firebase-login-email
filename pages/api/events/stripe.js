@@ -7,6 +7,7 @@ import {
   deleteSubscription,
   upsertProductRecord,
   upsertPriceRecord,
+  addUserTokens,
 } from "../../../utils/useDatabase";
 import { supabase } from "../../../utils/initSupabase";
 
@@ -60,6 +61,7 @@ export default async function handler(req, res) {
             subscription: s.subscription,
             clientRef: s.client_reference_id,
             customerEmail: s.customer_details?.email,
+            metadata: s.metadata,
           });
 
           if (s.mode === "subscription") {
@@ -96,6 +98,58 @@ export default async function handler(req, res) {
               userId,
               true
             );
+          } else if (s.mode === "payment") {
+            // Handle one-time credit purchase
+            console.log("🔍 Payment mode detected. Full session data:", {
+              client_reference_id: s.client_reference_id,
+              customer: s.customer,
+              metadata: s.metadata,
+              payment_status: s.payment_status,
+            });
+
+            if (!s.metadata?.token_type || !s.metadata?.token_amount) {
+              console.error(
+                "❌ Missing metadata! token_type or token_amount not found"
+              );
+              console.log("Available metadata:", s.metadata);
+              break;
+            }
+
+            const userId = s.client_reference_id;
+            const stripeCustomerId = s.customer;
+            const tokenType = s.metadata.token_type;
+            const tokenAmount = parseInt(s.metadata.token_amount);
+
+            console.log("🎯 Processing credit purchase:", {
+              userId,
+              stripeCustomerId,
+              tokenType,
+              tokenAmount,
+            });
+
+            if (!userId) {
+              console.error(
+                "❌ No client_reference_id (user ID) found in session"
+              );
+              break;
+            }
+
+            // Use the existing addUserTokens function
+            console.log(
+              `💰 Adding ${tokenAmount} ${tokenType} to user ${userId}`
+            );
+            const result = await addUserTokens(userId, tokenType, tokenAmount);
+
+            if (!result) {
+              console.error(
+                "❌ Failed to add tokens - customer not found or database error"
+              );
+            } else {
+              console.log(
+                `✅ SUCCESS! Added ${tokenAmount} ${tokenType} to user ${userId}.`,
+                `Old balance: ${result.oldBalance}, New balance: ${result.newBalance}`
+              );
+            }
           }
           break;
         }
