@@ -309,6 +309,9 @@ const Dashboard = () => {
             aria-label="Search recordings"
           />
         </div>
+        <Link href="/buy-credits">
+          <button className="buyCreditsBtn">💳 Buy Credits</button>
+        </Link>
       </header>
 
       {loading ? (
@@ -547,6 +550,23 @@ const Dashboard = () => {
         .search:focus {
           border-color: var(--accent);
           box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+        }
+
+        .buyCreditsBtn {
+          padding: 10px 20px;
+          border-radius: 10px;
+          border: 1px solid rgba(123, 92, 255, 0.3);
+          background: linear-gradient(to right, #7b5cff, #985cff);
+          color: white;
+          font-weight: 600;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          white-space: nowrap;
+        }
+        .buyCreditsBtn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(123, 92, 255, 0.4);
         }
 
         .table {

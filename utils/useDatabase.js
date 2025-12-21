@@ -138,6 +138,41 @@ const deductNumCallsToken = async (customerId, tokensToDeduct) => {
   }
 };
 
+const addUserTokens = async (customerId, tokenType, tokensToAdd) => {
+  const { data: customer, error: noCustomerError } = await supabase
+    .from("customers")
+    .select(`id, ${tokenType}`)
+    .eq("id", customerId)
+    .single();
+
+  if (noCustomerError) return false;
+
+  const currentTokens = customer[tokenType] || 0;
+  const newTokens = currentTokens + tokensToAdd;
+
+  let customerTokenUpdate = {
+    id: customer.id,
+    [tokenType]: newTokens,
+  };
+
+  const { data, error } = await supabase
+    .from("customers")
+    .upsert(customerTokenUpdate)
+    .select();
+
+  if (error) {
+    console.log("sorry can't do it");
+    return false;
+  }
+
+  return {
+    success: true,
+    data: data,
+    oldBalance: currentTokens,
+    newBalance: newTokens,
+  };
+};
+
 // Stripe-related functions
 const createOrRetrieveCustomer = async ({ email, uuid }) => {
   console.log("Creating/retrieving customer for:", { email, uuid });
@@ -559,6 +594,7 @@ export {
   deductUserMicToken,
   deductUserCallToken,
   deductNumCallsToken,
+  addUserTokens,
   createOrRetrieveCustomer,
   createSubscription,
   manageSubscriptionStatusChange,
