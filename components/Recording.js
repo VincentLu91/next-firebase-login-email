@@ -20,6 +20,7 @@ import { supabase } from "../utils/initSupabase";
 import { storeAsMp3 } from "../utils/storeAsMp3";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { toBlobURL } from "@ffmpeg/util";
+import Link from "next/link";
 
 // --- MP3 transcode (browser-only) ---
 let _ffmpeg; // singleton
@@ -315,6 +316,25 @@ border: 1px solid rgba(255,255,255,.12);
 padding: 10px 12px; border-radius: 10px;
 }
 .field input::placeholder { color: #9aa3b2; }
+
+/* Buy Credits Button */
+.buyCreditsBtn {
+padding: 10px 20px;
+border-radius: 10px;
+border: 1px solid rgba(123, 92, 255, 0.3);
+background: linear-gradient(to right, #7b5cff, #985cff);
+color: white;
+font-weight: 600;
+font-size: 14px;
+cursor: pointer;
+transition: all 0.2s ease;
+white-space: nowrap;
+margin-bottom: 20px;
+}
+.buyCreditsBtn:hover {
+transform: translateY(-2px);
+box-shadow: 0 4px 12px rgba(123, 92, 255, 0.4);
+}
 `;
 
 const Recording = () => {
@@ -374,6 +394,7 @@ const Recording = () => {
   const [time, setTime] = React.useState(0);
   const [numMicTokens, setNumMicTokens] = React.useState(0);
   const [elapsedTime, setElapsedTime] = React.useState(0);
+  const [hasSubscription, setHasSubscription] = React.useState(false);
   const timerRef = React.useRef(null);
   const intervalIdRef = React.useRef(null);
   const dispatch = useDispatch();
@@ -398,6 +419,21 @@ const Recording = () => {
       .eq("email_address", user?.email);
     setNumMicTokens(tokenResponse?.data[0]?.mic_tokens);
     setTimeDifference(tokenResponse?.data[0]?.mic_tokens);
+
+    // Check if user has an active subscription (not cancelled)
+    const customerId = tokenResponse?.data[0]?.id;
+    if (customerId) {
+      const { data: subscriptionData } = await supabase
+        .from("subscriptions")
+        .select("cancel_at_period_end")
+        .eq("customer_id", customerId)
+        .single();
+
+      // Subscription is active if cancel_at_period_end is FALSE
+      setHasSubscription(subscriptionData?.cancel_at_period_end === false);
+    } else {
+      setHasSubscription(false);
+    }
   }, [user, setNumMicTokens]);
 
   useEffect(() => {
@@ -839,6 +875,12 @@ const Recording = () => {
       </div>*/}
 
       <h2 className="headline">For best results, record audio on Chrome</h2>
+
+      {hasSubscription && numMicTokens <= 7200 && (
+        <Link href="/buy-credits">
+          <button className="buyCreditsBtn">💳 Buy Credits</button>
+        </Link>
+      )}
 
       {renderView()}
 
