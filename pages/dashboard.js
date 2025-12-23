@@ -309,9 +309,11 @@ const Dashboard = () => {
             aria-label="Search recordings"
           />
         </div>
+        {/* Commented out - only available for users with subscription
         <Link href="/buy-credits">
           <button className="buyCreditsBtn">💳 Buy Credits</button>
         </Link>
+        */}
       </header>
 
       {loading ? (

@@ -13,6 +13,7 @@ import {
   setSound,
 } from "../redux/recording/actions";
 import moment from "moment";
+import Link from "next/link";
 
 import { useDispatch, useSelector } from "react-redux";
 /* === STYLE: same look as Recording.js (no logic changes) === */
@@ -122,6 +123,25 @@ button[disabled],
 
 /* Keep existing hover/focus styles as-is */
 
+/* Buy Credits Button */
+.buyCreditsBtn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(123, 92, 255, 0.3);
+  background: linear-gradient(to right, #7b5cff, #985cff);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-bottom: 20px;
+}
+.buyCreditsBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(123, 92, 255, 0.4);
+}
+
 /* === END HOTFIX === */
 `;
 
@@ -148,6 +168,7 @@ const PhoneRecording2 = () => {
   const [recordingStatus, setRecordingStatus] = useState("");
   const [filename, setFilename] = React.useState("");
   const [numCalls, setNumCalls] = React.useState(0);
+  const [hasSubscription, setHasSubscription] = React.useState(false);
 
   const getNumCalls = useCallback(
     async (user) => {
@@ -156,6 +177,30 @@ const PhoneRecording2 = () => {
         .select("*")
         .eq("email_address", user?.email);
       setNumCalls(tokenResponse?.data[0]?.num_calls);
+
+      // Check if user has an active subscription (not cancelled)
+      const customerId = tokenResponse?.data[0]?.id;
+      if (customerId) {
+        const { data: subscriptionData, error: subError } = await supabase
+          .from("subscriptions")
+          .select("cancel_at_period_end")
+          .eq("customer_id", customerId)
+          .single();
+
+        console.log("Subscription data:", subscriptionData);
+        console.log(
+          "Cancel at period end:",
+          subscriptionData?.cancel_at_period_end
+        );
+
+        // Subscription is active if cancel_at_period_end is FALSE (not cancelled)
+        const isActive = subscriptionData?.cancel_at_period_end === false;
+        console.log("Is subscription active?", isActive);
+        setHasSubscription(isActive);
+      } else {
+        console.log("No customer ID found");
+        setHasSubscription(false);
+      }
     },
     [setNumCalls]
   );
@@ -491,6 +536,13 @@ const PhoneRecording2 = () => {
   return (
     <div className="rec-wrap">
       <h2 className="headline">Phone Call Recording</h2>
+
+      {hasSubscription && numCalls <= 2 && (
+        <Link href="/buy-credits">
+          <button className="buyCreditsBtn">💳 Buy Credits</button>
+        </Link>
+      )}
+
       <div className="rec-card">
         <div
           style={{
