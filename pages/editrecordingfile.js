@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
-import { useUser, useSupabaseClient } from "../utils/supabase-hooks";
+import { useProtectedPage } from "../utils/auth-helpers";
 import Select from "react-select";
 import axios from "axios";
 import getBlobDuration from "get-blob-duration";
@@ -373,8 +373,7 @@ const StyledSelect = styled(Select)`
 export default function EditRecordingFile() {
   const router = useRouter();
   const dispatch = useDispatch();
-  const user = useUser();
-  const supabase = useSupabaseClient();
+  const { user, customer, loading: authLoading, supabase } = useProtectedPage();
   const sound = useSelector((state) => state.recordingReducer.sound);
   const [percentage, setPercentage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -382,7 +381,6 @@ export default function EditRecordingFile() {
   const [audioURL, setAudioURL] = useState(null);
   const [isAudioSelected, setIsAudioSelected] = useState(false);
   const [durationSeconds, setDurationSeconds] = useState(0);
-  const [customer, setCustomer] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const [summary, setSummary] = useState(null);
@@ -411,33 +409,7 @@ export default function EditRecordingFile() {
 
   const audioRef = useRef();
 
-  const checkAuth = useCallback(
-    async (user) => {
-      if (user) {
-        console.log("Supabase user is: ", user);
-        let customerInfo = await supabase
-          .from("customers")
-          .select("*")
-          .eq("email_address", user.email);
-        console.log("customerInfo is: ", customerInfo.data[0]);
-        setCustomer(customerInfo.data[0]);
-        let subscriptionResponse = await supabase
-          .from("subscriptions")
-          .select()
-          .eq("customer_id", customerInfo.data[0].id);
-      } else {
-        console.log(
-          "The user is inauthenticated, redirecting back to signin page"
-        );
-        router.push("/signin");
-      }
-    },
-    [router, supabase]
-  );
-
-  useEffect(() => {
-    checkAuth(user);
-  }, [checkAuth, user]);
+  // Auth is now handled by useProtectedPage hook - no manual checkAuth needed
 
   const getSummary = async (transcript) => {
     if (sound == null || transcript == null) {
