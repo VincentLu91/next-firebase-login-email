@@ -45,9 +45,9 @@
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
     "stripe": "^20.1.2",
-    "styled-components": "^6.3.3",
+    "styled-components": "^6.3.5",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^4.6.0",
+    "telnyx": "^5.0.0",
     "twilio": "^5.11.2",
     "ws": "^8.19.0"
   },
