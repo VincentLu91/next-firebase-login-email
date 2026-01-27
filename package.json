@@ -18,8 +18,8 @@
     "@sanity/image-url": "^2.0.3",
     "@stripe/stripe-js": "^8.6.4",
     "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.91.1",
-    "axios": "^1.13.2",
+    "@supabase/supabase-js": "^2.93.1",
+    "axios": "^1.13.4",
     "cohere-ai": "^7.20.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
@@ -29,13 +29,13 @@
     "get-blob-duration": "^1.2.0",
     "micro": "^10.0.1",
     "moment": "^2.30.1",
-    "next": "^16.1.4",
-    "nodemailer": "^7.0.12",
-    "npm-check-updates": "^19.3.1",
+    "next": "^16.1.6",
+    "nodemailer": "^7.0.13",
+    "npm-check-updates": "^19.3.2",
     "pubnub": "^10.2.6",
     "raw-body": "^3.0.2",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-hot-toast": "^2.6.0",
     "react-media-recorder": "1.7.2",
     "react-phone-number-input": "^3.4.14",
@@ -47,7 +47,7 @@
     "stripe": "^20.2.0",
     "styled-components": "^6.3.8",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^5.11.0",
+    "telnyx": "^5.13.0",
     "twilio": "^5.12.0",
     "ws": "^8.19.0"
   },
@@ -58,6 +58,6 @@
   },
   "devDependencies": {
     "eslint": "9.39.2",
-    "eslint-config-next": "^16.1.4"
+    "eslint-config-next": "^16.1.6"
   }
 }
