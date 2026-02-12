@@ -32,7 +32,7 @@
     "next": "^16.1.6",
     "nodemailer": "^8.0.1",
     "npm-check-updates": "^19.3.2",
-    "pubnub": "^10.2.6",
+    "pubnub": "^10.2.7",
     "raw-body": "^3.0.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
@@ -47,7 +47,7 @@
     "stripe": "^20.3.1",
     "styled-components": "^6.3.9",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^5.25.0",
+    "telnyx": "^5.25.1",
     "twilio": "^5.12.1",
     "ws": "^8.19.0"
   },
