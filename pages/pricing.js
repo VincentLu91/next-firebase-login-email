@@ -1,238 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { useUser, useSupabaseClient } from "../utils/supabase-hooks";
-import styled from "styled-components";
 
-const Section = styled.section`
-  background: #0e0e0f;
-  position: relative;
-  min-height: 100vh;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle at 40% 30%,
-      rgba(123, 92, 255, 0.05) 0%,
-      transparent 60%
-    );
-  }
-`;
-
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 5rem 1.5rem;
-  position: relative;
-`;
-
-const Title = styled.h1`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  color: rgba(255, 255, 255, 0.95);
-  text-align: center;
-  margin-bottom: 2rem;
-`;
-
-const IntervalToggle = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 3rem;
-`;
-
-const ToggleContainer = styled.div`
-  position: relative;
-  height: 2rem;
-  background: #1a1a1d;
-  border-radius: 9999px;
-  width: 14rem;
-  display: flex;
-  align-items: center;
-  padding: 0.25rem;
-`;
-
-const ToggleButton = styled.button`
-  position: relative;
-  width: 50%;
-  height: 1.5rem;
-  border-radius: 9999px;
-  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  background: ${(props) =>
-    props.selected
-      ? "linear-gradient(to right, #7B5CFF, #985CFF)"
-      : "transparent"};
-  box-shadow: ${(props) =>
-    props.selected ? "0 0 12px rgba(123,92,255,0.35)" : "none"};
-  border: none;
-  cursor: pointer;
-
-  span {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: ${(props) => (props.selected ? "white" : "rgba(255,255,255,0.85)")};
-  }
-`;
-
-const SaveBadge = styled.span`
-  margin-left: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #7b5cff;
-  background: rgba(123, 92, 255, 0.1);
-  padding: 0.25rem 0.5rem;
-  border-radius: 9999px;
-  opacity: ${(props) => (props.visible ? 1 : 0)};
-  transition: opacity 150ms;
-`;
-
-const CardsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  margin-top: 3rem;
-  grid-auto-flow: row;
-  grid-template-rows: auto;
-
-  & > * {
-    grid-column: auto;
-  }
-
-  & > *:last-child:nth-child(3n-1) {
-    grid-column: 2;
-  }
-
-  & > *:last-child:nth-child(3n-2) {
-    grid-column: 2;
-  }
-
-  @media (max-width: 1100px) {
-    grid-template-columns: repeat(2, 1fr);
-
-    & > *:last-child:nth-child(2n-1) {
-      grid-column: 1 / -1;
-    }
-  }
-
-  @media (max-width: 750px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Card = styled.div`
-  background: #1a1a1d;
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: all 250ms cubic-bezier(0.25, 0.8, 0.25, 1);
-  width: 100%;
-
-  ${(props) =>
-    props.isCurrentPlan &&
-    `
-    box-shadow: 0 0 0 2px #7B5CFF;
-  `}
-
-  &:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 8px 24px rgba(123, 92, 255, 0.25);
-  }
-`;
-
-const PlanName = styled.h2`
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 0.5rem;
-`;
-
-const Description = styled.p`
-  color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 2rem;
-`;
-
-const PriceContainer = styled.div`
-  margin: 2rem 0;
-`;
-
-const Price = styled.span`
-  font-size: 48px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-`;
-
-const PriceInterval = styled.span`
-  color: rgba(255, 255, 255, 0.85);
-  margin-left: 0.5rem;
-`;
-
-const FeatureList = styled.ul`
-  margin: 2rem 0;
-  space-between: 1rem;
-`;
-
-const Feature = styled.li`
-  display: flex;
-  align-items: center;
-  color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 1rem;
-
-  svg {
-    width: 1rem;
-    height: 1rem;
-    color: #7b5cff;
-    margin-right: 0.75rem;
-    flex-shrink: 0;
-  }
-`;
-
-const Button = styled.button`
-  width: 100%;
-  padding: 0.875rem 2rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  position: relative;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.95);
-  border: none;
-  cursor: pointer;
-  transition: all 250ms cubic-bezier(0.25, 0.8, 0.25, 1);
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 0.5rem;
-    padding: 1px;
-    background: linear-gradient(to right, #7b5cff, #985cff);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-  }
-
-  &:hover {
-    background: linear-gradient(to right, #7b5cff, #985cff);
-    box-shadow: 0 0 12px rgba(123, 92, 255, 0.4);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const Pricing = () => {
+export default function Pricing() {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
   const [customer, setCustomer] = useState(null);
@@ -337,42 +108,74 @@ const Pricing = () => {
 
   if (!products.length) {
     return (
-      <Section>
-        <Container>
-          <Title>No subscription pricing plans found.</Title>
-        </Container>
-      </Section>
+      <section className="pricing-section">
+        <div className="pricing-container">
+          <h1 className="pricing-title">
+            No subscription pricing plans found.
+          </h1>
+        </div>
+        <style jsx>{`
+          .pricing-section {
+            background: #0e0e0f;
+            position: relative;
+            min-height: 100vh;
+          }
+          .pricing-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 1.5rem;
+            position: relative;
+          }
+          .pricing-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 2rem;
+          }
+        `}</style>
+      </section>
     );
   }
 
   return (
-    <Section>
-      <Container>
-        <Title>Choose Your Plan</Title>
+    <section className="pricing-section">
+      <div className="pricing-container">
+        <h1 className="pricing-title">Choose Your Plan</h1>
 
-        <IntervalToggle>
-          <ToggleContainer>
-            <ToggleButton
-              selected={interval === "month"}
+        <div className="interval-toggle">
+          <div className="toggle-container">
+            <button
+              className={`toggle-button ${
+                interval === "month" ? "selected" : ""
+              }`}
               onClick={() => setInterval("month")}
             >
               <span>Monthly</span>
-            </ToggleButton>
-            <ToggleButton
-              selected={interval === "year"}
+            </button>
+            <button
+              className={`toggle-button ${
+                interval === "year" ? "selected" : ""
+              }`}
               onClick={() => setInterval("year")}
             >
               <span>Yearly</span>
-            </ToggleButton>
-          </ToggleContainer>
+            </button>
+          </div>
           {interval === "year" && (
-            <SaveBadge visible={showAnnualSavings}>Save 18% yearly</SaveBadge>
+            <span
+              className={`save-badge ${showAnnualSavings ? "visible" : ""}`}
+            >
+              Save 18% yearly
+            </span>
           )}
-        </IntervalToggle>
-        <CardsContainer>
+        </div>
+
+        <div className="cards-container">
           {products.map((product) => {
             const price = product.prices?.find(
-              (p) => p.interval === interval && p.active === true
+              (p) => p.interval === interval && p.active === true,
             );
             if (!price) return null;
 
@@ -398,11 +201,7 @@ const Pricing = () => {
             const currency = (price.currency || "USD").toUpperCase();
             const isZeroDecimal = zeroDecimalCurrencies.has(currency);
             const unitAmount = price.unit_amount || 0;
-
-            // Stripe amounts are in the smallest unit; divide by 100 unless zero-decimal
             const amount = isZeroDecimal ? unitAmount : unitAmount / 100;
-
-            // Show 2 decimals only if there are nonzero cents (and not zero-decimal)
             const hasCents = !isZeroDecimal && unitAmount % 100 !== 0;
 
             const priceString = new Intl.NumberFormat("en-US", {
@@ -416,16 +215,19 @@ const Pricing = () => {
               subscriptionInfo?.stripe_price_id === price.stripe_price_id;
 
             return (
-              <Card key={product.id} isCurrentPlan={isCurrentPlan}>
-                <PlanName>{product.product_name}</PlanName>
-                <Description>{product.description}</Description>
-                <PriceContainer>
-                  <Price>{priceString}</Price>
-                  <PriceInterval>/{interval}</PriceInterval>
-                </PriceContainer>
+              <div
+                key={product.id}
+                className={`card ${isCurrentPlan ? "current-plan" : ""}`}
+              >
+                <h2 className="plan-name">{product.product_name}</h2>
+                <p className="description">{product.description}</p>
+                <div className="price-container">
+                  <span className="price">{priceString}</span>
+                  <span className="price-interval">/{interval}</span>
+                </div>
 
-                <FeatureList>
-                  <Feature>
+                <ul className="feature-list">
+                  <li className="feature">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path
                         strokeLinecap="round"
@@ -435,8 +237,8 @@ const Pricing = () => {
                       />
                     </svg>
                     {price.mic_tokens} Microphone Minutes
-                  </Feature>
-                  <Feature>
+                  </li>
+                  <li className="feature">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path
                         strokeLinecap="round"
@@ -446,8 +248,8 @@ const Pricing = () => {
                       />
                     </svg>
                     {price.call_tokens} Call Minutes
-                  </Feature>
-                  <Feature>
+                  </li>
+                  <li className="feature">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                       <path
                         strokeLinecap="round"
@@ -457,10 +259,11 @@ const Pricing = () => {
                       />
                     </svg>
                     {price.num_calls} Number of Calls
-                  </Feature>
-                </FeatureList>
+                  </li>
+                </ul>
 
-                <Button
+                <button
+                  className="cta-button"
                   onClick={() => {
                     if (!user) {
                       checkOut(price.stripe_price_id);
@@ -471,7 +274,7 @@ const Pricing = () => {
                       if (!isCurrentPlan) {
                         switchPlan(
                           subscriptionInfo.stripe_subscription_id,
-                          price.stripe_price_id
+                          price.stripe_price_id,
                         );
                       }
                     } else {
@@ -487,14 +290,193 @@ const Pricing = () => {
                     : isCurrentPlan
                     ? "Current Plan"
                     : "Switch Plan"}
-                </Button>
-              </Card>
+                </button>
+              </div>
             );
           })}
-        </CardsContainer>
-      </Container>
-    </Section>
-  );
-};
+        </div>
+      </div>
 
-export default Pricing;
+      <style jsx>{`
+        .pricing-section {
+          background: #0e0e0f;
+          position: relative;
+          min-height: 100vh;
+        }
+        .pricing-section::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(
+            circle at 40% 30%,
+            rgba(123, 92, 255, 0.05) 0%,
+            transparent 60%
+          );
+        }
+        .pricing-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 5rem 1.5rem;
+          position: relative;
+        }
+        .pricing-title {
+          font-size: 20px;
+          font-weight: 600;
+          letter-spacing: -0.2px;
+          color: rgba(255, 255, 255, 0.95);
+          text-align: center;
+          margin-bottom: 2rem;
+        }
+        .interval-toggle {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 3rem;
+        }
+        .toggle-container {
+          position: relative;
+          height: 2rem;
+          background: #1a1a1d;
+          border-radius: 9999px;
+          width: 14rem;
+          display: flex;
+          align-items: center;
+          padding: 0.25rem;
+        }
+        .toggle-button {
+          position: relative;
+          width: 50%;
+          height: 1.5rem;
+          border-radius: 9999px;
+          transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+        }
+        .toggle-button.selected {
+          background: linear-gradient(to right, #7b5cff, #985cff);
+          box-shadow: 0 0 12px rgba(123, 92, 255, 0.35);
+        }
+        .toggle-button span {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.85);
+        }
+        .toggle-button.selected span {
+          color: white;
+        }
+        .save-badge {
+          margin-left: 0.75rem;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #7b5cff;
+          background: rgba(123, 92, 255, 0.1);
+          padding: 0.25rem 0.5rem;
+          border-radius: 9999px;
+          opacity: 0;
+          transition: opacity 150ms;
+        }
+        .save-badge.visible {
+          opacity: 1;
+        }
+        .cards-container {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.5rem;
+          margin-top: 3rem;
+        }
+        @media (max-width: 1100px) {
+          .cards-container {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+        @media (max-width: 750px) {
+          .cards-container {
+            grid-template-columns: 1fr;
+          }
+        }
+        .card {
+          background: #1a1a1d;
+          padding: 2rem;
+          border-radius: 1rem;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+          transition: all 250ms cubic-bezier(0.25, 0.8, 0.25, 1);
+          width: 100%;
+        }
+        .card.current-plan {
+          box-shadow: 0 0 0 2px #7b5cff;
+        }
+        .card:hover {
+          transform: translateY(-6px) scale(1.02);
+          box-shadow: 0 8px 24px rgba(123, 92, 255, 0.25);
+        }
+        .plan-name {
+          font-size: 20px;
+          font-weight: 600;
+          letter-spacing: -0.2px;
+          color: rgba(255, 255, 255, 0.95);
+          margin-bottom: 0.5rem;
+        }
+        .description {
+          color: rgba(255, 255, 255, 0.85);
+          margin-bottom: 2rem;
+        }
+        .price-container {
+          margin: 2rem 0;
+        }
+        .price {
+          font-size: 48px;
+          font-weight: 700;
+          color: rgba(255, 255, 255, 0.95);
+        }
+        .price-interval {
+          color: rgba(255, 255, 255, 0.85);
+          margin-left: 0.5rem;
+        }
+        .feature-list {
+          margin: 2rem 0;
+          list-style: none;
+          padding: 0;
+        }
+        .feature {
+          display: flex;
+          align-items: center;
+          color: rgba(255, 255, 255, 0.85);
+          margin-bottom: 1rem;
+        }
+        .feature svg {
+          width: 1rem;
+          height: 1rem;
+          color: #7b5cff;
+          margin-right: 0.75rem;
+          flex-shrink: 0;
+        }
+        .cta-button {
+          width: 100%;
+          padding: 0.875rem 2rem;
+          border-radius: 0.5rem;
+          font-weight: 500;
+          position: relative;
+          background: transparent;
+          color: rgba(255, 255, 255, 0.95);
+          border: 1px solid #7b5cff;
+          cursor: pointer;
+          transition: all 250ms cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .cta-button:hover:not(:disabled) {
+          background: linear-gradient(to right, #7b5cff, #985cff);
+          box-shadow: 0 0 12px rgba(123, 92, 255, 0.4);
+        }
+        .cta-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      `}</style>
+    </section>
+  );
+}
