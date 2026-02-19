@@ -9,7 +9,7 @@ import moment from "moment";
 import getBlobDuration from "get-blob-duration";
 import { setCurrentUser } from "../redux/user/actions";
 import { useRouter } from "next/router";
-import signInStyles from "../styles/signinStyles"; // text
+import { signinStyles } from "../styles/signinStyles"; // text
 //import Telnyx from "telnyx";
 import dynamic from "next/dynamic";
 import axios from "axios";
@@ -405,7 +405,7 @@ const PhoneRecording = () => {
         unsubscribe all
       </button>*/}
       {renderView()}
-      <style jsx>{signInStyles}</style>
+      <style jsx>{signinStyles}</style>
     </div>
   );
 };
