@@ -9,7 +9,7 @@ import moment from "moment";
 import getBlobDuration from "get-blob-duration";
 import { setCurrentUser } from "../redux/user/actions";
 import { useRouter } from "next/router";
-import signInStyles from "../styles/signinStyles";
+import signInStyles from "../styles/signinStyles"; // text
 //import Telnyx from "telnyx";
 import dynamic from "next/dynamic";
 import axios from "axios";
@@ -70,15 +70,15 @@ const PhoneRecording = () => {
 
   const dispatch = useDispatch();
   const recordingList = useSelector(
-    (state) => state.recordingReducer.recordingList
+    (state) => state.recordingReducer.recordingList,
   );
   //const recording = useSelector((state) => state.recordingReducer.recording);
   const isRecording = useSelector(
-    (state) => state.recordingReducer.isRecording
+    (state) => state.recordingReducer.isRecording,
   );
 
   const callControlID = useSelector(
-    (state) => state.recordingReducer.callControlID
+    (state) => state.recordingReducer.callControlID,
   );
 
   // Fetch subscription info when customer is available
@@ -95,7 +95,7 @@ const PhoneRecording = () => {
         } else {
           console.log(
             "subscriptionResponse is: ",
-            subscriptionResponse.data[0].stripe_product_name
+            subscriptionResponse.data[0].stripe_product_name,
           );
           setIsSubscribed(true);
           setSubscriptionInfo(subscriptionResponse.data[0].stripe_product_name);
@@ -123,23 +123,23 @@ const PhoneRecording = () => {
           setTimeout(() => getEventType(callId), 1000);
           console.log(
             "nothing in getEventResponse1",
-            getEventResponseRef.current
+            getEventResponseRef.current,
           );
         } else {
           if (!getEventResponseRef.current.data[0]) {
             setCallStatus(null);
             console.log(
               "nothing in getEventResponse2",
-              getEventResponseRef.current
+              getEventResponseRef.current,
             );
             setTimeout(() => getEventType(callId), 1000);
           } else {
             console.log(
               "getEventResponse is: ",
-              getEventResponseRef.current.data[0]
+              getEventResponseRef.current.data[0],
             );
             setCallStatus(
-              getEventResponseRef.current.data[0].react_native_event
+              getEventResponseRef.current.data[0].react_native_event,
             );
             if (
               getEventResponseRef.current.data[0].react_native_event ==
@@ -148,7 +148,7 @@ const PhoneRecording = () => {
             ) {
               eventProcessedRef.current = true; // Mark the event as processed
               let numCallsResponse = await axios.post(
-                `/api/calls-token?user=${customer.id}`
+                `/api/calls-token?user=${customer.id}`,
               );
               getEventResponseRef.current = null;
               console.log("numCallsResponse: ", numCallsResponse.data);
@@ -160,7 +160,7 @@ const PhoneRecording = () => {
               console.log("customerInfo is: ", customerInfo.data[0]);
               console.log(
                 "Numer of tokens after decrement is: ",
-                customerInfo.data[0].num_calls
+                customerInfo.data[0].num_calls,
               );
               setNumCalls(customerInfo.data[0].num_calls);
             }
@@ -169,13 +169,13 @@ const PhoneRecording = () => {
         }
         console.log(
           "getEventResponse: ",
-          getEventResponseRef.current.data[0].react_native_event
+          getEventResponseRef.current.data[0].react_native_event,
         );
       } catch (error) {
         console.error("Error in getEventType:", error);
       }
     },
-    [customer]
+    [customer],
   );
 
   const getNumCalls = useCallback(
@@ -187,7 +187,7 @@ const PhoneRecording = () => {
       // when signed out, TypeError: Cannot read properties of null (reading 'email')
       setNumCalls(tokenResponse?.data[0]?.num_calls);
     },
-    [setNumCalls]
+    [setNumCalls],
   );
 
   useEffect(() => {
@@ -224,8 +224,8 @@ const PhoneRecording = () => {
     const from = "+18885390817";
     const res_dial = await axios.get(
       `/api/dial?from=${encodeURIComponent(from)}&to=${encodeURIComponent(
-        to
-      )}&customer_id=${customer.id}`
+        to,
+      )}&customer_id=${customer.id}`,
     );
     console.log("call_control_id is: ", res_dial.data);
     //console.log("callStatus is: ", res_dial.status);
@@ -277,13 +277,13 @@ const PhoneRecording = () => {
     if (callRecordingResponse.error) {
       console.log(
         "durationMillisResponse error: ",
-        callRecordingResponse.error
+        callRecordingResponse.error,
       );
     }
     if (callRecordingResponse.data) {
       console.log(
         "durationMillisResponse data durationMillis: ",
-        callRecordingResponse.data[0].durationMillis
+        callRecordingResponse.data[0].durationMillis,
       );
     }
     const durationMillis = callRecordingResponse.data[0].durationMillis;
