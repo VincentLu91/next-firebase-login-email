@@ -46,7 +46,7 @@
     "redux-persist": "^6.0.0",
     "stripe": "^20.4.0",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^6.2.0",
+    "telnyx": "^6.3.0",
     "twilio": "^5.12.2",
     "ws": "^8.19.0"
   },
