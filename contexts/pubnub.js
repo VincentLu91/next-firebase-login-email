@@ -15,14 +15,16 @@ const reducer = (state, action) => {
   switch (action.type) {
     case "SET_PUBNUB": {
       return { ...state, pubnub: action.payload };
-    }   
+    }
     case "SET_CALL_RECORDING_SAVED": {
-     return {
+      return {
         ...state,
-        callRecordingData: action.payload ? {
-          call_recording_id: action.payload.call_recording_id,
-          url: action.payload.url,
-        } : undefined,
+        callRecordingData: action.payload
+          ? {
+              call_recording_id: action.payload.call_recording_id,
+              url: action.payload.url,
+            }
+          : undefined,
       };
     }
     case "CALL_TRANSCRIPT": {
@@ -47,7 +49,7 @@ const PubnubProvider = ({ children }) => {
     const instance = new PubNub({
       publishKey: "pub-c-6b9eeb0b-bbaa-44ee-bab2-859a8f35724a",
       subscribeKey: "sub-c-99fbc867-98f7-469e-a595-6dab6e00a5ea",
-      logVerbosity: true,
+      logLevel: "debug",
       userId: "recreate-ai-user",
     });
     instance.addListener({
@@ -90,7 +92,7 @@ const PubnubProvider = ({ children }) => {
         channels: [channelName],
       });
     },
-    [pubnubState]
+    [pubnubState],
   );
 
   const unSubscribe = useCallback(
@@ -101,7 +103,7 @@ const PubnubProvider = ({ children }) => {
         channels: [channelName],
       });
     },
-    [pubnubState]
+    [pubnubState],
   );
 
   const unSubscribeAll = useCallback(() => {
@@ -112,7 +114,14 @@ const PubnubProvider = ({ children }) => {
 
   return (
     <PubnubContext.Provider
-      value={{ subscribe, unSubscribe, unSubscribeAll, pubnubDispatch, transcript: pubnubState.transcript, callRecordingData: pubnubState.callRecordingData  }}
+      value={{
+        subscribe,
+        unSubscribe,
+        unSubscribeAll,
+        pubnubDispatch,
+        transcript: pubnubState.transcript,
+        callRecordingData: pubnubState.callRecordingData,
+      }}
     >
       {children}
     </PubnubContext.Provider>
