@@ -100,7 +100,7 @@ export default function Home() {
                 alt="People having a conversation"
                 width={500}
                 height={300}
-                style={{ objectFit: "cover" }}
+                style={{ objectFit: "cover", width: "100%", height: "auto" }}
               />
             </div>
           </div>
