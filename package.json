@@ -18,7 +18,7 @@
     "@sanity/image-url": "^2.1.1",
     "@stripe/stripe-js": "^9.2.0",
     "@supabase/ssr": "^0.10.2",
-    "@supabase/supabase-js": "^2.103.3",
+    "@supabase/supabase-js": "^2.104.0",
     "axios": "^1.15.1",
     "cohere-ai": "^8.0.0",
     "cors": "^2.8.6",
@@ -32,7 +32,7 @@
     "next": "^16.2.4",
     "nodemailer": "^8.0.5",
     "npm-check-updates": "^21.0.2",
-    "pubnub": "^10.2.9",
+    "pubnub": "^11.0.0",
     "raw-body": "^3.0.2",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
@@ -47,7 +47,7 @@
     "stripe": "^22.0.2",
     "styled-jsx": "^5.1.7",
     "telnyx": "^6.41.0",
-    "twilio": "^5.13.1",
+    "twilio": "^6.0.0",
     "ws": "^8.20.0"
   },
   "overrides": {
