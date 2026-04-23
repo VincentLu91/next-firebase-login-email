@@ -63,20 +63,20 @@ async function ensureFFmpeg() {
         coreURL: await toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
         wasmURL: await toBlobURL(
           `${base}/ffmpeg-core.wasm`,
-          "application/wasm"
+          "application/wasm",
         ),
       };
 
       if (subdir === "core-mt") {
         loadOpts.workerURL = await toBlobURL(
           `${base}/ffmpeg-core.worker.js`,
-          "text/javascript"
+          "text/javascript",
         );
       }
 
       await ffmpeg.load(loadOpts);
       console.log(
-        `[ffmpeg] iso:${window.crossOriginIsolated} | using: ${subdir}`
+        `[ffmpeg] iso:${window.crossOriginIsolated} | using: ${subdir}`,
       );
     }
 
@@ -98,7 +98,7 @@ async function ensureFFmpeg() {
 
 async function wavBlobToMp3(
   wavBlob,
-  { bitrate = "128k", outName = "out.mp3" } = {}
+  { bitrate = "128k", outName = "out.mp3" } = {},
 ) {
   const ffmpeg = await ensureFFmpeg();
   if (!ffmpeg) throw new Error("FFmpeg not available (SSR?)");
@@ -388,7 +388,7 @@ const Recording = () => {
 
   const [filename, setFilename] = React.useState("");
   const [liveTranscript, setLiveTranscript] = React.useState("");
-  const [turns, setTurns] = React.useState({}); // { [turn_order]: { text, formatted } }
+  const [turns, setTurns] = React.useState({}); // { [turn_order]: { text, formatted, speaker } }
   const [transcript, setTranscript] = React.useState("");
   const [isTranscribing, setIsTranscribing] = React.useState(false);
   const [time, setTime] = React.useState(0);
@@ -399,11 +399,11 @@ const Recording = () => {
   const intervalIdRef = React.useRef(null);
   const dispatch = useDispatch();
   const recordingList = useSelector(
-    (state) => state.recordingReducer.recordingList
+    (state) => state.recordingReducer.recordingList,
   );
 
   const isRecording = useSelector(
-    (state) => state.recordingReducer.isRecording
+    (state) => state.recordingReducer.isRecording,
   );
   const recordURI = useSelector((state) => state.recordingReducer.recordURI);
 
@@ -561,9 +561,11 @@ const Recording = () => {
         sample_rate: "16000",
         format_turns: "true",
         token,
+        speech_model: "u3-rt-pro",
+        speaker_labels: true,
       });
       window.socket = new WebSocket(
-        `wss://streaming.assemblyai.com/v3/ws?${params}`
+        `wss://streaming.assemblyai.com/v3/ws?${params}`,
       );
       window.socket.binaryType = "arraybuffer";
     }
@@ -573,32 +575,42 @@ const Recording = () => {
         const data = JSON.parse(message.data);
         if (data.type === "Begin") return;
         if (data.type === "Turn") {
+          const transcript = data.transcript || "";
+          const formatted = data.turn_is_formatted;
+          const speakerLabel = data.speaker_label; // Extract speaker label (e.g., "A", "B", "C")
+
           // Show live partial for current utterance
           if (!data.end_of_turn) {
-            setInterim(
-              typeof data.transcript === "string" ? data.transcript : ""
-            );
+            setInterim(transcript);
             return;
           }
+
           // Commit on endpoint; prefer formatted if present
           const order = Number(data.turn_order ?? 0);
-          const text =
-            typeof data.transcript === "string" ? data.transcript : "";
-          const formatted = !!data.turn_is_formatted;
 
           setTurns((prev) => {
             const next = { ...prev };
             const curr = next[order];
             // upgrade/insert: if we don't have it yet, or we now have a formatted one
             if (!curr || (formatted && !curr.formatted)) {
-              next[order] = { text, formatted };
+              next[order] = {
+                text: transcript,
+                formatted,
+                speaker: speakerLabel,
+              };
             }
-            // rebuild the display string from ordered turns
+            // rebuild the display string from ordered turns with speaker labels
             const joined = Object.keys(next)
               .map((k) => Number(k))
               .sort((a, b) => a - b)
-              .map((k) => next[k].text)
-              .join("\n")
+              .map((k) => {
+                const turn = next[k];
+                // Only add speaker label if speaker info exists
+                return turn.speaker
+                  ? `Speaker ${turn.speaker}: ${turn.text}`
+                  : turn.text;
+              })
+              .join("\n\n")
               .trim();
             setLiveTranscript(joined);
             return next;
@@ -745,7 +757,7 @@ const Recording = () => {
       const customerUUID = customer?.id;
       if (!customerUUID) {
         throw new Error(
-          "Customer ID not found. Please ensure you have an active subscription."
+          "Customer ID not found. Please ensure you have an active subscription.",
         );
       }
 
