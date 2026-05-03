@@ -273,90 +273,178 @@ export default function AudioPlayer() {
               id="transcriptPane"
               className="u-card"
               style={{
-                padding: 16,
+                padding: 28,
                 display: "flex",
                 flexDirection: "column",
-                height: "800px",
+                backgroundColor: "var(--bg-800)",
+                border: "1px solid var(--muted-600)",
+                borderRadius: 36,
               }}
             >
               {isAudioSelected ? (
                 <>
-                  <h3 style={{ marginBottom: 8, fontWeight: 800 }}>
-                    {sound?.file_name}
-                  </h3>
-                  <div className="u-hr" />
-                  <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
-                    <button
-                      type="button"
-                      className="u-pill btn-muted"
-                      onClick={() => goEditFile(sound)}
-                      style={{
-                        backgroundColor: "transparent",
-                        borderColor: "var(--muted-600)",
-                        borderRadius: "50px",
-                        padding: "8px 24px",
-                      }}
-                    >
-                      <span style={{ color: "var(--text-300)" }}>
-                        Edit filename & transcript
-                      </span>
-                    </button>
-                    {/* hiding this for now. summary displayed screws up height of control panel */}
-                    {/*<button
-                      type="button"
-                      className="u-pill btn-primary"
-                      onClick={() => getSummary(sound.full_transcript)}
-                      style={{
-                        backgroundColor: "rgba(245,184,61,0.12)",
-                        borderColor: "var(--accent-400)",
-                        borderRadius: "50px",
-                        padding: "8px 24px",
-                      }}
-                    >
-                      <span style={{ color: "var(--accent-400)" }}>
-                        Summary
-                      </span>
-                    </button>*/}
-                  </div>
-
-                  <textarea
-                    readOnly
-                    value={sound?.full_transcript || "No transcript available."}
+                  <div
                     style={{
-                      flex: "0 0 320px",
                       width: "100%",
-                      height: "320px",
-                      maxHeight: "320px",
-                      overflowY: "auto",
-                      whiteSpace: "pre-wrap",
-                      color: "var(--text-100)",
-                      lineHeight: 1.6,
-                      marginTop: 16,
-                      padding: "18px",
                       backgroundColor: "var(--bg-700)",
                       borderRadius: "24px",
                       border: "1px solid var(--muted-600)",
-                      resize: "none",
-                      fontFamily: "inherit",
-                      fontSize: "15px",
-                      textAlign: "center",
-                    }}
-                  />
-                  <a
-                    onClick={copyTranscript}
-                    style={{
-                      display: "inline-block",
-                      marginTop: "var(--space-2)",
-                      marginLeft: "var(--space-2)",
-                      fontSize: "11px",
-                      color: "var(--text-400)",
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      fontFamily: "var(--font-family)",
+                      padding: "18px 18px 20px",
                     }}
                   >
-                    copy transcript
-                  </a>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: 18,
+                      }}
+                    >
+                      <h2
+                        style={{
+                          margin: 0,
+                          fontSize: 22,
+                          fontWeight: 800,
+                          color: "var(--text-100)",
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
+                        Transcript
+                      </h2>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="u-pill btn-muted"
+                          onClick={() => goEditFile(sound)}
+                          style={{
+                            backgroundColor: "var(--bg-800)",
+                            borderColor: "var(--muted-600)",
+                            borderRadius: "50px",
+                            padding: "8px 18px",
+                            color: "var(--text-100)",
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 8,
+                            }}
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M12 20h9" />
+                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                            </svg>
+                            Edit
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="u-pill btn-muted"
+                          onClick={copyTranscript}
+                          style={{
+                            backgroundColor: "var(--bg-800)",
+                            borderColor: "var(--muted-600)",
+                            borderRadius: "50px",
+                            padding: "8px 18px",
+                            color: "var(--text-100)",
+                          }}
+                        >
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 8,
+                            }}
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect x="9" y="9" width="13" height="13" rx="2" />
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            Copy
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <textarea
+                      readOnly
+                      value={
+                        sound?.full_transcript || "No transcript available."
+                      }
+                      style={{
+                        width: "100%",
+                        height: "260px",
+                        overflowY: "auto",
+                        whiteSpace: "pre-wrap",
+                        color: "var(--text-100)",
+                        lineHeight: 1.65,
+                        marginTop: 0,
+                        padding: "0 8px 4px",
+                        backgroundColor: "transparent",
+                        borderRadius: 0,
+                        border: "none",
+                        resize: "none",
+                        fontFamily: "inherit",
+                        fontSize: 16,
+                        textAlign: "center",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ margin: "26px 0 18px", textAlign: "center" }}>
+                    <h2
+                      style={{
+                        margin: 0,
+                        fontSize: 32,
+                        fontWeight: 800,
+                        color: "var(--text-100)",
+                        letterSpacing: "-0.03em",
+                      }}
+                    >
+                      {sound?.file_name}
+                    </h2>
+
+                    <p
+                      style={{
+                        margin: "8px 0 0",
+                        fontSize: 20,
+                        color: "var(--text-300)",
+                        fontWeight: 400,
+                      }}
+                    >
+                      {sound?.file_name?.toLowerCase().includes("call")
+                        ? "Phone recording"
+                        : "Mic recording"}
+                    </p>
+                  </div>
 
                   {/* summary takes up the height space of control panel and shrinks transcript. messed up*/}
                   {/*summary && (
@@ -367,7 +455,7 @@ export default function AudioPlayer() {
 
                   <div
                     className="audioplayer-body"
-                    style={{ marginTop: "auto", paddingTop: 16 }}
+                    style={{ marginTop: 22, paddingTop: 0 }}
                   >
                     <div className="audioplayer-container">
                       <audio
@@ -474,22 +562,22 @@ export default function AudioPlayer() {
                   readOnly
                   value={sound?.full_transcript || "No transcript available."}
                   style={{
-                    flex: 1,
                     width: "100%",
-                    height: "800px",
-                    maxHeight: "800px",
+                    height: view === "split" ? "320px" : "520px",
                     overflowY: "auto",
                     whiteSpace: "pre-wrap",
-                    color: "var(--muted)",
-                    lineHeight: 1.7,
-                    marginTop: 12,
-                    padding: "15px",
-                    backgroundColor: "var(--muted-100)",
-                    borderRadius: "8px",
-                    border: "1px solid var(--muted-300)",
+                    color: "var(--text-100)",
+                    lineHeight: 1.65,
+                    marginTop: 16,
+                    padding: "22px 24px",
+                    backgroundColor: "var(--bg-700)",
+                    borderRadius: "24px",
+                    border: "1px solid var(--muted-600)",
                     resize: "none",
                     fontFamily: "inherit",
-                    fontSize: "inherit",
+                    fontSize: 16,
+                    textAlign: "center",
+                    outline: "none",
                   }}
                 />
                 <a
@@ -517,7 +605,7 @@ export default function AudioPlayer() {
 
                 <div
                   className="audioplayer-body"
-                  style={{ marginTop: "auto", paddingTop: 16 }}
+                  style={{ marginTop: 22, paddingTop: 0 }}
                 >
                   <div className="audioplayer-container">
                     <audio
