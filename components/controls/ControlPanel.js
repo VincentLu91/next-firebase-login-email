@@ -73,14 +73,16 @@ export default function ControlPanel({
 
   return (
     <div className="cp">
-      <div>
-        <button className="pill" onClick={() => clampSeek(-10)}>
-          ⟲ 10s
+      <div className="controlsRow">
+        <button
+          className="iconBtn"
+          onClick={() => clampSeek(-10)}
+          aria-label="Rewind 10 seconds"
+        >
+          <span className="skipIcon">↺</span>
+          <span className="skipText">10</span>
         </button>
-      </div>
 
-      <div className="times">
-        <span className="time">{t(effectiveTime)}</span>
         <button
           className={`playBtn ${isPlaying ? "on" : ""}`}
           onClick={play}
@@ -95,57 +97,81 @@ export default function ControlPanel({
             <span className="playIcon" aria-hidden="true" />
           )}
         </button>
-        <span className="time">{t(effectiveDuration)}</span>
+
+        <button
+          className="iconBtn"
+          onClick={() => clampSeek(10)}
+          aria-label="Forward 10 seconds"
+        >
+          <span className="skipText">10</span>
+          <span className="skipIcon">↻</span>
+        </button>
       </div>
 
-      <div className="rightTools">
-        <button className="pill" onClick={() => clampSeek(10)}>
-          10s ⟳
-        </button>
+      <div className="timeRow">
+        <span className="time">{t(effectiveTime)}</span>
+        <span className="time">{t(effectiveDuration)}</span>
       </div>
 
       <style jsx>{`
         .cp {
           width: 100%;
-          display: grid;
-          grid-template-columns: 72px 1fr 72px;
-          align-items: center;
-          gap: 18px;
-          padding: 18px 0 4px;
+          padding: 0;
         }
 
-        .times {
+        .controlsRow {
+          width: 100%;
           display: grid;
-          grid-template-columns: 52px 78px 52px;
+          grid-template-columns: 64px 78px 64px;
           align-items: center;
           justify-content: center;
-          gap: 18px;
+          gap: 72px;
+          margin-bottom: 28px;
         }
 
-        .time {
-          font-variant-numeric: tabular-nums;
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--text-200);
-          text-align: center;
-          min-width: 52px;
-          font-family: var(--font-family);
+        .iconBtn {
+          width: 64px;
+          height: 48px;
+          border: none;
+          background: transparent;
+          color: var(--text-100);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          padding: 0;
+          cursor: pointer;
+          transition: var(--transition-base);
+          opacity: 0.95;
+        }
+
+        .iconBtn:hover {
+          opacity: 1;
+          transform: scale(1.03);
+        }
+
+        .skipIcon {
+          font-size: 26px;
+          line-height: 1;
+        }
+
+        .skipText {
+          font-size: 12px;
+          font-weight: 700;
+          line-height: 1;
         }
 
         .playBtn {
           width: 78px;
           height: 78px;
           border-radius: 999px;
-          border: 1px solid var(--muted-600);
+          border: none;
           background: var(--accent-600);
           color: var(--text-100);
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 0;
-          font-size: 24px;
-          font-weight: 800;
-          line-height: 1;
           cursor: pointer;
           transition: var(--transition-base);
           box-shadow: none;
@@ -158,60 +184,45 @@ export default function ControlPanel({
 
         .playBtn.on {
           background: var(--accent-600);
-          color: var(--text-100);
         }
 
         .playIcon {
           width: 0;
           height: 0;
-          border-top: 13px solid transparent;
-          border-bottom: 13px solid transparent;
-          border-left: 20px solid var(--text-100);
-          transform: translateX(3px);
+          border-top: 15px solid transparent;
+          border-bottom: 15px solid transparent;
+          border-left: 24px solid var(--text-100);
+          transform: translateX(4px);
         }
 
         .pauseIcon {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 7px;
+          gap: 8px;
         }
 
         .pauseIcon span {
-          width: 7px;
-          height: 28px;
+          width: 8px;
+          height: 30px;
           border-radius: 999px;
           background: var(--text-100);
         }
 
-        .pill {
-          width: 48px !important;
-          height: 48px;
-          border-radius: 999px;
-          border: 1px solid transparent;
-          background: transparent;
+        .timeRow {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 4px;
+        }
+
+        .time {
+          font-size: 13px;
+          font-weight: 600;
           color: var(--text-200);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0;
-          font-size: 12px;
-          font-weight: 700;
+          font-variant-numeric: tabular-nums;
           font-family: var(--font-family);
-          cursor: pointer;
-          transition: var(--transition-base);
-        }
-
-        .pill:hover {
-          background: var(--bg-700);
-          border-color: var(--muted-600);
-          color: var(--text-100);
-        }
-
-        .rightTools {
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
         }
       `}</style>
     </div>

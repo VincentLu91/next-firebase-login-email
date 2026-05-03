@@ -63,7 +63,7 @@ export default function AudioPlayer() {
     router.replace(
       { pathname: router.pathname, query: { ...router.query, view: v } },
       undefined,
-      { shallow: true }
+      { shallow: true },
     );
   };
 
@@ -154,7 +154,7 @@ export default function AudioPlayer() {
     const rawSummary = await axios.post(
       "/api/cohere_llm?prompt=" +
         "generate a summary for the following transcript: " +
-        transcript
+        transcript,
     );
     setSummary(rawSummary.data.text.trim());
   };
@@ -323,22 +323,23 @@ export default function AudioPlayer() {
                     readOnly
                     value={sound?.full_transcript || "No transcript available."}
                     style={{
-                      flex: 1,
+                      flex: "0 0 320px",
                       width: "100%",
-                      height: "800px",
-                      maxHeight: "800px",
+                      height: "320px",
+                      maxHeight: "320px",
                       overflowY: "auto",
                       whiteSpace: "pre-wrap",
-                      color: "var(--muted)",
-                      lineHeight: 1.7,
-                      marginTop: 12,
-                      padding: "15px",
-                      backgroundColor: "var(--muted-100)",
-                      borderRadius: "8px",
-                      border: "1px solid var(--muted-300)",
+                      color: "var(--text-100)",
+                      lineHeight: 1.6,
+                      marginTop: 16,
+                      padding: "18px",
+                      backgroundColor: "var(--bg-700)",
+                      borderRadius: "24px",
+                      border: "1px solid var(--muted-600)",
                       resize: "none",
                       fontFamily: "inherit",
-                      fontSize: "inherit",
+                      fontSize: "15px",
+                      textAlign: "center",
                     }}
                   />
                   <a
@@ -369,7 +370,6 @@ export default function AudioPlayer() {
                     style={{ marginTop: "auto", paddingTop: 16 }}
                   >
                     <div className="audioplayer-container">
-                      <Slider onChange={onChange} percentage={percentage} />
                       <audio
                         ref={audioRef}
                         crossOrigin="anonymous"
@@ -393,6 +393,7 @@ export default function AudioPlayer() {
                         currentTime={currentTime}
                         audioRef={audioRef}
                       />
+                      <Slider onChange={onChange} percentage={percentage} />
                     </div>
                   </div>
                 </>
@@ -519,7 +520,6 @@ export default function AudioPlayer() {
                   style={{ marginTop: "auto", paddingTop: 16 }}
                 >
                   <div className="audioplayer-container">
-                    <Slider onChange={onChange} percentage={percentage} />
                     <audio
                       ref={audioRef}
                       crossOrigin="anonymous"
@@ -543,6 +543,7 @@ export default function AudioPlayer() {
                       currentTime={currentTime}
                       audioRef={audioRef}
                     />
+                    <Slider onChange={onChange} percentage={percentage} />
                   </div>
                 </div>
               </>
