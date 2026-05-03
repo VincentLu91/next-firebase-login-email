@@ -11,22 +11,17 @@ export default css.global`
 
   .audioplayer-container {
     width: 100%;
-    max-width: 920px;
+    max-width: 100%;
     margin: 0 auto;
-    background: radial-gradient(
-        circle at top left,
-        rgba(167, 139, 250, 0.16),
-        transparent 34%
-      ),
-      linear-gradient(180deg, var(--bg-700), var(--bg-800));
-    border: 1px solid var(--muted-600);
-    border-radius: 24px;
-    padding: 20px;
-    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.26);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
   }
 
   .h1-center-bold {
-    text-align: left;
+    text-align: center;
     font-weight: 800;
     font-size: 28px;
     color: var(--text-100);
