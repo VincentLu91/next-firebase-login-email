@@ -72,20 +72,31 @@ a {
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&display=swap");
 
 :root {
-  /* Color tokens - Updated to match reference app */
-  --bg-900: #25262d; /* page background */
-  --bg-800: #212327; /* elevated panels */
-  --bg-700: #383b44; /* cards/rows */
-  --text-100: #ffffff; /* primary text */
-  --text-300: rgba(255, 255, 255, 0.64); /* secondary text */
-  --muted-600: rgba(255, 255, 255, 0.08); /* borders/dividers */
-  --accent-400: #ffa726; /* accent color */
-  --accent-500: #f5b83d; /* accent hover */
-  --accent-600: #e5a935; /* active/pressed */
-  --success: #22c55e;
+  /* Color tokens - aligned with Expo app */
+  --bg-900: #202033;
+  --bg-800: #2b2c3f;
+  --bg-700: #34364a;
+  --bg-650: #3d4054;
+
+  --text-100: #f8f8fc;
+  --text-200: #c9cad8;
+  --text-300: #8e90a3;
+  --text-400: #8e90a3;
+
+  --muted: #8e90a3;
+  --muted-100: #34364a;
+  --muted-300: rgba(255, 255, 255, 0.08);
+  --muted-600: rgba(255, 255, 255, 0.08);
+
+  --accent-400: #8b5cf6;
+  --accent-500: #a78bfa;
+  --accent-600: #5c4dff;
+  --accent-blue: #4f7cff;
+
+  --success: #34d399;
   --danger: #ef4444;
-  --focus: rgba(245, 184, 61, 0.36);
-  --overlay: rgba(8, 9, 12, 0.5);
+  --focus: rgba(167, 139, 250, 0.32);
+  --overlay: rgba(8, 9, 20, 0.55);
 
   /* Layout */
   --header-height: 56px;
