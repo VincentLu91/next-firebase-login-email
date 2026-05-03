@@ -86,7 +86,14 @@ export default function ControlPanel({
           onClick={play}
           aria-label={isPlaying ? "Pause" : "Play"}
         >
-          {isPlaying ? "❚❚" : "►"}
+          {isPlaying ? (
+            <span className="pauseIcon" aria-hidden="true">
+              <span />
+              <span />
+            </span>
+          ) : (
+            <span className="playIcon" aria-hidden="true" />
+          )}
         </button>
         <span className="time">{t(effectiveDuration)}</span>
       </div>
@@ -99,86 +106,112 @@ export default function ControlPanel({
 
       <style jsx>{`
         .cp {
+          width: 100%;
           display: grid;
-          grid-template-columns: 80px 1fr 80px;
+          grid-template-columns: 72px 1fr 72px;
           align-items: center;
-          gap: var(--space-4);
-          padding: var(--space-4);
+          gap: 18px;
+          padding: 18px 0 4px;
         }
 
         .times {
           display: grid;
-          grid-template-columns: auto 1fr auto;
-          gap: var(--space-3);
+          grid-template-columns: 52px 78px 52px;
           align-items: center;
+          justify-content: center;
+          gap: 18px;
         }
 
         .time {
           font-variant-numeric: tabular-nums;
-          font-size: 12px;
-          color: black;
-          text-align: center;
-          min-width: 48px;
-          font-family: var(--font-family);
+          font-size: 13px;
           font-weight: 600;
-          letter-spacing: -0.1px;
+          color: var(--text-200);
+          text-align: center;
+          min-width: 52px;
+          font-family: var(--font-family);
         }
 
         .playBtn {
+          width: 78px;
+          height: 78px;
+          border-radius: 999px;
           border: 1px solid var(--muted-600);
-          background: var(--bg-700);
-          border-radius: var(--radius-input);
-          padding: var(--space-2);
-          font-weight: 500;
-          font-size: 14px;
-          cursor: pointer;
-          transition: var(--transition-base);
-          width: 44px;
-          height: 44px;
+          background: var(--accent-600);
+          color: var(--text-100);
           display: flex;
           align-items: center;
           justify-content: center;
+          padding: 0;
+          font-size: 24px;
+          font-weight: 800;
           line-height: 1;
-          margin-left: auto;
-          margin-right: auto;
-          color: var(--text-100);
+          cursor: pointer;
+          transition: var(--transition-base);
+          box-shadow: none;
         }
 
         .playBtn:hover {
-          transform: scale(0.98);
-          opacity: 0.92;
+          transform: scale(1.02);
+          opacity: 0.94;
         }
 
         .playBtn.on {
-          background: var(--accent-400);
-          border-color: var(--accent-400);
-          color: #101114;
+          background: var(--accent-600);
+          color: var(--text-100);
+        }
+
+        .playIcon {
+          width: 0;
+          height: 0;
+          border-top: 13px solid transparent;
+          border-bottom: 13px solid transparent;
+          border-left: 20px solid var(--text-100);
+          transform: translateX(3px);
+        }
+
+        .pauseIcon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
+        }
+
+        .pauseIcon span {
+          width: 7px;
+          height: 28px;
+          border-radius: 999px;
+          background: var(--text-100);
         }
 
         .pill {
-          border: 1px solid var(--muted-600);
-          background: var(--bg-700);
-          border-radius: var(--radius-pill);
-          padding: var(--space-2) var(--space-3);
+          width: 48px !important;
+          height: 48px;
+          border-radius: 999px;
+          border: 1px solid transparent;
+          background: transparent;
+          color: var(--text-200);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0;
           font-size: 12px;
-          line-height: 1.1;
+          font-weight: 700;
+          font-family: var(--font-family);
           cursor: pointer;
           transition: var(--transition-base);
-          width: auto !important;
-          color: var(--text-300);
-          font-family: var(--font-family);
-          font-weight: 600;
-          letter-spacing: -0.1px;
         }
 
         .pill:hover {
+          background: var(--bg-700);
+          border-color: var(--muted-600);
           color: var(--text-100);
         }
 
         .rightTools {
           display: flex;
-          gap: var(--space-2);
           justify-content: flex-end;
+          align-items: center;
         }
       `}</style>
     </div>
