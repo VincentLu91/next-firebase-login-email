@@ -242,15 +242,83 @@ export default function EditRecordingFile() {
     }
   };
 
+  const originalName = sound?.file_name || "";
+  const originalTranscript = sound?.full_transcript || "";
+
+  const hasNameChanged = editName !== originalName;
+  const hasTranscriptChanged = editTranscript !== originalTranscript;
+  const hasChanges = hasNameChanged || hasTranscriptChanged;
+
+  const canSaveChanges = hasChanges && editName.trim() && !isLoading;
+
+  const handleCancelEdit = () => {
+    setEditName(originalName);
+    setEditTranscript(originalTranscript);
+    router.push("/audioplayer");
+  };
+
+  const handleSaveChanges = async () => {
+    if (!canSaveChanges) return;
+
+    const idStr = resolveRecordingId();
+    const nameTrimmed = editName.trim();
+
+    if (!idStr) {
+      alert("Invalid recording id.");
+      return;
+    }
+
+    const updates = {};
+
+    if (hasNameChanged) {
+      updates.file_name = nameTrimmed;
+    }
+
+    if (hasTranscriptChanged) {
+      updates.full_transcript = editTranscript;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase
+        .from(tableName)
+        .update(updates)
+        .eq("id", idStr)
+        .select("id,file_name,full_transcript");
+
+      if (error) throw error;
+
+      const row = data?.[0];
+
+      const updatedSound = {
+        ...sound,
+        file_name: row?.file_name ?? nameTrimmed,
+        full_transcript: row?.full_transcript ?? editTranscript,
+      };
+
+      dispatch(setSound(updatedSound));
+      setEditName(updatedSound.file_name);
+      setEditTranscript(updatedSound.full_transcript);
+
+      router.push("/audioplayer");
+    } catch (err) {
+      console.error("Save changes failed:", err);
+      alert(err.message || "Save changes failed.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="page-container">
       <div className="top-bar">
-        <div>
+        {/*<div>
           <h1 className="title">Edit Recording</h1>
           <h2 className="notice">
             For best results, play the recording on Chrome
           </h2>
-        </div>
+        </div>*/}
         <button
           className="back-button"
           onClick={() => router.push("/dashboard")}
@@ -260,7 +328,7 @@ export default function EditRecordingFile() {
       </div>
 
       <div className="main-grid">
-        <div className="card audio-player-card" data-delay="0">
+        {/*<div className="card audio-player-card" data-delay="0">
           <div className="audioplayer-container">
             <Slider percentage={percentage} onChange={onChange} />
             <audio
@@ -288,7 +356,7 @@ export default function EditRecordingFile() {
               audioRef={audioRef}
             />
           </div>
-        </div>
+        </div>*/}
 
         {isAudioSelected ? (
           <>
@@ -304,16 +372,6 @@ export default function EditRecordingFile() {
                 className="textarea filename-textarea"
                 placeholder="Edit the filename..."
               />
-              <div className="action-row">
-                <button
-                  className={`rename-button ${isLoading ? "loading" : ""}`}
-                  onClick={() => onSubmitRenameName(editName)}
-                  disabled={isLoading || !editName?.trim()}
-                  aria-busy={isLoading}
-                >
-                  Rename
-                </button>
-              </div>
             </div>
 
             <div className="card editor-panel" data-delay="120">
@@ -328,15 +386,27 @@ export default function EditRecordingFile() {
                 className="textarea transcript-textarea"
                 placeholder="Edit the transcript"
               />
-              <div className="action-row">
-                <button
-                  className={`primary-button ${isLoading ? "loading" : ""}`}
-                  onClick={() => onSubmitRenameTranscript(editTranscript)}
-                  disabled={isLoading}
-                >
-                  Edit Transcript
-                </button>
-              </div>
+            </div>
+
+            <div className="action-row edit-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={handleCancelEdit}
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className={`primary-button ${isLoading ? "loading" : ""}`}
+                onClick={handleSaveChanges}
+                disabled={!canSaveChanges}
+                aria-busy={isLoading}
+              >
+                Save Changes
+              </button>
             </div>
           </>
         ) : (
@@ -371,10 +441,10 @@ export default function EditRecordingFile() {
           max-width: 1100px;
           margin: 0 auto;
           padding: 24px 20px;
-          background: rgb(17, 24, 39);
+          background: var(--bg-900);
           font-family: Inter, ui-sans-serif, system-ui, -apple-system,
             sans-serif;
-          color: rgb(229, 231, 235);
+          color: var(--text-100);
           line-height: 1.45;
           font-size: 0.875rem;
         }
@@ -390,13 +460,13 @@ export default function EditRecordingFile() {
         .title {
           font-size: 18px;
           font-weight: 600;
-          color: #111827;
+          color: var(--text-100);
           margin: 0;
         }
 
         .notice {
           font-size: 14px;
-          color: #6b7280;
+          color: var(--text-300);
           margin: 0;
         }
 
@@ -426,11 +496,11 @@ export default function EditRecordingFile() {
         }
 
         .card {
-          background: #ffffff;
-          border: 1px solid #eef0f2;
-          border-radius: 16px;
+          background: var(--bg-800);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-card);
           padding: 16px;
-          box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
           animation: fadeUp 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
           opacity: 0;
         }
@@ -448,13 +518,13 @@ export default function EditRecordingFile() {
         }
 
         .card:hover {
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
         }
 
         .audio-player-card :global(.progress-track) {
           height: 6px;
           border-radius: 9999px;
-          background: #e5e7eb;
+          background: var(--bg-700);
           position: relative;
           cursor: pointer;
         }
@@ -462,20 +532,20 @@ export default function EditRecordingFile() {
         .audio-player-card :global(.progress-fill) {
           position: absolute;
           height: 100%;
-          background: #2563eb;
+          background: var(--accent-400);
           border-radius: 9999px;
         }
 
         .audio-player-card :global(.progress-thumb) {
           width: 16px;
           height: 16px;
-          background: #ffffff;
-          border: 2px solid #2563eb;
+          background: var(--text-100);
+          border: 2px solid var(--accent-400);
           border-radius: 50%;
           position: absolute;
           top: 50%;
           transform: translate(-50%, -50%);
-          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
           transition: transform 120ms ease-out;
         }
 
@@ -495,8 +565,8 @@ export default function EditRecordingFile() {
           box-sizing: border-box;
           padding: 24px;
           gap: 16px;
-          background: #1e1f26;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: var(--bg-800);
+          border: 1px solid var(--border);
           font-family: Manrope-Medium, -apple-system, system-ui, sans-serif;
         }
 
@@ -504,15 +574,15 @@ export default function EditRecordingFile() {
           font-size: 24px;
           font-weight: 500;
           margin-bottom: 16px;
-          color: #ffffff;
+          color: var(--text-100);
           font-family: Manrope-Medium, -apple-system, system-ui, sans-serif;
         }
 
         .textarea {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 12px;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-input);
           padding: 16px;
-          background: #2a2b36;
+          background: var(--bg-700);
           width: 100%;
           box-sizing: border-box;
           margin: 0;
@@ -520,24 +590,24 @@ export default function EditRecordingFile() {
           font-family: Manrope-Medium, -apple-system, system-ui, sans-serif;
           font-size: 1.5rem;
           font-weight: 500;
-          color: #ffffff;
-          caret-color: #ffa500;
+          color: var(--text-100);
+          caret-color: var(--accent-400);
           resize: vertical;
           line-height: 1.6;
         }
 
         .textarea::placeholder {
-          color: rgba(255, 255, 255, 0.5);
+          color: var(--text-300);
         }
 
         .textarea::selection {
-          background: rgba(255, 165, 0, 0.3);
+          background: rgba(168, 85, 247, 0.28);
         }
 
         .textarea:focus {
           outline: none;
-          border-color: #ffa500;
-          box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.15);
+          border-color: var(--accent-400);
+          box-shadow: 0 0 0 4px var(--focus);
         }
 
         .filename-textarea {
@@ -569,9 +639,40 @@ export default function EditRecordingFile() {
           }
         }
 
+        .edit-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+          margin-top: 24px;
+        }
+
+        .secondary-button {
+          background: var(--bg-800);
+          color: var(--text-100);
+          padding: 12px 16px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 1rem;
+          border: 1px solid var(--border);
+          min-height: 56px;
+          cursor: pointer;
+          transition: all 180ms ease-out;
+          width: 100%;
+        }
+
+        .secondary-button:hover:not(:disabled) {
+          background: var(--bg-700);
+          transform: translateY(-2px);
+        }
+
+        .secondary-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
         .primary-button {
-          background: #ffa500;
-          color: #000000;
+          background: var(--accent-400);
+          color: var(--bg-900);
           padding: 12px 16px;
           border-radius: 12px;
           font-weight: 600;
@@ -579,15 +680,15 @@ export default function EditRecordingFile() {
           border: 0;
           min-height: 48px;
           cursor: pointer;
-          box-shadow: 0 6px 16px rgba(255, 165, 0, 0.25);
+          box-shadow: 0 6px 16px rgba(168, 85, 247, 0.25);
           transition: all 180ms ease-out;
           width: 100%;
         }
 
         .primary-button:hover:not(:disabled) {
-          background: #ff9000;
+          background: var(--accent-500);
           transform: translateY(-2px);
-          box-shadow: 0 10px 24px rgba(255, 165, 0, 0.3);
+          box-shadow: 0 10px 24px rgba(168, 85, 247, 0.3);
         }
 
         .primary-button:active:not(:disabled) {
@@ -597,7 +698,7 @@ export default function EditRecordingFile() {
 
         .primary-button:focus {
           outline: none;
-          box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.32);
+          box-shadow: 0 0 0 3px var(--focus);
         }
 
         .primary-button:disabled {
@@ -625,8 +726,8 @@ export default function EditRecordingFile() {
         }
 
         .rename-button {
-          background: #ffa500;
-          color: #000000;
+          background: var(--accent-400);
+          color: var(--bg-900);
           padding: 8px 12px;
           border-radius: 10px;
           font-weight: 600;
@@ -635,16 +736,16 @@ export default function EditRecordingFile() {
           min-height: 48px;
           min-width: 132px;
           cursor: pointer;
-          box-shadow: 0 6px 16px rgba(255, 165, 0, 0.25);
+          box-shadow: 0 6px 16px rgba(168, 85, 247, 0.25);
           transition: all 180ms ease-out;
           width: auto;
           align-self: flex-start;
         }
 
         .rename-button:hover:not(:disabled) {
-          background: #ff9000;
+          background: var(--accent-500);
           transform: translateY(-2px);
-          box-shadow: 0 10px 24px rgba(255, 165, 0, 0.3);
+          box-shadow: 0 10px 24px rgba(168, 85, 247, 0.3);
         }
 
         .rename-button:active:not(:disabled) {
@@ -654,7 +755,7 @@ export default function EditRecordingFile() {
 
         .rename-button:focus {
           outline: none;
-          box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.32);
+          box-shadow: 0 0 0 3px var(--focus);
         }
 
         .rename-button:disabled {
