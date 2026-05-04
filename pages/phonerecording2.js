@@ -19,19 +19,72 @@ import { useDispatch, useSelector } from "react-redux";
 /* === STYLE: same look as Recording.js (no logic changes) === */
 const phoneRecordingStyles = `
 :root{
-  --bg:#0b0d12; --panel:#11151d; --muted:#a0a8b8; --text:#e6e8ef;
-  --primary:#2563eb; --primary-600:#1d4ed8; --danger:#ef4444; --danger-600:#dc2626;
-  --ring:rgba(37,99,235,.45); --shadow:0 10px 20px rgba(0,0,0,.25);
-  --radius:14px; --radius-sm:10px;
+
+ --bg:#1f2030;
+ --panel:#2b2c41;
+ --muted:#aaa8bd;
+ --text:#f6f2fb;
+
+ --primary:#4235e8;
+ --primary-600:#382ed2;
+ --danger:#ef4444;
+ --danger-600:#dc2626;
+
+ --ring:rgba(167,132,255,.35);
+ --shadow:none;
+
+ --radius:28px;
+ --radius-sm:18px;
+
 }
 .rec-wrap{min-height:calc(100vh - 80px);background:var(--bg);padding:48px 20px 80px;color:var(--text);}
 .headline{font-size:18px;font-weight:600;letter-spacing:.2px;opacity:.9;text-align:center;margin:0 0 18px;}
 .rec-card{width:100%;max-width:860px;margin:0 auto;background:var(--panel);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
-.rec-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.status,.chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:12px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--muted);}
-.status{text-transform:capitalize;}
-.status.idle{color:var(--muted);} .status.recording{color:#f59e0b;} .status.completed{color:#10b981;}
-.dot{width:10px;height:10px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px rgba(255,255,255,.05) inset;}
+.rec-row{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:14px;
+ flex-wrap:wrap;
+}
+
+.status,
+.chip{
+ display:inline-flex;
+ align-items:center;
+ gap:8px;
+ padding:10px 14px;
+ border-radius:999px;
+ font-size:13px;
+ font-weight:700;
+ border:1px solid rgba(255,255,255,.09);
+ background:rgba(255,255,255,.055);
+ color:var(--muted);
+}
+
+.status{
+ text-transform:capitalize;
+}
+
+.status.idle{
+ color:var(--text);
+}
+
+.status.recording{
+ color:#f6b65b;
+}
+
+.status.completed{
+ color:#7ee0a3;
+}
+
+.dot{
+ width:10px;
+ height:10px;
+ border-radius:50%;
+ background:currentColor;
+ box-shadow:0 0 0 3px rgba(255,255,255,.06) inset;
+}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(239,68,68,.7);transform:scale(1);}70%{box-shadow:0 0 0 10px rgba(239,68,68,0);transform:scale(1.05);}100%{box-shadow:0 0 0 0 rgba(239,68,68,0);transform:scale(1);}}
 .status.recording .dot{background:var(--danger);animation:pulse 1.5s infinite;}
 .btn{appearance:none;border:0;border-radius:12px;padding:12px 18px;font-weight:600;letter-spacing:.2px;cursor:pointer;transition:transform .16s ease,background .2s ease,box-shadow .2s ease;box-shadow:0 6px 14px rgba(0,0,0,.25);color:#fff;}
@@ -40,13 +93,67 @@ const phoneRecordingStyles = `
 .btn-danger{background:var(--danger);} .btn-danger:hover{background:var(--danger-600);}
 .btn-ghost{border:1px solid rgba(255,255,255,.1);background:transparent;color:var(--text);padding:10px 14px;border-radius:var(--radius-sm);font-weight:500;}
 .btn-ghost:hover{background:rgba(255,255,255,.04);}
-.field{display:flex;gap:10px;align-items:center;margin-top:14px;width:100%;}
-.field input[type="text"]{flex:1;min-width:240px;background:rgba(255,255,255,.06);color:var(--text);border:1px solid rgba(255,255,255,.12);padding:12px 14px;border-radius:var(--radius-sm);outline:0;}
-.field input[type="text"]:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--ring);}
-.transcript{margin-top:18px;padding:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius-sm);max-height:42vh;overflow:auto;line-height:1.6;font-size:16px;}
-.PhoneInput{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);padding:8px 10px;max-width:420px;width:100%;}
-.PhoneInput input{flex:1;background:transparent;border:0;outline:0;color:var(--text);font-size:16px;}
-.PhoneInput input::placeholder{color:rgba(230,232,239,.55);}
+.field{
+ display:flex;
+ gap:10px;
+ align-items:center;
+ margin-top:18px;
+ width:100%;
+}
+
+.field input[type="text"]{
+ flex:1;
+ min-width:240px;
+ background:#35364c;
+ color:var(--text);
+ border:1px solid rgba(255,255,255,.09);
+ padding:14px 16px;
+ border-radius:18px;
+ outline:0;
+}
+
+.field input[type="text"]:focus{
+ border-color:rgba(167,132,255,.65);
+ box-shadow:0 0 0 4px var(--ring);
+}
+
+.transcript{
+ margin-top:18px;
+ padding:18px;
+ background:rgba(255,255,255,.03);
+ border:1px solid rgba(255,255,255,.08);
+ border-radius:var(--radius-sm);
+ max-height:42vh;
+ overflow:auto;
+ line-height:1.6;
+ font-size:16px;
+}
+
+.PhoneInput{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ background:#35364c;
+ border:1px solid rgba(255,255,255,.09);
+ border-radius:18px;
+ padding:14px 16px;
+ max-width:420px;
+ width:100%;
+ box-sizing:border-box;
+}
+
+.PhoneInput input{
+ flex:1;
+ background:transparent;
+ border:0;
+ outline:0;
+ color:var(--text);
+ font-size:16px;
+}
+
+.PhoneInput input::placeholder{
+ color:rgba(246,242,251,.55);
+}
 
 /* === INTERACTION HOTFIX: ensure inputs & buttons stay clickable === */
 .rec-wrap,
@@ -161,7 +268,7 @@ const PhoneRecording2 = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const recordingList = useSelector(
-    (state) => state.recordingReducer.recordingList
+    (state) => state.recordingReducer.recordingList,
   );
   const [callRecordingData, setCallRecordingData] = useState(null);
   const [callRecordingInfo, setCallRecordingInfo] = useState(null);
@@ -190,7 +297,7 @@ const PhoneRecording2 = () => {
         console.log("Subscription data:", subscriptionData);
         console.log(
           "Cancel at period end:",
-          subscriptionData?.cancel_at_period_end
+          subscriptionData?.cancel_at_period_end,
         );
 
         // Subscription is active if cancel_at_period_end is FALSE (not cancelled)
@@ -202,7 +309,7 @@ const PhoneRecording2 = () => {
         setHasSubscription(false);
       }
     },
-    [setNumCalls]
+    [setNumCalls],
   );
 
   useEffect(() => {
@@ -261,7 +368,7 @@ const PhoneRecording2 = () => {
             console.log("customer object should be: ", customer?.id);
             if (customer?.id) {
               const response = await axios.get(
-                `/api/calls-token?user=${customer?.id}`
+                `/api/calls-token?user=${customer?.id}`,
               );
               console.log("Calls token response:", response.data);
               setNumCalls(response.data?.data[0]?.num_calls);
@@ -302,7 +409,7 @@ const PhoneRecording2 = () => {
       const res_dial = await axios.get(
         `/api/dialTwilio?to=${encodeURIComponent(to)}&customer_id=${
           customer.id
-        }`
+        }`,
       );
       setRecordingStatus("Recording In Progress...");
       if (res_dial) {
@@ -311,10 +418,11 @@ const PhoneRecording2 = () => {
     } catch (error) {
       console.error(
         "Error making call:",
-        error.response?.data || error.message
+        error.response?.data || error.message,
       );
       alert(
-        "Failed to make call: " + (error.response?.data?.error || error.message)
+        "Failed to make call: " +
+          (error.response?.data?.error || error.message),
       );
     }
   };
@@ -365,7 +473,7 @@ const PhoneRecording2 = () => {
           .format("mm:ss");
       }
       const recordingdate = moment(callRecordingInfo.recordingStartTime).format(
-        "MMMM Do YYYY"
+        "MMMM Do YYYY",
       );
       const newRecordingList = [...recordingList];
       newRecordingList.push({
@@ -380,12 +488,12 @@ const PhoneRecording2 = () => {
       console.log("In Phone Recording, currentUser is: ", customer);
       console.log(
         "In Phone Recording, newRecordingList is: ",
-        newRecordingList
+        newRecordingList,
       );
 
       const RecordingEndTime = addDurationToTimestamp(
         callRecordingInfo.recordingStartTime,
-        callRecordingInfo.recordingDuration
+        callRecordingInfo.recordingDuration,
       );
 
       const insertCallResponse = await supabase
