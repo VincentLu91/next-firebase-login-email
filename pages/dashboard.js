@@ -24,6 +24,7 @@ const Dashboard = () => {
   const [pendingDelete, setPendingDelete] = useState(null);
 
   const [expandedId, setExpandedId] = useState(null);
+  const [deletingRowId, setDeletingRowId] = useState(null);
 
   const searchInputRef = useRef(null);
 
@@ -45,13 +46,13 @@ const Dashboard = () => {
           supabase
             .from("mic_recordings")
             .select(
-              "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at"
+              "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at",
             )
             .eq("customer_id", customer.id),
           supabase
             .from("call_recordings")
             .select(
-              "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at"
+              "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at",
             )
             .eq("customer_id", customer.id),
         ]);
@@ -69,7 +70,7 @@ const Dashboard = () => {
         setLoading(false);
       }
     },
-    [supabase]
+    [supabase],
   );
 
   // Fetch recordings once customer is available
@@ -124,7 +125,7 @@ const Dashboard = () => {
         .eq("original_file_name", original_file_name);
       console.log(
         "callChunkDeleteInfo ID is: ",
-        callChunkDeleteInfo.data[0].id
+        callChunkDeleteInfo.data[0].id,
       );
       // delete from chunks table first since it depends on `call_recording` table
       await supabase
@@ -148,6 +149,7 @@ const Dashboard = () => {
     setPendingDelete({
       original_file_name: item.original_file_name,
       file_name: item.file_name,
+      rowId: getRowId(item),
     });
     setShowConfirm(true);
   }
@@ -158,10 +160,14 @@ const Dashboard = () => {
 
     await deleteRecording(original_file_name, customer);
 
-    // Optimistically remove from UI without router reload
-    setCloudRecordingList((prev) =>
-      prev.filter((r) => r.original_file_name !== original_file_name)
-    );
+    setDeletingRowId(pendingDelete.rowId);
+
+    setTimeout(() => {
+      setCloudRecordingList((prev) =>
+        prev.filter((r) => r.original_file_name !== original_file_name),
+      );
+      setDeletingRowId(null);
+    }, 240);
 
     setShowConfirm(false);
     setPendingDelete(null);
@@ -190,7 +196,7 @@ const Dashboard = () => {
     return cloudRecordingList.filter(
       (item) =>
         item.file_name?.toLowerCase().includes(q) ||
-        item.full_transcript?.toLowerCase().includes(q)
+        item.full_transcript?.toLowerCase().includes(q),
     );
   }, [cloudRecordingList, search]);
 
@@ -212,7 +218,7 @@ const Dashboard = () => {
 
     // Get month name (full name)
     const month = new Intl.DateTimeFormat("en-US", { month: "long" }).format(
-      date
+      date,
     );
 
     // Get day of the month
@@ -294,6 +300,31 @@ const Dashboard = () => {
     }
   }
 
+  function getRecordingType(item) {
+    const name = `${item.file_name || ""} ${
+      item.original_file_name || ""
+    }`.toLowerCase();
+    return name.includes("call") || name.includes("phone")
+      ? "Phone call"
+      : "Mic recording";
+  }
+
+  function formatCardDate(timestamp) {
+    if (!timestamp) return "—";
+
+    return new Intl.DateTimeFormat("en-CA", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(timestamp));
+  }
+
+  function hasTranscript(item) {
+    return Boolean(item.full_transcript && item.full_transcript.trim());
+  }
+
   return (
     <div className="page">
       <header className="header">
@@ -348,121 +379,83 @@ const Dashboard = () => {
         </div>
       ) : (
         <>
-          <table className="table" role="grid">
-            <colgroup>
-              <col className="col-file" />
-              <col className="col-date" />
-              <col className="col-duration" />
-              <col className="col-actions" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>File</th>
-                <th>Date</th>
-                <th>Duration</th>
-                <th className="actionsHeader">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentItems.map((item) => {
-                const id = getRowId(item);
-                const isOpen = expandedId === id;
-                return (
-                  <React.Fragment key={id}>
-                    <tr
-                      tabIndex={0}
-                      onKeyDown={(e) => handleRowKeyDown(e, item)}
-                      aria-expanded={isOpen}
+          <div className="recordingCards">
+            {currentItems.map((item) => {
+              const id = getRowId(item);
+              const isDeleting = deletingRowId === id;
+
+              return (
+                <article
+                  key={id}
+                  className={`recordingCard ${isDeleting ? "deleting" : ""}`}
+                  onKeyDown={(e) => handleRowKeyDown(e, item)}
+                >
+                  <button
+                    type="button"
+                    className="recordingCardMain"
+                    onClick={() => viewContent(item)}
+                    aria-label={`Open ${item.file_name}`}
+                  >
+                    <div className="recordingCardBody">
+                      <h3 className="recordingTitle">{item.file_name}</h3>
+
+                      <p className="recordingDate">
+                        {formatCardDate(item.created_at)}
+                      </p>
+
+                      <span className="recordingType">
+                        {getRecordingType(item)}
+                      </span>
+
+                      <div className="recordingMeta">
+                        <span className="durationText">
+                          {formatDuration(item.duration)}
+                        </span>
+
+                        <span
+                          className={`transcriptStatus ${
+                            hasTranscript(item) ? "ready" : "missing"
+                          }`}
+                        >
+                          {hasTranscript(item)
+                            ? "Transcript ready"
+                            : "No transcript"}
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="deleteIconButton"
+                    aria-label={`Delete ${item.file_name}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      requestDelete(item);
+                    }}
+                  >
+                    <svg
+                      width="26"
+                      height="26"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
                     >
-                      <td className="file">
-                        <div className="fileCell">
-                          <button
-                            className="rowToggle"
-                            aria-label={
-                              isOpen
-                                ? "Collapse transcript"
-                                : "Expand transcript"
-                            }
-                            aria-pressed={isOpen}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleExpand(item);
-                            }}
-                          >
-                            <span
-                              className={`chev ${isOpen ? "open" : ""}`}
-                              aria-hidden="true"
-                            >
-                              <svg
-                                width="12"
-                                height="12"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path d="M7 5l6 5-6 5V5z" />
-                              </svg>
-                            </span>
-                          </button>
-
-                          {/* This is the only new bit you need */}
-                          <span className="fileName" title={item.file_name}>
-                            {item.file_name}
-                          </span>
-                        </div>
-                      </td>
-
-                      <td>{dateString(item.created_at)}</td>
-                      <td>{formatDuration(item.duration)}</td>
-                      <td className="actionsCell">
-                        <div className="actionsStack">
-                          <button
-                            type="button"
-                            className="btn-primary actionBtn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              viewContent(item);
-                            }}
-                          >
-                            View
-                          </button>
-                          <button
-                            type="button"
-                            className="btn-danger actionBtn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              requestDelete(item);
-                            }}
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-
-                    {isOpen && (
-                      <tr className="expand">
-                        <td colSpan={4}>
-                          <div className="transcript">
-                            {item.full_transcript
-                              ? item.full_transcript
-                              : "No transcript available."}
-                          </div>
-                          <div className="expandActions">
-                            <button
-                              className="link"
-                              onClick={() => viewContent(item)}
-                            >
-                              Open full view →
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
+                      <path d="M3 6h18" />
+                      <path d="M8 6V4h8v2" />
+                      <path d="M19 6l-1 14H6L5 6" />
+                      <path d="M10 11v6" />
+                      <path d="M14 11v6" />
+                    </svg>
+                  </button>
+                </article>
+              );
+            })}
+          </div>
 
           <footer className="pager">
             <button
@@ -848,6 +841,160 @@ const Dashboard = () => {
         .ctaRow a:hover {
           background: var(--bg-800);
           color: var(--text-100);
+        }
+
+        .recordingCards {
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          margin-top: 18px;
+        }
+
+        .recordingCard {
+          position: relative;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-card);
+          background: var(--bg-800);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+          overflow: hidden;
+          transition: opacity 220ms ease, transform 220ms ease,
+            max-height 220ms ease, margin 220ms ease, padding 220ms ease,
+            border-color 180ms ease;
+          max-height: 140px;
+        }
+
+        .recordingCard:hover {
+          transform: translateY(-1px);
+          border-color: rgba(168, 85, 247, 0.35);
+        }
+
+        .recordingCard.deleting {
+          opacity: 0;
+          transform: translateX(20px) scale(0.98);
+          max-height: 0;
+          margin-top: -16px;
+          border-color: transparent;
+          pointer-events: none;
+        }
+
+        .recordingCardMain {
+          width: 100%;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          text-align: left;
+          padding: 20px 24px;
+          cursor: pointer;
+        }
+
+        .recordingTitle {
+          margin: 0;
+          max-width: calc(100% - 70px);
+          color: var(--text-100);
+          font-size: 18px;
+          font-weight: 700;
+          letter-spacing: -0.01em;
+        }
+
+        .recordingDate {
+          margin: 6px 0 10px;
+          color: var(--text-300);
+          font-size: 14px;
+        }
+
+        .recordingType {
+          display: inline-flex;
+          align-items: center;
+          border-radius: var(--radius-pill);
+          background: var(--bg-700);
+          color: var(--accent-400);
+          padding: 5px 12px;
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .recordingMeta {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          margin-top: 12px;
+        }
+
+        .durationText {
+          color: var(--text-100);
+          font-size: 15px;
+          font-weight: 500;
+        }
+
+        .transcriptStatus {
+          font-size: 14px;
+          font-weight: 700;
+        }
+
+        .transcriptStatus.ready {
+          color: #34d399;
+        }
+
+        .transcriptStatus.missing {
+          color: var(--text-300);
+        }
+
+        .deleteIconButton {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          width: 44px;
+          height: 44px;
+          display: grid;
+          place-items: center;
+          border-radius: 999px;
+          border: 1px solid rgba(239, 68, 68, 0.28);
+          background: rgba(255, 255, 255, 0.04);
+          color: #ef4444;
+          cursor: pointer;
+          transition: transform 160ms ease, background 160ms ease,
+            border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .deleteIconButton:hover {
+          transform: scale(1.05);
+          background: rgba(239, 68, 68, 0.1);
+          border-color: rgba(239, 68, 68, 0.55);
+          box-shadow: 0 8px 20px rgba(239, 68, 68, 0.14);
+        }
+
+        .deleteIconButton:active {
+          transform: scale(0.96);
+        }
+
+        @media (max-width: 700px) {
+          .recordingCardMain {
+            padding: 16px 18px;
+          }
+
+          .recordingTitle {
+            font-size: 16px;
+            max-width: calc(100% - 60px);
+          }
+
+          .recordingDate,
+          .recordingType {
+            font-size: 13px;
+          }
+
+          .recordingMeta {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 10px;
+          }
+
+          .deleteIconButton {
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+          }
         }
       `}</style>
     </div>
