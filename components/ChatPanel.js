@@ -10,6 +10,8 @@ export default function ChatPanel({ sound, soundUrl }) {
   const [typing, setTyping] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [copiedMessageIndex, setCopiedMessageIndex] = useState(null);
+  const [pressedCopyIndex, setPressedCopyIndex] = useState(null);
   const endRef = useRef(null);
 
   const transcript = sound?.full_transcript || "";
@@ -39,7 +41,7 @@ export default function ChatPanel({ sound, soundUrl }) {
       (data || []).map((m) => ({
         message: m.message,
         sender: m.sender === "User" ? "user" : "ChatGPT",
-      }))
+      })),
     );
   };
 
@@ -141,257 +143,290 @@ export default function ChatPanel({ sound, soundUrl }) {
   return (
     <div
       style={{
-        display: "grid",
-        gridTemplateRows: "1fr auto",
-        height: "600px", // Leave room for input area which is ~100px
+        height: "100%",
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+        border: "1px solid var(--muted-600)",
+        borderRadius: "28px",
+        background: "var(--bg-800)",
+        padding: "24px",
       }}
     >
-      <div style={{ overflowY: "auto", padding: "var(--space-4)" }}>
+      <div style={{ marginBottom: 24 }}>
+        <h2
+          style={{
+            margin: 0,
+            color: "var(--text-100)",
+            fontSize: 28,
+            fontWeight: 800,
+            letterSpacing: "-0.04em",
+          }}
+        >
+          AI Chat
+        </h2>
+
+        <p
+          style={{
+            margin: "6px 0 0",
+            color: "var(--text-300)",
+            fontSize: 16,
+            fontWeight: 500,
+          }}
+        >
+          Ask questions about this recording
+        </p>
+      </div>
+
+      <div
+        style={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
+          paddingRight: 6,
+        }}
+      >
         {messages.length === 0 && (
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: "200px",
-              gap: "var(--space-3)",
+              alignItems: "flex-start",
+              gap: 16,
             }}
           >
-            <div
+            <button
+              type="button"
+              onClick={() => setInputValue("Summarize this recording")}
               style={{
-                display: "flex",
-                gap: "var(--space-3)",
+                padding: "14px 22px",
+                borderRadius: "999px",
+                border: "1px solid var(--muted-600)",
+                background: "var(--bg-700)",
+                color: "var(--text-100)",
+                fontFamily: "var(--font-family)",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "pointer",
               }}
             >
-              <button
-                onClick={() => setInputValue("Summarize this document")}
-                style={{
-                  padding: "var(--space-3) var(--space-4)",
-                  borderRadius: "var(--radius-full, 24px)",
-                  border: "1px dotted var(--muted-600)",
-                  background: "var(--bg-700)",
-                  color: "var(--text-100)",
-                  fontFamily: "var(--font-family)",
-                  fontSize: "12px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  transition: "var(--transition-base)",
-                  letterSpacing: "-0.1px",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = "var(--bg-600)";
-                  e.target.style.borderColor = "var(--muted-500)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = "var(--bg-700)";
-                  e.target.style.borderColor = "var(--muted-600)";
-                }}
-              >
-                Summarize this document
-              </button>
-              <button
-                onClick={() => setInputValue("To do items")}
-                style={{
-                  padding: "var(--space-3) var(--space-4)",
-                  borderRadius: "var(--radius-full, 24px)",
-                  border: "1px dotted var(--muted-600)",
-                  background: "var(--bg-700)",
-                  color: "var(--text-100)",
-                  fontFamily: "var(--font-family)",
-                  fontSize: "12px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  transition: "var(--transition-base)",
-                  letterSpacing: "-0.1px",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = "var(--bg-600)";
-                  e.target.style.borderColor = "var(--muted-500)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = "var(--bg-700)";
-                  e.target.style.borderColor = "var(--muted-600)";
-                }}
-              >
-                To do items
-              </button>
-            </div>
-            <div>
-              <button
-                onClick={() => setInputValue("last thing speaker said")}
-                style={{
-                  padding: "var(--space-3) var(--space-4)",
-                  borderRadius: "var(--radius-full, 24px)",
-                  border: "1px dotted var(--muted-600)",
-                  background: "var(--bg-700)",
-                  color: "var(--text-100)",
-                  fontFamily: "var(--font-family)",
-                  fontSize: "12px",
-                  fontWeight: 500,
-                  cursor: "pointer",
-                  transition: "var(--transition-base)",
-                  letterSpacing: "-0.1px",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.background = "var(--bg-600)";
-                  e.target.style.borderColor = "var(--muted-500)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.background = "var(--bg-700)";
-                  e.target.style.borderColor = "var(--muted-600)";
-                }}
-              >
-                last thing speaker said
-              </button>
-            </div>
+              Summarize this recording
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setInputValue("What are the action items?")}
+              style={{
+                padding: "14px 22px",
+                borderRadius: "999px",
+                border: "1px solid var(--muted-600)",
+                background: "var(--bg-700)",
+                color: "var(--text-100)",
+                fontFamily: "var(--font-family)",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              What are the action items?
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                setInputValue("What was the last important thing said?")
+              }
+              style={{
+                padding: "14px 22px",
+                borderRadius: "999px",
+                border: "1px solid var(--muted-600)",
+                background: "var(--bg-700)",
+                color: "var(--text-100)",
+                fontFamily: "var(--font-family)",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              What was the last important thing said?
+            </button>
           </div>
         )}
+
         {messages.map((m, i) => (
           <div
             key={i}
             style={{
               display: "flex",
               justifyContent: m.sender === "user" ? "flex-end" : "flex-start",
-              marginBottom: "var(--space-3)",
+              marginBottom: 18,
             }}
           >
             <div
               style={{
-                maxWidth: "86%",
+                position: "relative",
+                width: m.sender === "ChatGPT" ? "100%" : "auto",
+                maxWidth: m.sender === "ChatGPT" ? "100%" : "82%",
+                padding: "18px",
+                borderRadius: 24,
+                border:
+                  m.sender === "user"
+                    ? "1px solid var(--accent-400)"
+                    : "1px solid var(--muted-600)",
+                background: m.sender === "user" ? "#3C36D9" : "var(--bg-700)",
+                color: "var(--text-100)",
+                lineHeight: 1.6,
+                fontSize: 15,
+                fontWeight: 500,
               }}
             >
               <div
                 style={{
-                  padding: "var(--space-4)",
-                  borderRadius: "var(--radius-card)",
-                  background:
-                    m.sender === "user"
-                      ? "rgba(245, 184, 61, 0.16)"
-                      : "var(--bg-700)",
-                  color: "var(--text-100)",
-                  fontFamily: "var(--font-family)",
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                  fontWeight: 500,
-                  letterSpacing: "-0.1px",
+                  marginBottom: 6,
+                  color:
+                    m.sender === "user" ? "var(--text-100)" : "var(--text-300)",
+                  fontSize: 13,
+                  fontWeight: 800,
                 }}
               >
-                {m.message}
+                {m.sender === "user" ? "You" : "AI Agent"}
               </div>
+
+              <div>{m.message}</div>
+
               {m.sender === "ChatGPT" && (
-                <a
-                  onClick={() => copyToClipboard(m.message)}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await copyToClipboard(m.message);
+                    setCopiedMessageIndex(i);
+                    setTimeout(() => setCopiedMessageIndex(null), 1200);
+                  }}
+                  onMouseDown={() => setPressedCopyIndex(i)}
+                  onMouseUp={() => setPressedCopyIndex(null)}
+                  onMouseLeave={() => setPressedCopyIndex(null)}
+                  onTouchStart={() => setPressedCopyIndex(i)}
+                  onTouchEnd={() => setPressedCopyIndex(null)}
+                  onTouchCancel={() => setPressedCopyIndex(null)}
                   style={{
-                    display: "inline-block",
-                    marginTop: "var(--space-2)",
-                    marginLeft: "var(--space-4)",
-                    fontSize: "11px",
-                    color: "var(--text-400)",
-                    cursor: "pointer",
-                    textDecoration: "underline",
+                    position: "absolute",
+                    top: 10,
+                    right: 16,
+                    padding: "8px 14px",
+                    borderRadius: "999px",
+                    border: "1px solid var(--muted-600)",
+                    background: "var(--bg-800)",
+                    color: "var(--text-100)",
                     fontFamily: "var(--font-family)",
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    boxShadow:
+                      pressedCopyIndex === i
+                        ? "none"
+                        : "0 8px 18px rgba(0, 0, 0, 0.18)",
+                    transform:
+                      pressedCopyIndex === i
+                        ? "translateY(1px)"
+                        : "translateY(0)",
+                    transition:
+                      "box-shadow 120ms ease, transform 120ms ease, background 120ms ease",
                   }}
                 >
-                  copy
-                </a>
+                  Copy
+                </button>
               )}
             </div>
           </div>
         ))}
+
+        {typing && (
+          <div
+            style={{
+              color: "var(--text-300)",
+              fontSize: 14,
+              fontWeight: 600,
+            }}
+          >
+            Chatbot is thinking...
+          </div>
+        )}
+
         <div ref={endRef} />
       </div>
 
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
-          padding: "var(--space-3)",
-          borderTop: "1px solid var(--muted-600)",
-          background: "var(--bg-800)",
+          gap: 12,
+          alignItems: "center",
+          marginTop: 18,
         }}
       >
-        {typing && (
-          <div
-            style={{
-              fontSize: "12px",
-              color: "var(--text-400)",
-              marginBottom: "var(--space-2)",
-            }}
-          >
-            Chatbot is thinking...
-          </div>
-        )}
-        <div
+        <textarea
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder="Ask about this recording..."
+          rows={1}
           style={{
+            flex: 1,
+            resize: "none",
+            height: 56,
+            padding: "16px 22px",
+            border: "1px solid var(--muted-600)",
+            borderRadius: "24px",
+            background: "var(--bg-700)",
+            color: "var(--text-100)",
+            fontFamily: "var(--font-family)",
+            fontSize: 16,
+            fontWeight: 500,
+            letterSpacing: "-0.1px",
+            outline: "none",
+          }}
+        />
+
+        <button
+          type="button"
+          onClick={send}
+          disabled={typing || !inputValue.trim()}
+          style={{
+            width: 44,
+            height: 44,
             display: "flex",
-            gap: "var(--space-2)",
             alignItems: "center",
+            justifyContent: "center",
+            background: "var(--accent-400)",
+            border: "none",
+            borderRadius: "50%",
+            color: "#101114",
+            cursor: "pointer",
+            transition: "var(--transition-base)",
           }}
         >
-          <textarea
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={onKeyDown}
-            placeholder="Type your message..."
-            rows={1}
-            style={{
-              flex: 1,
-              resize: "none",
-              height: 48,
-              padding: "var(--space-3) var(--space-5)",
-              border: "1px solid var(--muted-600)",
-              borderRadius: "var(--radius-input)",
-              background: "var(--bg-700)",
-              color: "var(--text-100)",
-              fontFamily: "var(--font-family)",
-              fontSize: "14px",
-              fontWeight: 500,
-              letterSpacing: "-0.1px",
-            }}
-          />
-          <button
-            type="button"
-            onClick={send}
-            disabled={typing || !inputValue.trim()}
-            style={{
-              width: 44,
-              height: 44,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "var(--accent-400)",
-              border: "none",
-              borderRadius: "50%",
-              color: "#101114",
-              cursor: "pointer",
-              transition: "var(--transition-base)",
-            }}
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M22 2L11 13"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M22 2L15 22L11 13L2 9L22 2Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
+            <path
+              d="M22 2L11 13"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M22 2L15 22L11 13L2 9L22 2Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
     </div>
   );
