@@ -37,6 +37,7 @@ export default function AudioPlayer() {
   };
 
   const audioRef = useRef();
+  const lastKnownTimeRef = useRef(0);
   const splitPlayerRef = useRef(null);
   const [splitPlayerHeight, setSplitPlayerHeight] = useState(null);
   const router = useRouter();
@@ -93,13 +94,50 @@ export default function AudioPlayer() {
     setDurationSeconds(durationSeconds);
   }
 
+  const handleLoadedMetadata = (e) => {
+    const audio = e.currentTarget;
+    const duration = audio.duration || 0;
+
+    setDurationSeconds(duration);
+
+    const restoreTime = Math.min(lastKnownTimeRef.current || 0, duration || 0);
+
+    if (restoreTime > 0 && Math.abs(audio.currentTime - restoreTime) > 0.5) {
+      audio.currentTime = restoreTime;
+    }
+
+    if (isPlaying) {
+      audio.play().catch((err) => {
+        console.error("Failed to resume audio after view switch:", err);
+        setIsPlaying(false);
+      });
+    }
+  };
+
+  const handleTimeUpdate = (e) => {
+    const audio = e.currentTarget;
+    const t = audio.currentTime || 0;
+    const d = audio.duration || durationSeconds || 1;
+
+    lastKnownTimeRef.current = t;
+    setCurrentTime(t);
+    setPercentage(Number(((t / d) * 100).toFixed(2)));
+  };
+
   const onChange = (e) => {
     const p = Number(e.target.value);
     setPercentage(p);
+
     if (!audioRef.current) return;
+
     const d = audioRef.current.duration || durationSeconds;
-    if (!d) return; // ← guard: avoids jumping to 0
-    audioRef.current.currentTime = (p / 100) * d;
+    if (!d) return;
+
+    const nextTime = (p / 100) * d;
+
+    audioRef.current.currentTime = nextTime;
+    lastKnownTimeRef.current = nextTime;
+    setCurrentTime(nextTime);
   };
 
   const play = () => {
@@ -274,6 +312,18 @@ export default function AudioPlayer() {
           </div>
         </div>
       </div>
+
+      {isAudioSelected && (
+        <audio
+          ref={audioRef}
+          crossOrigin="anonymous"
+          preload="metadata"
+          src={audioUrl || undefined}
+          onLoadedMetadata={handleLoadedMetadata}
+          onTimeUpdate={handleTimeUpdate}
+          style={{ display: "none" }}
+        />
+      )}
 
       {/* Layout container driven by 'view' */}
       {/* Layout (conditional render — no CSS tricks) */}
@@ -482,22 +532,6 @@ export default function AudioPlayer() {
                     style={{ marginTop: 22, paddingTop: 0 }}
                   >
                     <div className="audioplayer-container">
-                      <audio
-                        ref={audioRef}
-                        crossOrigin="anonymous"
-                        preload="metadata"
-                        src={audioUrl || undefined}
-                        onLoadedMetadata={(e) =>
-                          setDurationSeconds(e.currentTarget.duration || 0)
-                        }
-                        onTimeUpdate={(e) => {
-                          const t = e.currentTarget.currentTime || 0;
-                          const d =
-                            e.currentTarget.duration || durationSeconds || 1;
-                          setCurrentTime(t);
-                          setPercentage(Number(((t / d) * 100).toFixed(2)));
-                        }}
-                      />
                       <ControlPanel
                         play={play}
                         isPlaying={isPlaying}
@@ -547,10 +581,17 @@ export default function AudioPlayer() {
             id="transcriptPane"
             className="u-card"
             style={{
-              padding: 16,
+              width: "min(500px, 100%)",
+              margin: "0 auto",
+              padding: 28,
               display: "flex",
               flexDirection: "column",
-              height: "800px",
+              height: "730px",
+              backgroundColor: "var(--bg-800)",
+              border: "1px solid var(--muted-600)",
+              borderRadius: 36,
+              boxSizing: "border-box",
+              overflow: "hidden",
             }}
           >
             {isAudioSelected ? (
@@ -641,22 +682,6 @@ export default function AudioPlayer() {
                   style={{ marginTop: 22, paddingTop: 0 }}
                 >
                   <div className="audioplayer-container">
-                    <audio
-                      ref={audioRef}
-                      crossOrigin="anonymous"
-                      preload="metadata"
-                      src={audioUrl || undefined}
-                      onLoadedMetadata={(e) =>
-                        setDurationSeconds(e.currentTarget.duration || 0)
-                      }
-                      onTimeUpdate={(e) => {
-                        const t = e.currentTarget.currentTime || 0;
-                        const d =
-                          e.currentTarget.duration || durationSeconds || 1;
-                        setCurrentTime(t);
-                        setPercentage(Number(((t / d) * 100).toFixed(2)));
-                      }}
-                    />
                     <ControlPanel
                       play={play}
                       isPlaying={isPlaying}
