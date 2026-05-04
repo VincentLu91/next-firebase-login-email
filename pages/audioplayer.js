@@ -263,7 +263,7 @@ export default function AudioPlayer() {
             className="pair split"
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: "minmax(430px, 500px) minmax(420px, 1fr)",
               gap: 16,
               alignItems: "start",
             }}
