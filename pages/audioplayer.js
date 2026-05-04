@@ -37,9 +37,29 @@ export default function AudioPlayer() {
   };
 
   const audioRef = useRef();
+  const splitPlayerRef = useRef(null);
+  const [splitPlayerHeight, setSplitPlayerHeight] = useState(null);
   const router = useRouter();
   const dispatch = useDispatch();
   const sound = useSelector((state) => state.recordingReducer.sound);
+
+  useEffect(() => {
+    if (view !== "split") return;
+
+    const updateSplitPlayerHeight = () => {
+      if (splitPlayerRef.current) {
+        setSplitPlayerHeight(splitPlayerRef.current.offsetHeight);
+      }
+    };
+
+    updateSplitPlayerHeight();
+
+    window.addEventListener("resize", updateSplitPlayerHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateSplitPlayerHeight);
+    };
+  }, [view, sound, audioUrl, durationSeconds]);
 
   useEffect(() => {
     if (customer && sound) {
@@ -265,11 +285,13 @@ export default function AudioPlayer() {
               display: "grid",
               gridTemplateColumns: "minmax(430px, 500px) minmax(420px, 1fr)",
               gap: 16,
-              alignItems: "start",
+              alignItems: "stretch",
+              height: "730px",
             }}
           >
             {/* Transcript pane */}
             <section
+              ref={splitPlayerRef}
               id="transcriptPane"
               className="u-card"
               style={{
@@ -279,6 +301,8 @@ export default function AudioPlayer() {
                 backgroundColor: "var(--bg-800)",
                 border: "1px solid var(--muted-600)",
                 borderRadius: 36,
+                height: "100%",
+                boxSizing: "border-box",
               }}
             >
               {isAudioSelected ? (
@@ -494,7 +518,12 @@ export default function AudioPlayer() {
             <section
               id="chatPane"
               className="u-card"
-              style={{ padding: 16, height: "800px" }}
+              style={{
+                padding: 0,
+                height: "100%",
+                boxSizing: "border-box",
+                overflow: "hidden",
+              }}
             >
               <ChatPanel sound={sound} soundUrl={audioUrl} />
             </section>
@@ -504,7 +533,11 @@ export default function AudioPlayer() {
           <section
             id="chatPane"
             className="u-card"
-            style={{ padding: 16, height: "800px" }}
+            style={{
+              padding: 0,
+              height: splitPlayerHeight ? `${splitPlayerHeight}px` : "auto",
+              overflow: "hidden",
+            }}
           >
             <ChatPanel sound={sound} soundUrl={audioUrl} />
           </section>
