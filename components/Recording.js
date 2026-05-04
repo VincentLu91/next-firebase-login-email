@@ -159,19 +159,23 @@ async function wavBlobToMp3(
 
 const recordingStyles = `
 :root {
---bg: #0b0d12;
---panel: #11151d;
---muted: #a0a8b8;
---text: #e6e8ef;
---primary: #2563eb;
---primary-600: #1d4ed8;
---danger: #ef4444;
---danger-600: #dc2626;
---ring: rgba(37, 99, 235, 0.45);
---shadow: 0 10px 20px rgba(0,0,0,0.25);
---radius: 14px;
---radius-sm: 10px;
---gap: 20px;
+  --bg: var(--bg-900);
+  --panel: var(--bg-800);
+  --muted: var(--text-300);
+  --text: var(--text-100);
+
+  --primary: var(--accent-400);
+  --primary-600: var(--accent-500);
+
+  --danger-rec: #ef4444;
+  --danger-600: #dc2626;
+
+  --ring: var(--focus);
+  --shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+
+  --radius: var(--radius-card);
+  --radius-sm: var(--radius-input);
+  --gap: 20px;
 }
 
 /* Page shell */
@@ -252,7 +256,7 @@ color: var(--muted);
 
 .status.recording .dot {
 width: 10px; height: 10px; border-radius: 50%;
-background: var(--danger);
+background: var(--danger-rec);
 box-shadow: 0 0 0 0 rgba(239,68,68,.7);
 animation: pulse 1.2s ease-in-out infinite;
 }
@@ -286,7 +290,7 @@ color: #fff;
 .btn-primary { background: var(--primary); }
 .btn-primary:hover { background: var(--primary-600); }
 
-.btn-danger { background: var(--danger); }
+.btn-danger { background: var(--danger-rec); }
 .btn-danger:hover { background: var(--danger-600); }
 
 /* Transcript panel */
