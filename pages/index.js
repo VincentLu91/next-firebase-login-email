@@ -20,16 +20,15 @@ export default function Home() {
         <section className={styles.heroSection}>
           <div className={styles.heroContent}>
             <h1 className={styles.title}>
-              Be present now. Remember everything later.
+              Remember important calls without taking notes.
             </h1>
             <p className={styles.description}>
-              A simple app that records your mic or phone calls, transcribes in
-              real time, and lets an AI answer questions about what was
-              said&mdash;so you can listen without fear of missing anything.
+              A simple app for remembering important calls. Record, transcribe,
+              replay, and ask AI what was said later.
             </p>
             <div className={styles.ctaGroup}>
               <Link href="/signin" className={styles.primaryCta}>
-                Sign up free
+                Try free
               </Link>
               <Link href="#how-it-works" className={styles.secondaryCta}>
                 See how it works
@@ -55,16 +54,19 @@ export default function Home() {
 
         <section className={styles.featuresGrid}>
           <h1 className={styles.sectionTitle}>
-            A Personal AI that travels with you.
+            A memory layer for your important calls.
           </h1>
           <p className={styles.description} style={{ textAlign: "center" }}>
-            Have your personal assistant follow any convo, like a second brain
-            that never forgets.
+            Save the important parts of a call so you can come back to them
+            later.
           </p>
           <section id="use-cases" className={styles.useCases}>
             <div className={styles.useCase}>
               <h2>Works anywhere</h2>
-              <p>Mic recording and phone call recording. Phone and Desktop.</p>
+              <p>
+                Record calls on your phone, then review them later on mobile or
+                desktop.
+              </p>
               <Image
                 src="/mic_call.png"
                 alt="Transcript interface on mobile"
@@ -75,7 +77,9 @@ export default function Home() {
             </div>
             <div className={styles.useCase}>
               <h2>Your data, your control</h2>
-              <p>Private by default, delete anytime</p>
+              <p>
+                Your saved calls stay private, and you can delete them anytime.
+              </p>
               <Image
                 src="/deleteanytime.png"
                 alt="Transcript interface on mobile"
@@ -92,7 +96,10 @@ export default function Home() {
           <div className={styles.featureCard}>
             <div className={styles.featureContent}>
               <h2>Focus on people, not notes</h2>
-              <p>We capture the words so you can keep eye contact.</p>
+              <p>
+                Record the call so you can listen now and review the details
+                later.
+              </p>
             </div>
             <div className={styles.featureImage}>
               <Image
@@ -108,7 +115,10 @@ export default function Home() {
           <div className={styles.featureCard}>
             <div className={styles.featureContent}>
               <h2>Replay or skim</h2>
-              <p>Listen back or scan clean transcripts on any device.</p>
+              <p>
+                Replay the call or skim the transcript when you need the
+                details.
+              </p>
             </div>
             <div className={styles.featureImage}>
               <Image
@@ -125,8 +135,8 @@ export default function Home() {
             <div className={styles.featureContent}>
               <h2>Ask the AI</h2>
               <p>
-                &quot;What did we agree?&quot; &quot;What are my next
-                steps?&quot; Get answers instantly.
+                Ask what was said on a call, what details mattered, or what you
+                need to remember next.
               </p>
             </div>
             <div className={styles.featureImage}>
@@ -142,47 +152,54 @@ export default function Home() {
         </section>
 
         <section className={styles.featuresGrid}>
-          <h1 className={styles.sectionTitle}>Your day-to-day. Remembered</h1>
+          <h1 className={styles.sectionTitle}>Important calls. Remembered.</h1>
           <section className={styles.splitSection}>
             <div className={styles.splitContent}>
               <p>
-                If you&apos;re busy, you drift. You nod, but details blur. Later
-                you need to respond, and you&apos;re not 100% sure what was
-                said.
+                Important calls move fast. Names, dates, decisions, and details
+                are easy to miss when you are trying to listen.
               </p>
             </div>
             <div className={styles.splitDivider} />
             <div className={styles.splitContent}>
               <p>
-                This app is your safety net. It records, transcribes, and gives
-                you an AI you can ask&mdash;so you can be present now and still
-                have perfect recall later.
+                The app records and transcribes your call so you can replay it,
+                search the transcript, and ask AI what was said later.
               </p>
             </div>
           </section>
         </section>
 
         <section className={styles.featuresGrid}>
-          <h1 className={styles.sectionTitle}>Use Cases</h1>
+          <h1 className={styles.sectionTitle}>Built for important calls</h1>
           <section id="use-cases" className={styles.useCases}>
             <div className={styles.useCase}>
-              <h2>Work calls</h2>
-              <p>Leave the note-taking to us; leave with clear next steps.</p>
-            </div>
-            <div className={styles.useCase}>
-              <h2>Personal life</h2>
-              <p>Remember details loved ones share, from dates to to-dos.</p>
-            </div>
-            <div className={styles.useCase}>
-              <h2>Learning</h2>
+              <h2>Important calls</h2>
               <p>
-                Interview, lecture, or podcast&mdash;capture and extract key
-                ideas.
+                Record the call, then review what was said when you need the
+                details.
               </p>
             </div>
             <div className={styles.useCase}>
-              <h2>Errands &amp; planning</h2>
-              <p>Turn shopping lists and chores into actionable tasks.</p>
+              <h2>Personal calls</h2>
+              <p>
+                Keep track of details from family calls, appointments, and
+                everyday conversations.
+              </p>
+            </div>
+            <div className={styles.useCase}>
+              <h2>Learning conversations</h2>
+              <p>
+                Record interviews, lectures, or study conversations so you can
+                revisit the key details later.
+              </p>
+            </div>
+            <div className={styles.useCase}>
+              <h2>Appointments and admin calls</h2>
+              <p>
+                Remember details from appointments, service calls, and planning
+                conversations.
+              </p>
             </div>
           </section>
         </section>
@@ -193,10 +210,10 @@ export default function Home() {
 
         <section className={styles.closingCta}>
           <h2 className={styles.title}>
-            Ready to feel present and still remember it all?
+            Ready to remember your important calls?
           </h2>
           <Link href="/signin" className={styles.primaryCta}>
-            Sign up free (no credit card needed)
+            Start recording important calls
           </Link>
         </section>
       </main>
