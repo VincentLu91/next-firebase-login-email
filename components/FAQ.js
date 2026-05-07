@@ -72,7 +72,7 @@ const faqData = [
     id: 5,
     question: "Can I try it for free?",
     answer:
-      "Yes! You can sign up and start using EchoAlly without a credit card. The free tier includes basic recording and transcription features.",
+      "Yes. You can sign up without a credit card. Free accounts include 6 call credits for short phone calls, plus microphone recording and transcription.",
   },
 ];
 

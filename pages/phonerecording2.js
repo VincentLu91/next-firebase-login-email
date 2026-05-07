@@ -644,6 +644,7 @@ const PhoneRecording2 = () => {
   return (
     <div className="rec-wrap">
       <h2 className="headline">Phone Call Recording</h2>
+      <h2 className="headline">Each recording session lasts up to 5 minutes</h2>
 
       {hasSubscription && numCalls <= 2 && (
         <Link href="/buy-credits">
