@@ -209,9 +209,9 @@ const createOrRetrieveCustomer = async ({ email, uuid }) => {
       id: uuid,
       stripe_customer_id: customer.id,
       // Preserve existing token values or default to 0
-      mic_tokens: existingCustomer?.mic_tokens ?? 0,
-      call_tokens: existingCustomer?.call_tokens ?? 0,
-      num_calls: existingCustomer?.num_calls ?? 0,
+      mic_tokens: existingCustomer?.mic_tokens ?? 2000,
+      call_tokens: existingCustomer?.call_tokens ?? 6,
+      num_calls: existingCustomer?.num_calls ?? 6,
     });
 
     if (supabaseError) throw supabaseError;
@@ -235,14 +235,14 @@ const createSubscription = async (subscriptionId, customerId) => {
   // Do not proceed without a valid customer_id
   if (!customer?.id) {
     throw new Error(
-      `Cannot create subscription: No customer found with Stripe ID ${customerId}`
+      `Cannot create subscription: No customer found with Stripe ID ${customerId}`,
     );
   }
 
   // Double check this is the right customer
   if (customer.stripe_customer_id !== customerId) {
     throw new Error(
-      `Customer ID mismatch: ${customer.stripe_customer_id} !== ${customerId}`
+      `Customer ID mismatch: ${customer.stripe_customer_id} !== ${customerId}`,
     );
   }
 
@@ -282,10 +282,10 @@ const createSubscription = async (subscriptionId, customerId) => {
       cancel_at_period_end: subscription.cancel_at_period_end,
       created: new Date(subscription.created * 1000).toISOString(),
       current_period_start: new Date(
-        subscription.current_period_start * 1000
+        subscription.current_period_start * 1000,
       ).toISOString(),
       current_period_end: new Date(
-        subscription.current_period_end * 1000
+        subscription.current_period_end * 1000,
       ).toISOString(),
     });
 
@@ -327,7 +327,7 @@ const manageSubscriptionStatusChange = async (
   stripeCustomerId,
   userId,
   createAction = false,
-  cancelAt = null
+  cancelAt = null,
 ) => {
   // Get subscription details
   const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
@@ -387,10 +387,10 @@ const manageSubscriptionStatusChange = async (
     cancel_at_period_end: subscription.cancel_at_period_end,
     created: new Date(subscription.created * 1000).toISOString(),
     current_period_start: new Date(
-      subscription.current_period_start * 1000
+      subscription.current_period_start * 1000,
     ).toISOString(),
     current_period_end: new Date(
-      subscription.current_period_end * 1000
+      subscription.current_period_end * 1000,
     ).toISOString(),
   };
 
