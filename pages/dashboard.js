@@ -46,13 +46,13 @@ const Dashboard = () => {
           supabase
             .from("mic_recordings")
             .select(
-              "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at",
+              "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at, recap",
             )
             .eq("customer_id", customer.id),
           supabase
             .from("call_recordings")
             .select(
-              "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at",
+              "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at, recap",
             )
             .eq("customer_id", customer.id),
         ]);

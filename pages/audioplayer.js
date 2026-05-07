@@ -24,7 +24,9 @@ export default function AudioPlayer() {
   const [summary, setSummary] = useState(null);
   const [translation, setTranslation] = useState(null);
   const [language, setLanguage] = useState(null);
-  const [view, setView] = useState("split"); // 'transcript' | 'chat' | 'split'
+  const [view, setView] = useState("split"); // 'transcript' | 'chat' | 'split' | 'recap'
+  const [recapLoading, setRecapLoading] = useState(false);
+  const [recapError, setRecapError] = useState("");
 
   const copyTranscript = async () => {
     const transcript = sound?.full_transcript || "No transcript available.";
@@ -76,7 +78,8 @@ export default function AudioPlayer() {
 
   useEffect(() => {
     const v = router.query.view;
-    if (v === "transcript" || v === "chat" || v === "split") setView(v);
+    if (v === "transcript" || v === "chat" || v === "split" || v === "recap")
+      setView(v);
   }, [router.query.view]);
 
   const setViewAndURL = (v) => {
@@ -217,6 +220,159 @@ export default function AudioPlayer() {
     setSummary(rawSummary.data.text.trim());
   };
 
+  const arrayOfObjects = (arr) =>
+    arr.map((chunk, index) => ({
+      title: String(index + 1),
+      snippet: chunk,
+    }));
+
+  const splitStringIntoChunks = (str, chunkSize) => {
+    const words = (str || "").split(" ");
+    const chunks = [];
+    let current = "";
+
+    for (const word of words) {
+      if (current.split(" ").length < chunkSize) {
+        current += (current ? " " : "") + word;
+      } else {
+        chunks.push(current.trim());
+        current = word;
+      }
+    }
+
+    if (current) chunks.push(current.trim());
+
+    return arrayOfObjects(chunks);
+  };
+
+  const parseRecapResponse = (text) => {
+    const cleaned = (text || "")
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    try {
+      return JSON.parse(cleaned);
+    } catch (error) {
+      return {
+        summary: cleaned,
+        key_points: [],
+        important_moments: [],
+        follow_ups: [],
+        important_details: [],
+        things_to_remember: [],
+      };
+    }
+  };
+
+  const findRecordingRow = async () => {
+    if (!sound?.original_file_name) return null;
+
+    const tables = ["mic_recordings", "call_recordings"];
+
+    for (const tableName of tables) {
+      const { data, error } = await supabase
+        .from(tableName)
+        .select("id")
+        .eq("original_file_name", sound.original_file_name)
+        .limit(1);
+
+      if (error) {
+        console.error(`Error checking ${tableName}:`, error.message);
+        continue;
+      }
+
+      if (data?.[0]?.id) {
+        return {
+          tableName,
+          id: data[0].id,
+        };
+      }
+    }
+
+    return null;
+  };
+
+  const generateSavedRecap = async () => {
+    if (!sound?.full_transcript) {
+      setRecapError("Transcript is empty.");
+      return;
+    }
+
+    setRecapLoading(true);
+    setRecapError("");
+
+    try {
+      const prompt = `
+Create a concise memory recap for this recording.
+
+Return ONLY valid JSON in this exact shape:
+{
+  "summary": "",
+  "key_points": [],
+  "important_moments": [
+    {
+      "time": "",
+      "moment": "",
+      "why_it_matters": ""
+    }
+  ],
+  "follow_ups": [],
+  "important_details": [],
+  "things_to_remember": []
+}
+
+Rules:
+- Do not include markdown.
+- Do not invent details.
+- If a section has nothing useful, return an empty array.
+- Focus on what the user would want to remember later.
+- For important_moments, include a rough timestamp only if the transcript contains timing or enough context. Otherwise leave "time" empty.
+`;
+
+      const response = await axios.post("/api/agent", {
+        query: prompt,
+        documents: splitStringIntoChunks(sound.full_transcript, 80),
+        chat_history: [],
+        messages: [],
+        metadata: {
+          soundUrl: audioUrl,
+          type: "saved_recap",
+        },
+      });
+
+      const agentText =
+        response?.data?.text ||
+        response?.data?.answer ||
+        response?.data?.output ||
+        response?.data?.reply ||
+        "";
+
+      const recap = parseRecapResponse(agentText);
+      const recordingRow = await findRecordingRow();
+
+      if (!recordingRow) {
+        throw new Error("Could not find this recording row.");
+      }
+
+      const { data, error } = await supabase
+        .from(recordingRow.tableName)
+        .update({ recap })
+        .eq("id", recordingRow.id)
+        .select("*")
+        .single();
+
+      if (error) throw error;
+
+      dispatch(setSound({ ...sound, ...data }));
+    } catch (error) {
+      console.error("Error generating recap:", error);
+      setRecapError(error.message || "Could not generate recap.");
+    } finally {
+      setRecapLoading(false);
+    }
+  };
+
   return (
     <div>
       {/* Tabs + Back (no routes, just state) */}
@@ -291,6 +447,21 @@ export default function AudioPlayer() {
             >
               Split
             </span>
+          </button>
+          <button
+            type="button"
+            className="u-pill btn-muted"
+            onClick={() => setViewAndURL("recap")}
+            style={{
+              backgroundColor: "transparent",
+              borderColor:
+                view === "recap" ? "var(--accent-400)" : "var(--muted-600)",
+              color: "var(--text-300)",
+              borderRadius: "50px",
+              padding: "8px 24px",
+            }}
+          >
+            Recap
           </button>
 
           <div style={{ marginLeft: "auto" }}>
@@ -562,6 +733,318 @@ export default function AudioPlayer() {
               <ChatPanel sound={sound} soundUrl={audioUrl} />
             </section>
           </div>
+        ) : view === "recap" ? (
+          <section
+            id="recapPane"
+            className="u-card"
+            style={{
+              width: "min(720px, 100%)",
+              margin: "0 auto",
+              padding: 32,
+              backgroundColor: "var(--bg-800)",
+              border: "1px solid var(--muted-600)",
+              borderRadius: 36,
+              boxSizing: "border-box",
+              minHeight: "520px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "flex-start",
+                gap: 16,
+                marginBottom: 24,
+              }}
+            >
+              <div>
+                <h2
+                  style={{
+                    margin: 0,
+                    fontSize: 30,
+                    fontWeight: 800,
+                    color: "var(--text-100)",
+                    letterSpacing: "-0.03em",
+                  }}
+                >
+                  Recap
+                </h2>
+
+                <p
+                  style={{
+                    margin: "8px 0 0",
+                    color: "var(--text-400)",
+                    fontSize: 15,
+                  }}
+                >
+                  Saved memory from this recording
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="u-pill btn-primary"
+                onClick={generateSavedRecap}
+                disabled={recapLoading}
+                style={{
+                  borderRadius: "50px",
+                  padding: "9px 18px",
+                  opacity: recapLoading ? 0.7 : 1,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {recapLoading
+                  ? "Generating..."
+                  : sound?.recap
+                  ? "Regenerate"
+                  : "Generate Recap"}
+              </button>
+            </div>
+
+            {recapError && (
+              <p
+                style={{
+                  margin: "0 0 16px",
+                  color: "#ffb4b4",
+                  fontSize: 14,
+                }}
+              >
+                {recapError}
+              </p>
+            )}
+
+            {!sound?.recap ? (
+              <div
+                style={{
+                  padding: "42px 28px",
+                  backgroundColor: "var(--bg-700)",
+                  border: "1px solid var(--muted-600)",
+                  borderRadius: 28,
+                  textAlign: "center",
+                }}
+              >
+                <h3
+                  style={{
+                    margin: 0,
+                    color: "var(--text-100)",
+                    fontSize: 20,
+                    fontWeight: 800,
+                  }}
+                >
+                  No recap yet
+                </h3>
+
+                <p
+                  style={{
+                    margin: "10px auto 0",
+                    maxWidth: 420,
+                    color: "var(--text-400)",
+                    fontSize: 15,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  Generate a saved recap so this recording becomes easier to
+                  remember later.
+                </p>
+              </div>
+            ) : (
+              <div
+                style={{
+                  padding: "24px 26px",
+                  backgroundColor: "var(--bg-700)",
+                  border: "1px solid var(--muted-600)",
+                  borderRadius: 28,
+                  color: "var(--text-200)",
+                  fontSize: 15,
+                  lineHeight: 1.65,
+                }}
+              >
+                {sound.recap.summary && (
+                  <div style={{ marginBottom: 22 }}>
+                    <h3
+                      style={{
+                        margin: "0 0 8px",
+                        color: "var(--text-100)",
+                        fontSize: 18,
+                        fontWeight: 800,
+                      }}
+                    >
+                      Summary
+                    </h3>
+                    <p style={{ margin: 0 }}>{sound.recap.summary}</p>
+                  </div>
+                )}
+
+                {Array.isArray(sound.recap.key_points) &&
+                  sound.recap.key_points.length > 0 && (
+                    <div style={{ marginBottom: 22 }}>
+                      <h3
+                        style={{
+                          margin: "0 0 8px",
+                          color: "var(--text-100)",
+                          fontSize: 18,
+                        }}
+                      >
+                        Key points
+                      </h3>
+                      <ul style={{ margin: 0, paddingLeft: 22 }}>
+                        {sound.recap.key_points.map((item, index) => (
+                          <li key={`key-point-${index}`}>
+                            {typeof item === "string"
+                              ? item
+                              : JSON.stringify(item)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                {Array.isArray(sound.recap.important_moments) &&
+                  sound.recap.important_moments.length > 0 && (
+                    <div style={{ marginBottom: 22 }}>
+                      <h3
+                        style={{
+                          margin: "0 0 8px",
+                          color: "var(--text-100)",
+                          fontSize: 18,
+                          fontWeight: 800,
+                        }}
+                      >
+                        Important moments
+                      </h3>
+
+                      <div style={{ display: "grid", gap: 12 }}>
+                        {sound.recap.important_moments.map((item, index) => {
+                          const time =
+                            typeof item === "object" ? item.time : "";
+                          const moment =
+                            typeof item === "object"
+                              ? item.moment
+                              : String(item);
+                          const whyItMatters =
+                            typeof item === "object" ? item.why_it_matters : "";
+
+                          return (
+                            <div
+                              key={`important-moment-${index}`}
+                              style={{
+                                padding: "14px 16px",
+                                backgroundColor: "var(--bg-800)",
+                                border: "1px solid var(--muted-600)",
+                                borderRadius: 18,
+                              }}
+                            >
+                              {time && (
+                                <p
+                                  style={{
+                                    margin: "0 0 6px",
+                                    color: "var(--accent-300)",
+                                    fontSize: 13,
+                                    fontWeight: 700,
+                                  }}
+                                >
+                                  {time}
+                                </p>
+                              )}
+
+                              <p
+                                style={{ margin: 0, color: "var(--text-100)" }}
+                              >
+                                {moment}
+                              </p>
+
+                              {whyItMatters && (
+                                <p
+                                  style={{
+                                    margin: "6px 0 0",
+                                    color: "var(--text-400)",
+                                    fontSize: 14,
+                                  }}
+                                >
+                                  {whyItMatters}
+                                </p>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                {Array.isArray(sound.recap.follow_ups) &&
+                  sound.recap.follow_ups.length > 0 && (
+                    <div style={{ marginBottom: 22 }}>
+                      <h3
+                        style={{
+                          margin: "0 0 8px",
+                          color: "var(--text-100)",
+                          fontSize: 18,
+                        }}
+                      >
+                        Follow-ups
+                      </h3>
+                      <ul style={{ margin: 0, paddingLeft: 22 }}>
+                        {sound.recap.follow_ups.map((item, index) => (
+                          <li key={`follow-up-${index}`}>
+                            {typeof item === "string"
+                              ? item
+                              : JSON.stringify(item)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                {Array.isArray(sound.recap.important_details) &&
+                  sound.recap.important_details.length > 0 && (
+                    <div style={{ marginBottom: 22 }}>
+                      <h3
+                        style={{
+                          margin: "0 0 8px",
+                          color: "var(--text-100)",
+                          fontSize: 18,
+                        }}
+                      >
+                        Important details
+                      </h3>
+                      <ul style={{ margin: 0, paddingLeft: 22 }}>
+                        {sound.recap.important_details.map((item, index) => (
+                          <li key={`important-detail-${index}`}>
+                            {typeof item === "string"
+                              ? item
+                              : JSON.stringify(item)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                {Array.isArray(sound.recap.things_to_remember) &&
+                  sound.recap.things_to_remember.length > 0 && (
+                    <div>
+                      <h3
+                        style={{
+                          margin: "0 0 8px",
+                          color: "var(--text-100)",
+                          fontSize: 18,
+                        }}
+                      >
+                        Things to remember
+                      </h3>
+                      <ul style={{ margin: 0, paddingLeft: 22 }}>
+                        {sound.recap.things_to_remember.map((item, index) => (
+                          <li key={`thing-to-remember-${index}`}>
+                            {typeof item === "string"
+                              ? item
+                              : JSON.stringify(item)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+              </div>
+            )}
+          </section>
         ) : view === "chat" ? (
           // Chat-only
           <section
