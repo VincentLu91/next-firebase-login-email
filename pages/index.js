@@ -23,8 +23,9 @@ export default function Home() {
               Remember important calls without taking notes.
             </h1>
             <p className={styles.description}>
-              A simple app for remembering important calls. Record, transcribe,
-              replay, and ask AI what was said later.
+              A simple app for remembering important conversations. Record phone
+              calls or in-person audio, transcribe them, replay them, and ask AI
+              what was said later.
             </p>
             <div className={styles.ctaGroup}>
               <Link href="/signin" className={styles.primaryCta}>
@@ -34,7 +35,7 @@ export default function Home() {
                 See how it works
               </Link>
             </div>
-            <p>iOS and Android TBA</p>
+            <p>Mobile app coming soon. Free account includes 6 call credits</p>
           </div>
           <div className={styles.heroImage}>
             <Image
@@ -171,7 +172,9 @@ export default function Home() {
         </section>
 
         <section className={styles.featuresGrid}>
-          <h1 className={styles.sectionTitle}>Built for important calls</h1>
+          <h1 className={styles.sectionTitle}>
+            Built for important conversations
+          </h1>
           <section id="use-cases" className={styles.useCases}>
             <div className={styles.useCase}>
               <h2>Important calls</h2>
@@ -213,7 +216,7 @@ export default function Home() {
             Ready to remember your important calls?
           </h2>
           <Link href="/signin" className={styles.primaryCta}>
-            Start recording important calls
+            Try 6 free call credits
           </Link>
         </section>
       </main>
