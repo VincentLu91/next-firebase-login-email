@@ -251,8 +251,16 @@ export default function AudioPlayer() {
       .replace(/```/g, "")
       .trim();
 
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+
+    const jsonCandidate =
+      firstBrace !== -1 && lastBrace !== -1
+        ? cleaned.slice(firstBrace, lastBrace + 1)
+        : cleaned;
+
     try {
-      return JSON.parse(cleaned);
+      return JSON.parse(jsonCandidate);
     } catch (error) {
       return {
         summary: cleaned,
@@ -293,6 +301,21 @@ export default function AudioPlayer() {
     return null;
   };
 
+  const formatRecapItem = (item) => {
+    if (typeof item === "string") return item;
+    if (!item || typeof item !== "object") return String(item || "");
+
+    return (
+      item.text ||
+      item.point ||
+      item.detail ||
+      item.action ||
+      item.memory ||
+      item.note ||
+      Object.values(item).filter(Boolean).join(" — ")
+    );
+  };
+
   const generateSavedRecap = async () => {
     if (!sound?.full_transcript) {
       setRecapError("Transcript is empty.");
@@ -304,7 +327,7 @@ export default function AudioPlayer() {
 
     try {
       const prompt = `
-Create a concise memory recap for this recording.
+Create a concise personal memory recap for this recording.
 
 Return ONLY valid JSON in this exact shape:
 {
@@ -327,6 +350,12 @@ Rules:
 - Do not invent details.
 - If a section has nothing useful, return an empty array.
 - Focus on what the user would want to remember later.
+- Keep the summary short: 2 to 4 sentences.
+- key_points should capture the main ideas.
+- important_moments should capture decisions, commitments, dates, names, numbers, emotional turning points, warnings, or anything the user may want to find again later.
+- important_details should capture concrete facts like names, dates, amounts, links, places, deadlines, or specific requirements.
+- follow_ups should only include actual next actions mentioned or clearly implied.
+- things_to_remember should be written like memory notes for the user.
 - For important_moments, include a rough timestamp only if the transcript contains timing or enough context. Otherwise leave "time" empty.
 `;
 
@@ -875,30 +904,6 @@ Rules:
                   </div>
                 )}
 
-                {Array.isArray(sound.recap.key_points) &&
-                  sound.recap.key_points.length > 0 && (
-                    <div style={{ marginBottom: 22 }}>
-                      <h3
-                        style={{
-                          margin: "0 0 8px",
-                          color: "var(--text-100)",
-                          fontSize: 18,
-                        }}
-                      >
-                        Key points
-                      </h3>
-                      <ul style={{ margin: 0, paddingLeft: 22 }}>
-                        {sound.recap.key_points.map((item, index) => (
-                          <li key={`key-point-${index}`}>
-                            {typeof item === "string"
-                              ? item
-                              : JSON.stringify(item)}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
                 {Array.isArray(sound.recap.important_moments) &&
                   sound.recap.important_moments.length > 0 && (
                     <div style={{ marginBottom: 22 }}>
@@ -910,19 +915,30 @@ Rules:
                           fontWeight: 800,
                         }}
                       >
-                        Important moments
+                        Moments to Remember
                       </h3>
 
                       <div style={{ display: "grid", gap: 12 }}>
                         {sound.recap.important_moments.map((item, index) => {
-                          const time =
-                            typeof item === "object" ? item.time : "";
-                          const moment =
-                            typeof item === "object"
-                              ? item.moment
-                              : String(item);
-                          const whyItMatters =
-                            typeof item === "object" ? item.why_it_matters : "";
+                          const isMomentObject =
+                            item &&
+                            typeof item === "object" &&
+                            !Array.isArray(item);
+
+                          const time = isMomentObject
+                            ? item.time || item.timestamp || ""
+                            : "";
+
+                          const moment = isMomentObject
+                            ? item.moment || item.title || formatRecapItem(item)
+                            : String(item || "");
+
+                          const whyItMatters = isMomentObject
+                            ? item.why_it_matters ||
+                              item.reason ||
+                              item.context ||
+                              ""
+                            : "";
 
                           return (
                             <div
@@ -961,6 +977,9 @@ Rules:
                                     fontSize: 14,
                                   }}
                                 >
+                                  <strong style={{ color: "var(--text-200)" }}>
+                                    Why it matters:
+                                  </strong>{" "}
                                   {whyItMatters}
                                 </p>
                               )}
@@ -968,6 +987,28 @@ Rules:
                           );
                         })}
                       </div>
+                    </div>
+                  )}
+
+                {Array.isArray(sound.recap.key_points) &&
+                  sound.recap.key_points.length > 0 && (
+                    <div style={{ marginBottom: 22 }}>
+                      <h3
+                        style={{
+                          margin: "0 0 8px",
+                          color: "var(--text-100)",
+                          fontSize: 18,
+                        }}
+                      >
+                        Key points
+                      </h3>
+                      <ul style={{ margin: 0, paddingLeft: 22 }}>
+                        {sound.recap.key_points.map((item, index) => (
+                          <li key={`key-point-${index}`}>
+                            {formatRecapItem(item)}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
 
@@ -986,9 +1027,7 @@ Rules:
                       <ul style={{ margin: 0, paddingLeft: 22 }}>
                         {sound.recap.follow_ups.map((item, index) => (
                           <li key={`follow-up-${index}`}>
-                            {typeof item === "string"
-                              ? item
-                              : JSON.stringify(item)}
+                            {formatRecapItem(item)}
                           </li>
                         ))}
                       </ul>
@@ -1010,9 +1049,7 @@ Rules:
                       <ul style={{ margin: 0, paddingLeft: 22 }}>
                         {sound.recap.important_details.map((item, index) => (
                           <li key={`important-detail-${index}`}>
-                            {typeof item === "string"
-                              ? item
-                              : JSON.stringify(item)}
+                            {formatRecapItem(item)}
                           </li>
                         ))}
                       </ul>
@@ -1034,9 +1071,7 @@ Rules:
                       <ul style={{ margin: 0, paddingLeft: 22 }}>
                         {sound.recap.things_to_remember.map((item, index) => (
                           <li key={`thing-to-remember-${index}`}>
-                            {typeof item === "string"
-                              ? item
-                              : JSON.stringify(item)}
+                            {formatRecapItem(item)}
                           </li>
                         ))}
                       </ul>
