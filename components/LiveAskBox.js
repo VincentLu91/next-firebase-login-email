@@ -42,6 +42,7 @@ export default function LiveAskBox({
   };
 
   const [loading, setLoading] = React.useState(false);
+  const [copied, setCopied] = React.useState(false);
 
   const askLive = async () => {
     const trimmedQuestion = question.trim();
@@ -59,6 +60,7 @@ export default function LiveAskBox({
     setLoading(true);
     setError("");
     setAnswer("");
+    setCopied(false);
 
     try {
       const response = await fetch("/api/agent", {
@@ -185,6 +187,39 @@ export default function LiveAskBox({
             whiteSpace: "pre-line",
           }}
         >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 8,
+            }}
+          >
+            <strong>Answer</strong>
+
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(answer);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 1200);
+                } catch (err) {
+                  setError("Could not copy answer.");
+                }
+              }}
+              className="btn btn-ghost"
+              style={{
+                padding: "6px 10px",
+                fontSize: 13,
+                boxShadow: "none",
+              }}
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
+
           {answer}
         </div>
       )}
