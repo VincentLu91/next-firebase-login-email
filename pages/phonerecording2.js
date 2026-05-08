@@ -16,6 +16,7 @@ import moment from "moment";
 import Link from "next/link";
 
 import { useDispatch, useSelector } from "react-redux";
+import LiveAskBox from "../components/LiveAskBox";
 /* === STYLE: same look as Recording.js (no logic changes) === */
 const phoneRecordingStyles = `
 :root{
@@ -263,6 +264,11 @@ const PhoneRecording2 = () => {
     supabase: supabaseClient,
   } = useProtectedPage();
   const [transcriptionText, setTranscriptionText] = useState("");
+  const [askLiveState, setAskLiveState] = React.useState({
+    question: "",
+    answer: "",
+    error: "",
+  });
   const [phoneNumber, setPhoneNumber] = React.useState(null);
   const customer = authCustomer; // Use customer from auth helper
   const router = useRouter();
@@ -276,6 +282,7 @@ const PhoneRecording2 = () => {
   const [filename, setFilename] = React.useState("");
   const [numCalls, setNumCalls] = React.useState(0);
   const [hasSubscription, setHasSubscription] = React.useState(false);
+  const callCreditDeductedRef = React.useRef(false);
 
   const getNumCalls = useCallback(
     async (user) => {
@@ -363,13 +370,24 @@ const PhoneRecording2 = () => {
         setRecordingStatus(result?.recordingStatus);
 
         // Call the API when recording is complete
-        if (result?.recordingStatus === "completed") {
+        const statusText = (result?.recordingStatus || "").toLowerCase();
+
+        const isCompletedStatus =
+          statusText.includes("completed") ||
+          statusText.includes("complete") ||
+          Boolean(result?.recordingUrl);
+
+        // Call the API when recording is complete
+        if (isCompletedStatus && !callCreditDeductedRef.current) {
+          callCreditDeductedRef.current = true;
           try {
             console.log("customer object should be: ", customer?.id);
+
             if (customer?.id) {
               const response = await axios.get(
                 `/api/calls-token?user=${customer?.id}`,
               );
+
               console.log("Calls token response:", response.data);
               setNumCalls(response.data?.data[0]?.num_calls);
             }
@@ -403,6 +421,13 @@ const PhoneRecording2 = () => {
         alert("Please wait for customer data to load");
         return;
       }
+
+      setAskLiveState({
+        question: "",
+        answer: "",
+        error: "",
+      });
+      callCreditDeductedRef.current = false;
 
       // call the "dial" API endpoint
       const to = phoneNumber;
@@ -557,7 +582,13 @@ const PhoneRecording2 = () => {
       if (recordingStatus) {
         // ── Status present (in-progress or completed)
         const s = (recordingStatus || "").toLowerCase();
-        const tone = s === "completed" ? "completed" : "recording";
+
+        const isCompleted =
+          s.includes("completed") ||
+          s.includes("complete") ||
+          Boolean(callRecordingInfo?.recordingUrl);
+
+        const tone = isCompleted ? "completed" : "recording";
 
         return (
           <div className="rec-card">
@@ -571,7 +602,7 @@ const PhoneRecording2 = () => {
               </div>
             </div>
 
-            {recordingStatus === "completed" && (
+            {isCompleted && (
               <div className="field" style={{ marginTop: 14 }}>
                 <div>
                   <span className="chip" style={{ borderRadius: 10 }}>
@@ -602,13 +633,22 @@ const PhoneRecording2 = () => {
             )}
 
             {transcriptionText && (
-              <div
-                className="transcript"
-                aria-live="polite"
-                style={{ whiteSpace: "pre-wrap" }}
-              >
-                {transcriptionText}
-              </div>
+              <>
+                <div
+                  className="transcript"
+                  aria-live="polite"
+                  style={{ whiteSpace: "pre-wrap" }}
+                >
+                  {transcriptionText}
+                </div>
+
+                <LiveAskBox
+                  contextText={transcriptionText.trim()}
+                  placeholder="Ask about this call..."
+                  askLiveState={askLiveState}
+                  setAskLiveState={setAskLiveState}
+                />
+              </>
             )}
           </div>
         );
