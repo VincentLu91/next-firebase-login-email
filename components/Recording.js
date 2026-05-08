@@ -21,6 +21,7 @@ import { storeAsMp3 } from "../utils/storeAsMp3";
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { toBlobURL } from "@ffmpeg/util";
 import Link from "next/link";
+import LiveAskBox from "./LiveAskBox";
 
 // --- MP3 transcode (browser-only) ---
 let _ffmpeg; // singleton
@@ -415,6 +416,17 @@ const Recording = () => {
   const recorderRef = React.useRef(null);
 
   const [interim, setInterim] = React.useState("");
+
+  const transcriptScrollRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!isTranscribing) return;
+
+    const transcriptEl = transcriptScrollRef.current;
+    if (!transcriptEl) return;
+
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  }, [liveTranscript, interim, isTranscribing]);
 
   const getNumMicTokens = useCallback(async () => {
     let tokenResponse = await supabase
@@ -831,6 +843,7 @@ const Recording = () => {
               </button>
             </div>
             <div
+              ref={transcriptScrollRef}
               className="transcript"
               aria-live="polite"
               style={{ whiteSpace: "pre-wrap" }}
@@ -840,6 +853,10 @@ const Recording = () => {
                 <span style={{ opacity: 0.55 }}>{interim}</span>
               </p>
             </div>
+            <LiveAskBox
+              contextText={`${liveTranscript}\n\n${interim}`.trim()}
+              disabled={!isTranscribing}
+            />
           </div>
         );
       } else {
@@ -876,6 +893,10 @@ const Recording = () => {
           </div>
           <div className="transcript" style={{ whiteSpace: "pre-wrap" }}>
             {transcript}
+            <LiveAskBox
+              contextText={(transcript || liveTranscript || "").trim()}
+              placeholder="Ask about this recording..."
+            />
           </div>
         </div>
       );
