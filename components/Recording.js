@@ -414,6 +414,7 @@ const Recording = () => {
 
   // Keep recorder reference in a ref to persist between renders
   const recorderRef = React.useRef(null);
+  const lastAudioChunkAtRef = React.useRef(null);
 
   const [interim, setInterim] = React.useState("");
 
@@ -552,6 +553,7 @@ const Recording = () => {
     setTurns({});
     setLiveTranscript("");
     setInterim("");
+    lastAudioChunkAtRef.current = null;
     startRecording();
     setIsTranscribing(true);
     setAskLiveState({
@@ -600,6 +602,12 @@ const Recording = () => {
     window.socket.onmessage = (message) => {
       try {
         const data = JSON.parse(message.data);
+
+        if (data.type === "Error") {
+          console.error("AssemblyAI websocket error message:", data);
+          return;
+        }
+
         if (data.type === "Begin") return;
         if (data.type === "Turn") {
           const transcript = data.transcript || "";
@@ -652,13 +660,29 @@ const Recording = () => {
     };
 
     window.socket.onerror = (event) => {
-      console.error(event);
-      try {
-        window.socket.send(JSON.stringify({ type: "Terminate" }));
-      } catch {}
+      console.error("AssemblyAI socket error:", event);
       setInterim("");
-      window.socket.close();
+
+      try {
+        window.socket?.send(JSON.stringify({ type: "Terminate" }));
+      } catch {}
+
+      try {
+        window.socket?.close();
+      } catch {}
+
+      window.socket = null;
       setIsTranscribing(false);
+    };
+
+    window.socket.onclose = (event) => {
+      console.warn("AssemblyAI socket closed:", {
+        code: event.code,
+        reason: event.reason,
+        wasClean: event.wasClean,
+      });
+
+      window.socket = null;
     };
 
     window.socket.onopen = (e) => {
@@ -676,14 +700,33 @@ const Recording = () => {
             timeSlice: 120,
             // Get data every 120ms
             ondataavailable: (blob) => {
-              // Convert blob to array buffer
+              const now = Date.now();
+              const elapsedSinceLastChunk = lastAudioChunkAtRef.current
+                ? now - lastAudioChunkAtRef.current
+                : 0;
+
+              lastAudioChunkAtRef.current = now;
+
+              if (elapsedSinceLastChunk > 900) {
+                console.warn(
+                  "Skipping delayed audio chunk to avoid AssemblyAI 3007:",
+                  {
+                    elapsedSinceLastChunk,
+                  },
+                );
+                return;
+              }
+
               const reader = new FileReader();
+
               reader.onload = () => {
                 const buffer = reader.result;
-                if (window.socket.readyState === WebSocket.OPEN) {
+
+                if (window.socket?.readyState === WebSocket.OPEN) {
                   window.socket.send(buffer);
                 }
               };
+
               reader.readAsArrayBuffer(blob);
             },
           });
@@ -927,6 +970,7 @@ const Recording = () => {
       </div>*/}
 
       <h2 className="headline">For best results, record audio on Chrome</h2>
+      <p>For best results, keep this tab open while recording.</p>
 
       {hasSubscription && numMicTokens <= 7200 && (
         <Link href="/buy-credits">
