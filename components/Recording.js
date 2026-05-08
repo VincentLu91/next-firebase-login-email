@@ -417,6 +417,12 @@ const Recording = () => {
 
   const [interim, setInterim] = React.useState("");
 
+  const [askLiveState, setAskLiveState] = React.useState({
+    question: "",
+    answer: "",
+    error: "",
+  });
+
   const transcriptScrollRef = React.useRef(null);
 
   React.useEffect(() => {
@@ -548,6 +554,11 @@ const Recording = () => {
     setInterim("");
     startRecording();
     setIsTranscribing(true);
+    setAskLiveState({
+      question: "",
+      answer: "",
+      error: "",
+    });
 
     // 🔒 Get auth token from Supabase session
     const {
@@ -856,6 +867,8 @@ const Recording = () => {
             <LiveAskBox
               contextText={`${liveTranscript}\n\n${interim}`.trim()}
               disabled={!isTranscribing}
+              askLiveState={askLiveState}
+              setAskLiveState={setAskLiveState}
             />
           </div>
         );
@@ -893,11 +906,13 @@ const Recording = () => {
           </div>
           <div className="transcript" style={{ whiteSpace: "pre-wrap" }}>
             {transcript}
-            <LiveAskBox
-              contextText={(transcript || liveTranscript || "").trim()}
-              placeholder="Ask about this recording..."
-            />
           </div>
+          <LiveAskBox
+            contextText={(transcript || liveTranscript || "").trim()}
+            placeholder="Ask about this recording..."
+            askLiveState={askLiveState}
+            setAskLiveState={setAskLiveState}
+          />
         </div>
       );
     }

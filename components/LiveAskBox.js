@@ -4,11 +4,44 @@ export default function LiveAskBox({
   contextText = "",
   disabled = false,
   placeholder = "Ask about the conversation so far...",
+  askLiveState,
+  setAskLiveState,
 }) {
-  const [question, setQuestion] = React.useState("");
-  const [answer, setAnswer] = React.useState("");
+  const [fallbackState, setFallbackState] = React.useState({
+    question: "",
+    answer: "",
+    error: "",
+  });
+
+  const state = askLiveState || fallbackState;
+  const updateState = setAskLiveState || setFallbackState;
+
+  const question = state.question || "";
+  const answer = state.answer || "";
+  const error = state.error || "";
+
+  const setQuestion = (value) => {
+    updateState((prev) => ({
+      ...(prev || {}),
+      question: value,
+    }));
+  };
+
+  const setAnswer = (value) => {
+    updateState((prev) => ({
+      ...(prev || {}),
+      answer: value,
+    }));
+  };
+
+  const setError = (value) => {
+    updateState((prev) => ({
+      ...(prev || {}),
+      error: value,
+    }));
+  };
+
   const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState("");
 
   const askLive = async () => {
     const trimmedQuestion = question.trim();
