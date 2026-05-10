@@ -6,6 +6,7 @@ export default function LiveAskBox({
   placeholder = "Ask about the conversation so far...",
   askLiveState,
   setAskLiveState,
+  metadata = {},
 }) {
   const [fallbackState, setFallbackState] = React.useState({
     question: "",
@@ -77,7 +78,12 @@ export default function LiveAskBox({
           ],
           chat_history: [],
           metadata: {
+            ...metadata,
             mode: "ask_live",
+            type: "ask_live",
+            platform: "web",
+            persistMessages: false,
+            persist_messages: false,
           },
         }),
       });

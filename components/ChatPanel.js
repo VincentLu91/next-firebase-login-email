@@ -86,7 +86,16 @@ export default function ChatPanel({ sound, soundUrl }) {
         documents: splitStringIntoChunks(transcript, 30),
         chat_history: apiMessages,
         messages: apiMessages,
-        metadata: { soundUrl },
+        metadata: {
+          soundUrl,
+          user_id: user?.id,
+          userId: user?.id,
+          recording_type: sound?.file_name?.toLowerCase().includes("call")
+            ? "call"
+            : "mic",
+          platform: "web",
+          type: "chat",
+        },
       });
 
       const agentText =
