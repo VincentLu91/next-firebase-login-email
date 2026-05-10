@@ -912,6 +912,12 @@ const Recording = () => {
               disabled={!isTranscribing}
               askLiveState={askLiveState}
               setAskLiveState={setAskLiveState}
+              metadata={{
+                user_id: user?.id,
+                userId: user?.id,
+                soundUrl: `live-mic-${user?.id || "anonymous"}`,
+                recording_type: "mic",
+              }}
             />
           </div>
         );
@@ -955,6 +961,12 @@ const Recording = () => {
             placeholder="Ask about this recording..."
             askLiveState={askLiveState}
             setAskLiveState={setAskLiveState}
+            metadata={{
+              user_id: user?.id,
+              userId: user?.id,
+              soundUrl: `live-mic-${user?.id || "anonymous"}`,
+              recording_type: "mic",
+            }}
           />
         </div>
       );

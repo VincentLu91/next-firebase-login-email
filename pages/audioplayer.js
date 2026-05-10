@@ -46,6 +46,11 @@ export default function AudioPlayer() {
   const dispatch = useDispatch();
   const sound = useSelector((state) => state.recordingReducer.sound);
 
+  console.log(
+    "WEB IMPORTANT MOMENTS:",
+    JSON.stringify(sound?.recap?.important_moments, null, 2),
+  );
+
   useEffect(() => {
     if (view !== "split") return;
 
@@ -366,7 +371,15 @@ Rules:
         messages: [],
         metadata: {
           soundUrl: audioUrl,
+          user_id: user?.id,
+          userId: user?.id,
+          recording_type: sound?.file_name?.toLowerCase().includes("call")
+            ? "call"
+            : "mic",
+          platform: "web",
           type: "saved_recap",
+          persistMessages: false,
+          persist_messages: false,
         },
       });
 
@@ -915,7 +928,7 @@ Rules:
                           fontWeight: 800,
                         }}
                       >
-                        Moments to Remember
+                        Important Moments
                       </h3>
 
                       <div style={{ display: "grid", gap: 12 }}>
