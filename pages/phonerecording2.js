@@ -286,35 +286,41 @@ const PhoneRecording2 = () => {
 
   const getNumCalls = useCallback(
     async (user) => {
-      let tokenResponse = await supabase
-        .from("customers")
-        .select("*")
-        .eq("email_address", user?.email);
-      setNumCalls(tokenResponse?.data[0]?.num_calls);
-
-      // Check if user has an active subscription (not cancelled)
-      const customerId = tokenResponse?.data[0]?.id;
-      if (customerId) {
-        const { data: subscriptionData, error: subError } = await supabase
-          .from("subscriptions")
-          .select("cancel_at_period_end")
-          .eq("customer_id", customerId)
-          .single();
-
-        console.log("Subscription data:", subscriptionData);
-        console.log(
-          "Cancel at period end:",
-          subscriptionData?.cancel_at_period_end,
-        );
-
-        // Subscription is active if cancel_at_period_end is FALSE (not cancelled)
-        const isActive = subscriptionData?.cancel_at_period_end === false;
-        console.log("Is subscription active?", isActive);
-        setHasSubscription(isActive);
-      } else {
-        console.log("No customer ID found");
+      if (!user?.id) {
+        setNumCalls(0);
         setHasSubscription(false);
+        return;
       }
+
+      const { data: entitlement, error: entitlementError } = await supabase
+        .from("customers")
+        .select("id, num_calls")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (entitlementError || !entitlement) {
+        console.log("No call entitlement found for user:", user.id);
+        setNumCalls(0);
+        setHasSubscription(false);
+        return;
+      }
+
+      setNumCalls(entitlement.num_calls ?? 0);
+
+      const { data: subscriptionData, error: subError } = await supabase
+        .from("subscriptions")
+        .select("cancel_at_period_end")
+        .eq("customer_id", user.id)
+        .maybeSingle();
+
+      if (subError || !subscriptionData) {
+        console.log("No active subscription row found for user:", user.id);
+        setHasSubscription(false);
+        return;
+      }
+
+      const isActive = subscriptionData.cancel_at_period_end === false;
+      setHasSubscription(isActive);
     },
     [setNumCalls],
   );
@@ -324,7 +330,7 @@ const PhoneRecording2 = () => {
   }, [getNumCalls, user]);
 
   useEffect(() => {
-    if (!customer) return;
+    if (!user?.id) return;
     const wsUrl = process.env.NEXT_PUBLIC_WSS_URL;
     let ws = new WebSocket(wsUrl);
     let keepAliveInterval;
@@ -381,15 +387,17 @@ const PhoneRecording2 = () => {
         if (isCompletedStatus && !callCreditDeductedRef.current) {
           callCreditDeductedRef.current = true;
           try {
-            console.log("customer object should be: ", customer?.id);
+            console.log("deducting call token for user: ", user?.id);
 
-            if (customer?.id) {
+            const tokenOwnerId = user?.id;
+
+            if (tokenOwnerId) {
               const response = await axios.get(
-                `/api/calls-token?user=${customer?.id}`,
+                `/api/calls-token?user_id=${tokenOwnerId}`,
               );
 
               console.log("Calls token response:", response.data);
-              setNumCalls(response.data?.data[0]?.num_calls);
+              setNumCalls(response.data?.num_calls ?? 0);
             }
           } catch (error) {
             console.error("Error calling /api/calls-token:", error);
@@ -407,7 +415,7 @@ const PhoneRecording2 = () => {
         clearInterval(keepAliveInterval);
       }
     };
-  }, [customer]); // Empty dependency array means this runs once when component mounts
+  }, [user?.id]); // Empty dependency array means this runs once when component mounts
 
   const dialNumber = async () => {
     try {
@@ -417,8 +425,8 @@ const PhoneRecording2 = () => {
         return;
       }
 
-      if (!customer || !customer.id) {
-        alert("Please wait for customer data to load");
+      if (!user || !user.id) {
+        alert("Please wait for user data to load");
         return;
       }
 
@@ -432,9 +440,7 @@ const PhoneRecording2 = () => {
       // call the "dial" API endpoint
       const to = phoneNumber;
       const res_dial = await axios.get(
-        `/api/dialTwilio?to=${encodeURIComponent(to)}&customer_id=${
-          customer.id
-        }`,
+        `/api/dialTwilio?to=${encodeURIComponent(to)}&user_id=${customer.id}`,
       );
       setRecordingStatus("Recording In Progress...");
       if (res_dial) {
