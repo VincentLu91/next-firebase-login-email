@@ -647,6 +647,12 @@ const PhoneRecording2 = () => {
                   placeholder="Ask about this call..."
                   askLiveState={askLiveState}
                   setAskLiveState={setAskLiveState}
+                  metadata={{
+                    user_id: user?.id,
+                    userId: user?.id,
+                    soundUrl: `live-phone-${user?.id || "anonymous"}`,
+                    recording_type: "call",
+                  }}
                 />
               </>
             )}
