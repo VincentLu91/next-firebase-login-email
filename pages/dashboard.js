@@ -54,7 +54,8 @@ const Dashboard = () => {
             .select(
               "id, customer_id, file_name, duration, full_transcript, original_file_name, created_at, recap",
             )
-            .eq("customer_id", customer.id),
+            .eq("customer_id", customer.id)
+            .not("original_file_name", "is", null),
         ]);
 
         const combined = [
