@@ -42,8 +42,16 @@ export default async function handler(req, res) {
 
     console.log("Making request to Heroku endpoint...");
 
+    const callTranscribeApiBaseUrl = process.env.CALL_TRANSCRIBE_API_BASE_URL;
+
+    if (!callTranscribeApiBaseUrl) {
+      return res.status(500).json({
+        error: "CALL_TRANSCRIBE_API_BASE_URL is not configured",
+      });
+    }
+
     const response = await fetch(
-      "https://call-transcribe-heroku-b15b1132d70f.herokuapp.com/make-outbounding-call",
+      `${callTranscribeApiBaseUrl}/make-outbounding-call`,
       {
         method: "POST",
         headers: {
