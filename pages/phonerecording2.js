@@ -527,9 +527,9 @@ const PhoneRecording2 = () => {
         callRecordingInfo.recordingDuration,
       );
 
-      const insertCallResponse = await supabase
+      const saveCallResponse = await supabase
         .from("call_recordings")
-        .insert([
+        .upsert(
           {
             telnyx_call_control_id: callRecordingInfo.callSid,
             file_name: filename,
@@ -537,23 +537,24 @@ const PhoneRecording2 = () => {
             full_transcript: transcriptionText,
             customer_id: customer.id,
             recording_id: callRecordingInfo.recordingSid,
+            recording_url: callRecordingInfo.recordingUrl,
             original_file_name: file_name, // Use the new Supabase storage filename
             durationMillis,
             start_time: callRecordingInfo.recordingStartTime,
             end_time: RecordingEndTime,
-            react_native_event: callRecordingInfo.recordingStatus,
           },
-        ])
+          { onConflict: "telnyx_call_control_id" },
+        )
         .select()
         .single();
 
-      if (insertCallResponse.error) {
-        console.log(insertCallResponse.error);
+      if (saveCallResponse.error) {
+        console.log(saveCallResponse.error);
         throw new Error("Failed to save recording information");
       }
 
       // Set the saved recording in Redux so audioplayer can access it
-      dispatch(setSound(insertCallResponse.data));
+      dispatch(setSound(saveCallResponse.data));
 
       setFilename("");
 
