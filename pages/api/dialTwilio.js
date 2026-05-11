@@ -49,7 +49,10 @@ export default async function handler(req, res) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ phoneNumber: to }),
+        body: JSON.stringify({
+          phoneNumber: to,
+          customerId: user_id,
+        }),
       },
     );
 
