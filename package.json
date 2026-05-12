@@ -16,7 +16,7 @@
     "@reduxjs/toolkit": "^2.11.2",
     "@sanity/block-content-to-react": "^3.0.0",
     "@sanity/image-url": "^2.1.1",
-    "@stripe/stripe-js": "^9.4.0",
+    "@stripe/stripe-js": "^9.5.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "axios": "^1.16.0",
@@ -31,7 +31,7 @@
     "moment": "^2.30.1",
     "next": "^16.2.6",
     "nodemailer": "^8.0.7",
-    "npm-check-updates": "^22.1.1",
+    "npm-check-updates": "^22.2.0",
     "pubnub": "^11.0.0",
     "raw-body": "^3.0.2",
     "react": "^19.2.6",
@@ -46,9 +46,9 @@
     "redux-persist": "^6.0.0",
     "stripe": "^22.1.1",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^6.58.0",
+    "telnyx": "^6.63.0",
     "twilio": "^6.0.2",
-    "ws": "^8.20.0"
+    "ws": "^8.20.1"
   },
   "overrides": {
     "redux-persist": {
