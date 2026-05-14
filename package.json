@@ -19,7 +19,7 @@
     "@stripe/stripe-js": "^9.5.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
-    "axios": "^1.16.0",
+    "axios": "^1.16.1",
     "cohere-ai": "^8.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
@@ -46,7 +46,7 @@
     "redux-persist": "^6.0.0",
     "stripe": "^22.1.1",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^6.63.0",
+    "telnyx": "^6.65.0",
     "twilio": "^6.0.2",
     "ws": "^8.20.1"
   },
