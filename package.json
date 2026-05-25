@@ -18,7 +18,7 @@
     "@sanity/image-url": "^2.1.1",
     "@stripe/stripe-js": "^9.6.0",
     "@supabase/ssr": "^0.10.3",
-    "@supabase/supabase-js": "^2.106.1",
+    "@supabase/supabase-js": "^2.106.2",
     "axios": "^1.16.1",
     "cohere-ai": "^8.0.0",
     "cors": "^2.8.6",
