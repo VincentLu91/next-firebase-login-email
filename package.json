@@ -44,9 +44,9 @@
     "recordrtc": "^5.6.2",
     "redux-logger": "^4.0.0",
     "redux-persist": "^6.0.0",
-    "stripe": "^22.1.1",
+    "stripe": "^22.2.0",
     "styled-jsx": "^5.1.7",
-    "telnyx": "^6.70.0",
+    "telnyx": "^6.72.0",
     "twilio": "^6.0.2",
     "ws": "^8.21.0"
   },
