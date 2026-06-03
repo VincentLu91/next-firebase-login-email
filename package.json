@@ -19,7 +19,7 @@
     "@stripe/stripe-js": "^9.7.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.107.0",
-    "axios": "^1.16.1",
+    "axios": "^1.17.0",
     "cohere-ai": "^8.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
