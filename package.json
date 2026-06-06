@@ -31,7 +31,7 @@
     "moment": "^2.30.1",
     "next": "^16.2.7",
     "nodemailer": "^8.0.10",
-    "npm-check-updates": "^22.2.2",
+    "npm-check-updates": "^22.2.3",
     "pubnub": "^11.0.1",
     "raw-body": "^3.0.2",
     "react": "^19.2.7",
