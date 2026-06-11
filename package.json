@@ -32,7 +32,7 @@
     "next": "^16.2.9",
     "nodemailer": "^8.0.11",
     "npm-check-updates": "^22.2.3",
-    "pubnub": "^11.0.1",
+    "pubnub": "^11.0.2",
     "raw-body": "^3.0.2",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
